@@ -1,0 +1,455 @@
+/* ==========================================================
+   Cisco CCNA Exam Simulator
+   main.css
+   Version: 0.1.0
+   ========================================================== */
+
+/* ==========================================================
+   GOOGLE FONT
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+
+/* ==========================================================
+   CSS VARIABLES
+   ========================================================== */
+
+:root{
+
+    /* Background */
+
+    --bg:#eef2f7;
+    --bg-dark:#1b2430;
+    --panel:#ffffff;
+    --panel-dark:#263241;
+
+    /* Cisco */
+
+    --cisco-blue:#049fd9;
+    --cisco-blue-dark:#0077aa;
+
+    /* Text */
+
+    --text:#1c2430;
+    --text-light:#6c7784;
+    --text-white:#ffffff;
+
+    /* Status */
+
+    --success:#27ae60;
+    --warning:#f39c12;
+    --danger:#d63031;
+    --info:#3498db;
+
+    /* Borders */
+
+    --border:#dfe6ec;
+
+    /* Buttons */
+
+    --primary:#1976d2;
+    --primary-hover:#1565c0;
+
+    --secondary:#7f8c8d;
+    --secondary-hover:#69757a;
+
+    /* Radius */
+
+    --radius-small:6px;
+    --radius:10px;
+    --radius-large:18px;
+
+    /* Shadows */
+
+    --shadow:
+
+        0 2px 8px rgba(0,0,0,.08);
+
+    --shadow-large:
+
+        0 10px 30px rgba(0,0,0,.15);
+
+}
+
+
+/* ==========================================================
+   RESET
+   ========================================================== */
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    font-family:'Inter',sans-serif;
+
+    min-height:100vh;
+
+    overflow:hidden;
+
+}
+
+
+/* ==========================================================
+   LINKS
+   ========================================================== */
+
+a{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+
+/* ==========================================================
+   LISTS
+   ========================================================== */
+
+ul{
+
+    list-style:none;
+
+}
+
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+button{
+
+    font-family:inherit;
+
+    cursor:pointer;
+
+    border:none;
+
+    transition:.25s;
+
+}
+
+button:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+}
+
+
+/* ==========================================================
+   INPUTS
+   ========================================================== */
+
+input{
+
+    font-family:inherit;
+
+    outline:none;
+
+}
+
+
+/* ==========================================================
+   IMAGES
+   ========================================================== */
+
+img{
+
+    max-width:100%;
+
+    display:block;
+
+}
+
+
+/* ==========================================================
+   APP
+   ========================================================== */
+
+#app{
+
+    display:flex;
+
+    flex-direction:column;
+
+    height:100vh;
+
+}
+
+
+/* ==========================================================
+   COMMON BUTTONS
+   ========================================================== */
+
+.btn{
+
+    padding:
+
+        12px 22px;
+
+    border-radius:
+
+        var(--radius-small);
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+/* Primary */
+
+.btn-primary{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+.btn-primary:hover{
+
+    background:var(--primary-hover);
+
+}
+
+/* Secondary */
+
+.btn-secondary{
+
+    background:var(--secondary);
+
+    color:white;
+
+}
+
+.btn-secondary:hover{
+
+    background:var(--secondary-hover);
+
+}
+
+/* Danger */
+
+.btn-danger{
+
+    background:var(--danger);
+
+    color:white;
+
+}
+
+/* Warning */
+
+.btn-warning{
+
+    background:var(--warning);
+
+    color:white;
+
+}
+
+/* Light */
+
+.btn-light{
+
+    background:#ecf0f1;
+
+}
+
+
+/* ==========================================================
+   CARD
+   ========================================================== */
+
+.card{
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+
+/* ==========================================================
+   TEXT
+   ========================================================== */
+
+.text-center{
+
+    text-align:center;
+
+}
+
+.text-right{
+
+    text-align:right;
+
+}
+
+.bold{
+
+    font-weight:600;
+
+}
+
+
+/* ==========================================================
+   HIDDEN
+   ========================================================== */
+
+.hidden{
+
+    display:none !important;
+
+}
+
+
+/* ==========================================================
+   SCROLLBAR
+   ========================================================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#eceff3;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#b5bcc4;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#8b949e;
+
+}
+
+
+/* ==========================================================
+   TRANSITIONS
+   ========================================================== */
+
+.fade{
+
+    animation:fade .25s ease;
+
+}
+
+@keyframes fade{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+
+/* ==========================================================
+   LOADING SPINNER
+   ========================================================== */
+
+.spinner{
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:50%;
+
+    border:5px solid #dfe6ec;
+
+    border-top:5px solid var(--cisco-blue);
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+
+/* ==========================================================
+   TERMINAL FONT
+   ========================================================== */
+
+.terminal-font{
+
+    font-family:'JetBrains Mono',monospace;
+
+}
+
+
+/* ==========================================================
+   FOCUS
+   ========================================================== */
+
+button:focus,
+input:focus{
+
+    outline:2px solid var(--cisco-blue);
+
+    outline-offset:2px;
+
+}
+
+
+/* ==========================================================
+   SELECTION
+   ========================================================== */
+
+::selection{
+
+    background:var(--cisco-blue);
+
+    color:white;
+
+}
