@@ -1,0 +1,24 @@
+{
+  "title": "Simulador Cisco CCNA 200-301",
+  "version": "1.0.0",
+  "language": "pt-BR",
+  "duration": 120,
+  "passingScore": 82,
+  "shuffleQuestions": true,
+  "shuffleAnswers": true,
+  "showExplanationAfterAnswer": false,
+  "showScoreAtEnd": true,
+  "allowReview": true,
+  "questionSelection": "random",
+
+  "domains": [
+    {
+      "id": "network-fundamentals",
+      "name": "Fundamentos de Rede",
+      "objective": "1.0",
+      "questionsPerExam": 20,
+      "totalQuestions": 300,
+      "file": "data/network-fundamentals.json"
+    }
+  ]
+}
