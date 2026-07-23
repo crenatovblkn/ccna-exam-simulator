@@ -196,14 +196,21 @@ class NavigationController {
 
     refresh() {
 
-        this.render();
+    this.render();
 
-        this.updateNavigation();
+    this.updateNavigation();
+
+    try {
 
         this.save();
 
+    } catch (e) {
+
+        console.error("Erro no Storage:", e);
+
     }
 
+}
     /*
     ======================================================
     Renderização
