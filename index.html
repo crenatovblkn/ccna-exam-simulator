@@ -32,6 +32,88 @@
 
 <div id="app">
 
+<div id="startScreen" class="start-screen">
+
+    <div class="start-card">
+
+        <h1>Cisco CCNA 200-301</h1>
+
+        <h2>Exam Simulator</h2>
+
+        <p class="bank-info">
+            Question Bank:
+            <strong id="questionBankSize">0</strong>
+            questions
+        </p>
+
+        <div class="exam-options">
+
+            <label class="exam-option">
+
+                <input
+                    type="radio"
+                    name="examMode"
+                    value="20"
+                    checked>
+
+                <div>
+
+                    <strong>Quick Practice</strong>
+
+                    <span>20 Questions • 30 Minutes</span>
+
+                </div>
+
+            </label>
+
+            <label class="exam-option">
+
+                <input
+                    type="radio"
+                    name="examMode"
+                    value="45">
+
+                <div>
+
+                    <strong>Standard Exam</strong>
+
+                    <span>45 Questions • 60 Minutes</span>
+
+                </div>
+
+            </label>
+
+            <label class="exam-option">
+
+                <input
+                    type="radio"
+                    name="examMode"
+                    value="90">
+
+                <div>
+
+                    <strong>Full Exam</strong>
+
+                    <span>90 Questions • 120 Minutes</span>
+
+                </div>
+
+            </label>
+
+        </div>
+
+        <button
+            id="startExamButton"
+            class="btn btn-primary start-button">
+
+            START EXAM
+
+        </button>
+
+    </div>
+
+</div>	
+
 <header class="top-header">
 
     <div class="logo-area">
@@ -64,7 +146,7 @@
 
 </header>
 
-<div class="main-container">
+<div id="examScreen" class="main-container" hidden>
 
 <aside
     id="sidebar"
