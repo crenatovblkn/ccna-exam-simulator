@@ -42,6 +42,8 @@ class App {
 
     async initialize() {
 
+        console.log("2 - Questões carregadas");
+
         if (this.initialized) {
             return;
         }
@@ -91,8 +93,11 @@ Botão START EXAM
 const startButton =
     document.getElementById("startExamButton");
 
+    console.log("3 - Botão:", startButton);    
+
 startButton.addEventListener("click",()=>{
 
+    console.log("4 - Clique recebido");
     this.startExam();
 
 });
