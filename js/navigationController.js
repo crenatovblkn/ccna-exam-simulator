@@ -212,7 +212,7 @@ class NavigationController {
 
     render() {
 
-        this.app.renderer.renderCurrentQuestion();
+        this.app.renderer.render();
 
     }
 

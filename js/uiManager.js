@@ -50,59 +50,104 @@ class UIManager {
 
     cacheElements() {
 
-        this.elements = {
+    this.elements = {
 
-            questionContainer:
-                document.getElementById("question-container"),
+        question:
+            document.getElementById("question"),
 
-            answersContainer:
-                document.getElementById("answers-container"),
+        answers:
+            document.getElementById("answers"),
 
-            explanationContainer:
-                document.getElementById("explanation-container"),
+        explanation:
+            document.getElementById("explanation"),
 
-            imageContainer:
-                document.getElementById("image-container"),
+        image:
+            document.getElementById("image"),
 
-            progressBar:
-                document.getElementById("progress-bar"),
+        scenario:
+            document.getElementById("scenario"),
 
-            progressText:
-                document.getElementById("progress-text"),
+        progressBar:
+            document.getElementById("progressBar"),
 
-            timer:
-                document.getElementById("timer"),
+        progressText:
+            document.getElementById("progressText"),
 
-            previousButton:
-                document.getElementById("btn-previous"),
+        timer:
+            document.getElementById("timer"),
 
-            nextButton:
-                document.getElementById("btn-next"),
+        previousButton:
+            document.getElementById("previousButton"),
 
-            finishButton:
-                document.getElementById("btn-finish"),
+        nextButton:
+            document.getElementById("nextButton"),
 
-            reviewButton:
-                document.getElementById("btn-review"),
+        finishButton:
+            document.getElementById("finishButton"),
 
-            navigationPanel:
-                document.getElementById("navigation-panel"),
+        reviewButton:
+            document.getElementById("reviewButton"),
 
-            statusBar:
-                document.getElementById("status-bar"),
+        navigationPanel:
+            document.getElementById("navigationPanel"),
 
-            sidebar:
-                document.getElementById("sidebar"),
+        questionCounter:
+            document.getElementById("questionCounter"),
 
-            modal:
-                document.getElementById("modal"),
+        answeredCount:
+            document.getElementById("answeredCount"),
 
-            loading:
-                document.getElementById("loading")
+        remainingCount:
+            document.getElementById("remainingCount"),
 
-        };
+        reviewCount:
+            document.getElementById("reviewCount"),
 
-    }
+        statisticsAnswered:
+            document.getElementById("statisticsAnswered"),
+
+        statisticsRemaining:
+            document.getElementById("statisticsRemaining"),
+
+        statisticsReview:
+            document.getElementById("statisticsReview"),
+
+        statisticsTime:
+            document.getElementById("statisticsTime"),
+
+        resultCorrect:
+            document.getElementById("resultCorrect"),
+
+        resultIncorrect:
+            document.getElementById("resultIncorrect"),
+
+        resultTotal:
+            document.getElementById("resultTotal"),
+
+        resultPercentage:
+            document.getElementById("resultPercentage"),
+
+        resultStatus:
+            document.getElementById("resultStatus"),
+
+        reviewQuestions:
+            document.getElementById("reviewQuestions"),
+
+        statusBar:
+            document.getElementById("statusBar"),
+
+        sidebar:
+            document.getElementById("sidebar"),
+
+        modal:
+            document.getElementById("modal"),
+
+        loading:
+            document.getElementById("loading")
+
+    };
+
+}
 
     /*
     ======================================================

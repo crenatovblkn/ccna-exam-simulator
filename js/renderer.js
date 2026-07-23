@@ -69,7 +69,7 @@ class Renderer {
 
         const engine = this.engine();
 
-        if (!engine.hasQuestions()) {
+        if (engine.getTotalQuestions() === 0) {
             return;
         }
 
@@ -757,9 +757,10 @@ class Renderer {
         const results =
 
             this.engine()
+			
+			     .calculateScore();
 
-                .getResults();
-
+                
         const ui = this.ui();
 
         ui.setText(

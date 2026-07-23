@@ -152,7 +152,6 @@ class ExamEngine {
 
     }
 
-}
 
 /*
 ======================================================
@@ -696,5 +695,5 @@ getState() {
         score: this.calculateScore()
 
     };
-
+}
 }
