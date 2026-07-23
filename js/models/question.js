@@ -22,13 +22,18 @@ class Question {
         this.explanation = data.explanation || "";
         this.image = data.image || null;
 
-        this.answers = Array.isArray(data.answers)
-            ? data.answers.map(answer =>
-                answer instanceof Answer
-                    ? answer
-                    : new Answer(answer)
-              )
-            : [];
+       this.answers = Array.isArray(data.answers)
+    ? data.answers.map((answer, index) => {
+
+        console.log("Questão:", data.id);
+        console.log("Resposta", index, answer);
+
+        return answer instanceof Answer
+            ? answer
+            : new Answer(answer);
+
+      })
+    : [];
 
         this.correctAnswers = Array.isArray(data.correctAnswers)
             ? [...data.correctAnswers]
