@@ -3,10 +3,6 @@
 CCNA Exam Simulator
 Question Model
 ==========================================================
-
-Representa uma questão individual durante a execução
-do exame.
-==========================================================
 */
 
 class Question {
@@ -22,36 +18,52 @@ class Question {
         this.explanation = data.explanation || "";
         this.image = data.image || null;
 
-       this.answers = Array.isArray(data.answers)
-    ? data.answers.map((answer, index) => {
+        this.answers = Array.isArray(data.answers)
+            ? data.answers.map(answer =>
+                answer instanceof Answer
+                    ? answer
+                    : new Answer(answer)
+              )
+            : [];
 
-        console.log("Questão:", data.id);
-        console.log("Resposta", index, answer);
+        /*
+        Compatível com os dois formatos:
 
-        return answer instanceof Answer
-            ? answer
-            : new Answer(answer);
+        Antigo:
+        correctAnswers: ["1"]
 
-      })
-    : [];
+        Novo:
+        answers[].correct = true
+        */
 
-       this.correctAnswers = Array.isArray(data.correctAnswers)
-    ? [...data.correctAnswers]
-    : this.answers
-          .filter(answer => answer.isCorrect())
-          .map(answer => answer.getId());
+        if (
+            Array.isArray(data.correctAnswers) &&
+            data.correctAnswers.length > 0
+        ) {
+
+            this.correctAnswers =
+                data.correctAnswers.map(String);
+
+        } else {
+
+            this.correctAnswers = this.answers
+                .filter(answer => answer.isCorrect())
+                .map(answer => String(answer.getId()));
+
+        }
 
         this.lab = data.lab || null;
         this.cli = data.cli || null;
         this.dragdrop = data.dragdrop || null;
 
         this.userAnswers = Array.isArray(data.userAnswers)
-            ? [...data.userAnswers]
+            ? data.userAnswers.map(String)
             : [];
 
         this.review = Boolean(data.review);
         this.answered = Boolean(data.answered);
         this.visited = Boolean(data.visited);
+
     }
 
     /*
@@ -95,27 +107,34 @@ class Question {
     getScenario() {
 
         if (this.cli) {
+
             return {
                 type: "cli",
                 content: this.cli
             };
+
         }
 
         if (this.lab) {
+
             return {
                 type: "lab",
                 content: this.lab
             };
+
         }
 
         if (this.dragdrop) {
+
             return {
                 type: "dragdrop",
                 content: this.dragdrop
             };
+
         }
 
         return null;
+
     }
 
     /*
@@ -126,19 +145,26 @@ class Question {
 
     answer(answerId) {
 
+        answerId = String(answerId);
+
         if (!this.userAnswers.includes(answerId)) {
+
             this.userAnswers.push(answerId);
+
         }
 
         this.answers.forEach(answer => {
 
-            if (answer.getId() === answerId) {
+            if (String(answer.getId()) === answerId) {
+
                 answer.select();
+
             }
 
         });
 
         this.answered = this.userAnswers.length > 0;
+
     }
 
     setAnswers(answerIds = []) {
@@ -156,10 +182,13 @@ class Question {
         this.answers.forEach(answer => answer.reset());
 
         this.answered = false;
+
     }
 
     getUserAnswers() {
+
         return this.userAnswers;
+
     }
 
     /*
@@ -169,16 +198,23 @@ class Question {
     */
 
     setReview(value = true) {
+
         this.review = Boolean(value);
+
     }
 
     toggleReview() {
+
         this.review = !this.review;
+
         return this.review;
+
     }
 
     isMarkedForReview() {
+
         return this.review;
+
     }
 
     /*
@@ -188,11 +224,15 @@ class Question {
     */
 
     visit() {
+
         this.visited = true;
+
     }
 
     wasVisited() {
+
         return this.visited;
+
     }
 
     /*
@@ -202,7 +242,9 @@ class Question {
     */
 
     isAnswered() {
+
         return this.answered;
+
     }
 
     reset() {
@@ -211,6 +253,7 @@ class Question {
 
         this.review = false;
         this.visited = false;
+
     }
 
     /*
@@ -221,12 +264,17 @@ class Question {
 
     isCorrect() {
 
-        if (this.userAnswers.length !== this.correctAnswers.length) {
+        if (
+            this.userAnswers.length !==
+            this.correctAnswers.length
+        ) {
+
             return false;
+
         }
 
-        return this.correctAnswers.every(answer =>
-            this.userAnswers.includes(answer)
+        return this.correctAnswers.every(id =>
+            this.userAnswers.includes(String(id))
         );
 
     }
@@ -257,11 +305,14 @@ class Question {
             domain: this.domain,
             type: this.type,
             difficulty: this.difficulty,
+
             question: this.question,
             explanation: this.explanation,
             image: this.image,
 
-            answers: this.answers.map(answer => answer.toJSON()),
+            answers: this.answers.map(
+                answer => answer.toJSON()
+            ),
 
             correctAnswers: [...this.correctAnswers],
 
