@@ -46,21 +46,60 @@ class App {
             return;
         }
 
-        this.createModules();
+       this.createModules();
 
-        this.ui.initialize();
+this.ui.initialize();
 
-        await this.loadQuestions();
+await this.loadQuestions();
 
-        this.createExam();
+/*
+=====================================================
+Atualiza tela inicial
+=====================================================
+*/
 
-        this.restoreState();
+const bank = document.getElementById("questionBankSize");
 
-        this.navigation.initialize();
-        this.renderer.initialize();
-        this.renderer.render();
-        this.ui.hide("loading");
-        this.initialized = true;
+if(bank){
+
+    bank.textContent =
+        this.questionManager.questions.length;
+
+}
+
+/*
+=====================================================
+Esconde tela da prova
+=====================================================
+*/
+
+const examScreen =
+    document.getElementById("examScreen");
+
+if(examScreen){
+
+    examScreen.classList.add("hidden");
+
+}
+
+/*
+=====================================================
+Botão START EXAM
+=====================================================
+*/
+
+const startButton =
+    document.getElementById("startExamButton");
+
+startButton.addEventListener("click",()=>{
+
+    this.startExam();
+
+});
+
+this.ui.hide("loading");
+
+this.initialized=true;
 
     }
 
@@ -120,6 +159,39 @@ class App {
 
     }
 
+    /*
+=====================================================
+Iniciar Exame
+=====================================================
+*/
+
+startExam(){
+
+    const startScreen =
+        document.getElementById("startScreen");
+
+    const examScreen =
+        document.getElementById("examScreen");
+
+    startScreen.classList.remove("active");
+
+    startScreen.classList.add("hidden");
+
+    examScreen.classList.remove("hidden");
+
+    this.createExam();
+
+    this.restoreState();
+
+    this.navigation.initialize();
+
+    this.renderer.initialize();
+
+    this.renderer.render();
+
+}
+
+    
     /*
     ======================================================
     Restaurar Estado
