@@ -293,16 +293,32 @@ if (!response.ok) {
 
         }
 
-        if (question.getCorrectAnswers().length === 0) {
+		console.log(
+        question.getId(),
+        question.getCorrectAnswers()
+       );
 
-            throw new Error(
+        const correctAnswers = question.getCorrectAnswers();
 
-                `Question ${question.getId()} has no correct answers.`
+if (
+    !Array.isArray(correctAnswers) ||
+    correctAnswers.length === 0
+) {
 
-            );
+    const detected = question
+        .getAnswers()
+        .filter(answer => answer.isCorrect())
+        .map(answer => answer.getId());
 
-        }
+    if (detected.length === 0) {
 
+        throw new Error(
+            `Question ${question.getId()} has no correct answers.`
+        );
+
+    }
+
+}
         this.validateQuestionType(question);
 
     }
