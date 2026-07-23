@@ -453,3 +453,6 @@ input:focus{
     color:white;
 
 }
+
+/* hidden support */
+[hidden]{display:none !important;}
