@@ -6,7 +6,6 @@ Question Model
 
 Representa uma questão individual durante a execução
 do exame.
-
 ==========================================================
 */
 
@@ -14,62 +13,38 @@ class Question {
 
     constructor(data = {}) {
 
-        /*
-        ==================================================
-        Dados da Questão
-        ==================================================
-        */
-
         this.id = data.id || "";
-
         this.domain = data.domain || "";
-
         this.type = data.type || "single";
-
         this.difficulty = data.difficulty || "easy";
 
         this.question = data.question || "";
-
         this.explanation = data.explanation || "";
-
         this.image = data.image || null;
 
-        /*
-        ==================================================
-        Alternativas
-        ==================================================
-        */
+        this.answers = Array.isArray(data.answers)
+            ? data.answers.map(answer =>
+                answer instanceof Answer
+                    ? answer
+                    : new Answer(answer)
+              )
+            : [];
 
-        this.answers = data.answers || [];
-
-        this.correctAnswers = data.correctAnswers || [];
-
-        /*
-        ==================================================
-        Laboratórios
-        ==================================================
-        */
+        this.correctAnswers = Array.isArray(data.correctAnswers)
+            ? [...data.correctAnswers]
+            : [];
 
         this.lab = data.lab || null;
-
         this.cli = data.cli || null;
-
         this.dragdrop = data.dragdrop || null;
 
-        /*
-        ==================================================
-        Estado da Questão
-        ==================================================
-        */
+        this.userAnswers = Array.isArray(data.userAnswers)
+            ? [...data.userAnswers]
+            : [];
 
-        this.userAnswers = [];
-
-        this.review = false;
-
-        this.answered = false;
-
-        this.visited = false;
-
+        this.review = Boolean(data.review);
+        this.answered = Boolean(data.answered);
+        this.visited = Boolean(data.visited);
     }
 
     /*
@@ -79,39 +54,61 @@ class Question {
     */
 
     getId() {
-
         return this.id;
+    }
 
+    getDomain() {
+        return this.domain;
     }
 
     getType() {
-
         return this.type;
-
     }
 
     getQuestion() {
-
         return this.question;
-
     }
 
-    getAnswers() {
-
-        return this.answers;
-
-    }
-
-    getCorrectAnswers() {
-
-        return this.correctAnswers;
-
+    getExplanation() {
+        return this.explanation;
     }
 
     getImage() {
-
         return this.image;
+    }
 
+    getAnswers() {
+        return this.answers;
+    }
+
+    getCorrectAnswers() {
+        return this.correctAnswers;
+    }
+
+    getScenario() {
+
+        if (this.cli) {
+            return {
+                type: "cli",
+                content: this.cli
+            };
+        }
+
+        if (this.lab) {
+            return {
+                type: "lab",
+                content: this.lab
+            };
+        }
+
+        if (this.dragdrop) {
+            return {
+                type: "dragdrop",
+                content: this.dragdrop
+            };
+        }
+
+        return null;
     }
 
     /*
@@ -120,23 +117,28 @@ class Question {
     ======================================================
     */
 
-    answer(answer) {
+    answer(answerId) {
 
-        if (!this.userAnswers.includes(answer)) {
-
-            this.userAnswers.push(answer);
-
+        if (!this.userAnswers.includes(answerId)) {
+            this.userAnswers.push(answerId);
         }
 
-        this.answered = true;
+        this.answers.forEach(answer => {
 
+            if (answer.getId() === answerId) {
+                answer.select();
+            }
+
+        });
+
+        this.answered = this.userAnswers.length > 0;
     }
 
-    setAnswers(answers) {
+    setAnswers(answerIds = []) {
 
-        this.userAnswers = [...answers];
+        this.clearAnswers();
 
-        this.answered = answers.length > 0;
+        answerIds.forEach(id => this.answer(id));
 
     }
 
@@ -144,14 +146,13 @@ class Question {
 
         this.userAnswers = [];
 
-        this.answered = false;
+        this.answers.forEach(answer => answer.reset());
 
+        this.answered = false;
     }
 
     getUserAnswers() {
-
         return this.userAnswers;
-
     }
 
     /*
@@ -161,15 +162,16 @@ class Question {
     */
 
     setReview(value = true) {
+        this.review = Boolean(value);
+    }
 
-        this.review = value;
-
+    toggleReview() {
+        this.review = !this.review;
+        return this.review;
     }
 
     isMarkedForReview() {
-
         return this.review;
-
     }
 
     /*
@@ -179,15 +181,11 @@ class Question {
     */
 
     visit() {
-
         this.visited = true;
-
     }
 
     wasVisited() {
-
         return this.visited;
-
     }
 
     /*
@@ -197,9 +195,15 @@ class Question {
     */
 
     isAnswered() {
-
         return this.answered;
+    }
 
+    reset() {
+
+        this.clearAnswers();
+
+        this.review = false;
+        this.visited = false;
     }
 
     /*
@@ -210,23 +214,25 @@ class Question {
 
     isCorrect() {
 
-        if (
-
-            this.userAnswers.length !==
-
-            this.correctAnswers.length
-
-        ) {
-
+        if (this.userAnswers.length !== this.correctAnswers.length) {
             return false;
-
         }
 
         return this.correctAnswers.every(answer =>
-
             this.userAnswers.includes(answer)
-
         );
+
+    }
+
+    /*
+    ======================================================
+    Clone
+    ======================================================
+    */
+
+    clone() {
+
+        return new Question(this.toJSON());
 
     }
 
@@ -241,38 +247,34 @@ class Question {
         return {
 
             id: this.id,
-
             domain: this.domain,
-
             type: this.type,
-
             difficulty: this.difficulty,
-
             question: this.question,
-
             explanation: this.explanation,
-
             image: this.image,
 
-            answers: this.answers,
+            answers: this.answers.map(answer => answer.toJSON()),
 
-            correctAnswers: this.correctAnswers,
+            correctAnswers: [...this.correctAnswers],
 
             lab: this.lab,
-
             cli: this.cli,
-
             dragdrop: this.dragdrop,
 
-            userAnswers: this.userAnswers,
+            userAnswers: [...this.userAnswers],
 
             review: this.review,
-
             answered: this.answered,
-
             visited: this.visited
 
         };
+
+    }
+
+    static fromJSON(data) {
+
+        return new Question(data);
 
     }
 
