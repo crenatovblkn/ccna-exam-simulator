@@ -384,10 +384,7 @@
     "references": [
       "Cisco CCNA 200-301 Official Cert Guide Volume 1"
     ]
-  }
-]
-
-,
+  },
 {
   "id": "NF-0011",
   "type": "single-choice",
@@ -7499,3 +7496,4 @@
     "Cisco CCNA 200-301 Official Cert Guide Volume 1"
   ]
 }
+]
