@@ -16,7 +16,7 @@
 
     color:#fff;
 
-    display:flex;
+    display:none;
 
     align-items:center;
 
@@ -602,7 +602,7 @@
 
     background:rgba(255,255,255,.90);
 
-    display:flex;
+    display:none;
 
     justify-content:center;
 
@@ -842,3 +842,6 @@
     font-size:15px;
 
 }
+
+.modal:not([hidden]){display:flex;}
+.loading:not([hidden]){display:flex;}
