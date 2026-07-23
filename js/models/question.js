@@ -35,9 +35,11 @@ class Question {
       })
     : [];
 
-        this.correctAnswers = Array.isArray(data.correctAnswers)
-            ? [...data.correctAnswers]
-            : [];
+       this.correctAnswers = Array.isArray(data.correctAnswers)
+    ? [...data.correctAnswers]
+    : this.answers
+          .filter(answer => answer.isCorrect())
+          .map(answer => answer.getId());
 
         this.lab = data.lab || null;
         this.cli = data.cli || null;
