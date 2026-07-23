@@ -5,47 +5,18 @@
 
     <meta charset="UTF-8">
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>CCNA 200-301 Exam Simulator</title>
+    <title>CCNA Exam Simulator</title>
 
-    <meta name="description"
-          content="Professional Cisco CCNA 200-301 Exam Simulator">
-
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="css/main.css">
-
-    <link rel="stylesheet"
-          href="css/layout.css">
-
-    <link rel="stylesheet"
-          href="css/components.css">
-
-    <link rel="stylesheet"
-          href="css/responsive.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/layout.css">
 
 </head>
 
 <body>
 
-<!-- ===================================================== -->
-<!-- LOADING -->
-<!-- ===================================================== -->
-
-<div id="loading-screen"
-     class="loading-screen">
+<div id="loading" class="loading">
 
     <div class="loading-box">
 
@@ -59,213 +30,81 @@
 
 </div>
 
-<!-- ===================================================== -->
-<!-- APPLICATION -->
-<!-- ===================================================== -->
+<div id="app">
 
-<div id="app"
-     class="app-container">
+<header class="top-header">
 
-<!-- ===================================================== -->
-<!-- HEADER -->
-<!-- ===================================================== -->
+    <div class="logo-area">
 
-<header class="topbar">
+        <div class="title-area">
 
-    <div class="topbar-left">
+            <h1>Cisco CCNA 200-301 Exam Simulator</h1>
 
-        <img
-            src="assets/images/cisco-logo.png"
-            class="logo"
-            alt="Cisco">
-
-        <div>
-
-            <h1>
-
-                Cisco CCNA 200-301
-
-            </h1>
-
-            <span>
-
-                Practice Examination
-
-            </span>
+            <span>Practice Exam</span>
 
         </div>
 
     </div>
 
-    <div class="topbar-center">
+    <div class="question-area-header">
 
-        <div class="status-card">
+        <span class="label">QUESTION</span>
 
-            <span>
-
-                Candidate
-
-            </span>
-
-            <strong id="candidate-name">
-
-                Guest
-
-            </strong>
-
-        </div>
-
-        <div class="status-card">
-
-            <span>
-
-                Question
-
-            </span>
-
-            <strong id="question-counter">
-
-                1 / 60
-
-            </strong>
-
-        </div>
-
-        <div class="status-card">
-
-            <span>
-
-                Answered
-
-            </span>
-
-            <strong id="answered-counter">
-
-                0
-
-            </strong>
-
-        </div>
-
-        <div class="status-card">
-
-            <span>
-
-                Review
-
-            </span>
-
-            <strong id="review-counter">
-
-                0
-
-            </strong>
-
-        </div>
+        <strong id="questionCounter">0 / 0</strong>
 
     </div>
 
-    <div class="topbar-right">
+    <div class="timer-area">
 
-        <div
-            id="timer"
-            class="timer">
+        <span class="label">TIME REMAINING</span>
 
-            02:00:00
-
-        </div>
-
-        <button
-            id="finishExamButton"
-            class="btn btn-danger">
-
-            Finish Exam
-
-        </button>
+        <strong id="timer">00:00:00</strong>
 
     </div>
 
 </header>
 
-<!-- ===================================================== -->
-<!-- MAIN -->
-<!-- ===================================================== -->
+<div class="main-container">
 
-<div class="main-layout">
-
-<!-- ===================================================== -->
-<!-- SIDEBAR -->
-<!-- ===================================================== -->
-
-<aside class="sidebar">
+<aside
+    id="sidebar"
+    class="sidebar">
 
     <div class="sidebar-title">
 
-        Question Navigator
+        Navigation
 
     </div>
 
     <div
-        id="navigator"
-        class="navigator-grid">
-
-        <!-- Criado dinamicamente -->
+        id="navigationPanel"
+        class="question-grid">
 
     </div>
 
-    <div class="sidebar-title">
-
-        Legend
-
-    </div>
-
-    <div class="legend">
+    <div class="sidebar-legend">
 
         <div class="legend-item">
 
-            <span class="legend-color unanswered"></span>
+            <div class="legend-box answered"></div>
 
-            <span>
-
-                Unanswered
-
-            </span>
+            <span>Answered</span>
 
         </div>
 
         <div class="legend-item">
 
-            <span class="legend-color answered"></span>
+            <div class="legend-box review"></div>
 
-            <span>
-
-                Answered
-
-            </span>
+            <span>Review</span>
 
         </div>
 
         <div class="legend-item">
 
-            <span class="legend-color review"></span>
+            <div class="legend-box unanswered"></div>
 
-            <span>
-
-                Marked for Review
-
-            </span>
-
-        </div>
-
-        <div class="legend-item">
-
-            <span class="legend-color current"></span>
-
-            <span>
-
-                Current Question
-
-            </span>
+            <span>Unanswered</span>
 
         </div>
 
@@ -273,175 +112,266 @@
 
 </aside>
 
-<!-- ===================================================== -->
-<!-- CONTENT -->
-<!-- ===================================================== -->
+<div class="exam-container">
 
-<main class="content">
+<div class="exam-card">
 
-<section
-    id="question-container"
-    class="question-container">
+<div class="exam-header">
 
-<!-- Renderer.js irá inserir a questão aqui -->
+    <div class="domain">
 
-</section>
+        CCNA 200-301
 
-<!-- ===================================================== -->
-<!-- NAVIGATION -->
-<!-- ===================================================== -->
+    </div>
 
-<div class="navigation-bar">
+    <progress
+        id="progressBar"
+        value="0"
+        max="100">
+    </progress>
+
+    <span id="progressText">
+
+        0 / 0
+
+    </span>
+
+</div>
+
+<div class="question-body">
+
+    <section
+        id="scenario"
+        hidden>
+    </section>
+
+    <section
+        id="image"
+        hidden>
+    </section>
+
+    <section
+        id="question"
+        class="question-text">
+    </section>
+
+    <section
+        id="answers"
+        class="answers">
+    </section>
+
+    <section
+        id="explanation"
+        hidden>
+    </section>
+	
+<div class="exam-footer">
 
     <button
         id="previousButton"
-        class="btn">
+        class="btn btn-secondary"
+        type="button">
 
         Previous
 
     </button>
 
-    <button
-        id="reviewButton"
-        class="btn btn-warning">
+    <div class="footer-center">
 
-        Mark for Review
+        <button
+            id="reviewButton"
+            class="btn btn-warning"
+            type="button">
 
-    </button>
+            Mark for Review
 
-    <button
-        id="nextButton"
-        class="btn btn-primary">
+        </button>
 
-        Next
+        <button
+            id="nextButton"
+            class="btn btn-primary"
+            type="button">
 
-    </button>
+            Next
 
-</div>
+        </button>
 
-</main>
+        <button
+            id="finishButton"
+            class="btn btn-danger"
+            type="button"
+            hidden>
 
-</div>
+            Finish Exam
 
-<!-- ===================================================== -->
-<!-- FINISH EXAM MODAL -->
-<!-- ===================================================== -->
-
-<div id="finishModal"
-     class="modal hidden">
-
-    <div class="modal-overlay"></div>
-
-    <div class="modal-window">
-
-        <div class="modal-header">
-
-            <h2>Finish Exam</h2>
-
-        </div>
-
-        <div class="modal-body">
-
-            <p>
-
-                Are you sure you want to finish the exam?
-
-            </p>
-
-            <div class="exam-summary">
-
-                <div class="summary-item">
-
-                    <span>Answered</span>
-
-                    <strong id="summaryAnswered">
-
-                        0
-
-                    </strong>
-
-                </div>
-
-                <div class="summary-item">
-
-                    <span>Unanswered</span>
-
-                    <strong id="summaryUnanswered">
-
-                        60
-
-                    </strong>
-
-                </div>
-
-                <div class="summary-item">
-
-                    <span>Review</span>
-
-                    <strong id="summaryReview">
-
-                        0
-
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="modal-footer">
-
-            <button
-                id="cancelFinishButton"
-                class="btn">
-
-                Cancel
-
-            </button>
-
-            <button
-                id="confirmFinishButton"
-                class="btn btn-danger">
-
-                Finish Exam
-
-            </button>
-
-        </div>
+        </button>
 
     </div>
 
 </div>
 
-<!-- ===================================================== -->
-<!-- TIME EXPIRED MODAL -->
-<!-- ===================================================== -->
+</div>
 
-<div id="timeExpiredModal"
-     class="modal hidden">
+</div>
 
-    <div class="modal-overlay"></div>
+</div>
+
+<footer
+    id="statusBar"
+    class="status-bar">
+
+    <span>
+
+        Answered:
+        <strong id="answeredCount">0</strong>
+
+    </span>
+
+    <span>
+
+        Remaining:
+        <strong id="remainingCount">0</strong>
+
+    </span>
+
+    <span>
+
+        Review:
+        <strong id="reviewCount">0</strong>
+
+    </span>
+
+    <span>
+
+        Time:
+        <strong id="statisticsTime">00:00:00</strong>
+
+    </span>
+
+</footer>
+
+<div
+    id="modal"
+    class="modal"
+    hidden>
 
     <div class="modal-window">
 
         <div class="modal-header">
 
-            <h2>Time Expired</h2>
+            <h2>
+
+                Exam Results
+
+            </h2>
 
         </div>
 
         <div class="modal-body">
 
+            <table class="results-table">
+
+                <tr>
+
+                    <td>Correct</td>
+
+                    <td id="resultCorrect">0</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Incorrect</td>
+
+                    <td id="resultIncorrect">0</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Total</td>
+
+                    <td id="resultTotal">0</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Percentage</td>
+
+                    <td id="resultPercentage">0%</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Status</td>
+
+                    <td id="resultStatus">-</td>
+
+                </tr>
+
+            </table>
+
+            <hr>
+
+            <table class="statistics-table">
+
+                <tr>
+
+                    <td>Answered</td>
+
+                    <td id="statisticsAnswered">0</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Remaining</td>
+
+                    <td id="statisticsRemaining">0</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Review</td>
+
+                    <td id="statisticsReview">0</td>
+
+                </tr>
+
+	                <tr>
+
+                    <td>Elapsed Time</td>
+
+                    <td id="statisticsTime">
+
+                        00:00:00
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+            <hr>
+
+            <h3>
+
+                Review Summary
+
+            </h3>
+
             <p>
 
-                The allotted exam time has expired.
+                Questions marked for review:
 
-            </p>
+                <strong id="reviewQuestions">
 
-            <p>
+                    0
 
-                Your answers will now be submitted automatically.
+                </strong>
 
             </p>
 
@@ -450,97 +380,9 @@
         <div class="modal-footer">
 
             <button
-                id="timeExpiredOkButton"
-                class="btn btn-primary">
-
-                View Result
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ===================================================== -->
-<!-- RESULT MODAL -->
-<!-- ===================================================== -->
-
-<div id="resultModal"
-     class="modal hidden">
-
-    <div class="modal-overlay"></div>
-
-    <div class="modal-window result-window">
-
-        <div class="modal-header">
-
-            <h2>Exam Result</h2>
-
-        </div>
-
-        <div class="modal-body">
-
-            <div class="result-grid">
-
-                <div class="result-card">
-
-                    <span>Correct</span>
-
-                    <strong id="resultCorrect">
-
-                        0
-
-                    </strong>
-
-                </div>
-
-                <div class="result-card">
-
-                    <span>Total</span>
-
-                    <strong id="resultTotal">
-
-                        60
-
-                    </strong>
-
-                </div>
-
-                <div class="result-card">
-
-                    <span>Percentage</span>
-
-                    <strong id="resultPercentage">
-
-                        0%
-
-                    </strong>
-
-                </div>
-
-                <div class="result-card">
-
-                    <span>Status</span>
-
-                    <strong id="resultStatus">
-
-                        Pending
-
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="modal-footer">
-
-            <button
-                id="closeResultButton"
-                class="btn btn-primary">
+                id="closeResultsButton"
+                class="btn btn-primary"
+                type="button">
 
                 Close
 
@@ -553,411 +395,33 @@
 </div>
 
 <!-- ===================================================== -->
-<!-- REVIEW PANEL -->
-<!-- ===================================================== -->
-
-<aside id="reviewPanel"
-       class="review-panel hidden">
-
-    <div class="review-header">
-
-        <h2>
-
-            Review Questions
-
-        </h2>
-
-        <button
-            id="closeReviewPanel"
-            class="btn btn-small">
-
-            ✕
-
-        </button>
-
-    </div>
-
-    <div
-        id="reviewList"
-        class="review-list">
-
-        <!-- Dynamic -->
-
-    </div>
-
-</aside>
-
-<!-- ===================================================== -->
-<!-- TOAST -->
-<!-- ===================================================== -->
-
-<div id="toast"
-     class="toast hidden">
-
-    <span id="toastMessage">
-
-        Message
-
-    </span>
-
-</div>
-
-<!-- ===================================================== -->
-<!-- STATUS BAR -->
-<!-- ===================================================== -->
-
-<footer class="status-bar">
-
-    <div>
-
-        Question Bank
-
-        <strong id="bankSize">
-
-            --
-
-        </strong>
-
-    </div>
-
-    <div>
-
-        Exam
-
-        <strong id="examSize">
-
-            60
-
-        </strong>
-
-    </div>
-
-    <div>
-
-        Version
-
-        <strong>
-
-            2.0
-
-        </strong>
-
-    </div>
-
-</footer>
-
-<!-- ===================================================== -->
-<!-- WAR ROOM -->
-<!-- ===================================================== -->
-
-<section id="warRoom"
-         class="war-room hidden">
-
-    <div class="warroom-header">
-
-        <h2>
-
-            CCNA War Room
-
-        </h2>
-
-        <button
-            id="closeWarRoom"
-            class="btn btn-small">
-
-            Close
-
-        </button>
-
-    </div>
-
-    <div
-        id="warRoomContent"
-        class="warroom-content">
-
-        <!-- Dynamic -->
-
-    </div>
-
-</section>
-
-<!-- ===================================================== -->
-<!-- CLI TERMINAL -->
-<!-- ===================================================== -->
-
-<section id="cliSimulator"
-         class="cli-simulator hidden">
-
-    <div class="terminal-header">
-
-        <div class="terminal-title">
-
-            Cisco IOS CLI
-
-        </div>
-
-    </div>
-
-    <div
-        id="terminalOutput"
-        class="terminal-output">
-
-    </div>
-
-    <div class="terminal-input-row">
-
-        <span class="terminal-prompt">
-
-            Router#
-
-        </span>
-
-        <input
-            id="terminalInput"
-            class="terminal-input"
-            type="text"
-            autocomplete="off"
-            spellcheck="false">
-
-    </div>
-
-</section>
-
-<!-- ===================================================== -->
-<!-- QUESTION TEMPLATE -->
-<!-- ===================================================== -->
-
-<template id="questionTemplate">
-
-    <article class="question-card">
-
-        <div class="question-header">
-
-            <div class="question-domain"
-                 id="questionDomain">
-
-            </div>
-
-            <div class="question-title"
-                 id="questionTitle">
-
-            </div>
-
-        </div>
-
-        <div class="question-body">
-
-            <div
-                id="questionText"
-                class="question-text">
-
-            </div>
-
-            <div
-                id="questionImage"
-                class="question-image">
-
-            </div>
-
-            <div
-                id="answerContainer"
-                class="answers">
-
-            </div>
-
-        </div>
-
-    </article>
-
-</template>
-
-<!-- ===================================================== -->
-<!-- SINGLE ANSWER TEMPLATE -->
-<!-- ===================================================== -->
-
-<template id="singleAnswerTemplate">
-
-    <label class="answer-option">
-
-        <input
-            type="radio"
-            name="answer">
-
-        <span class="answer-text">
-
-        </span>
-
-    </label>
-
-</template>
-
-<!-- ===================================================== -->
-<!-- MULTIPLE ANSWER TEMPLATE -->
-<!-- ===================================================== -->
-
-<template id="multipleAnswerTemplate">
-
-    <label class="answer-option">
-
-        <input
-            type="checkbox">
-
-        <span class="answer-text">
-
-        </span>
-
-    </label>
-
-</template>
-
-<!-- ===================================================== -->
-<!-- DRAG AND DROP TEMPLATE -->
-<!-- ===================================================== -->
-
-<template id="dragDropTemplate">
-
-    <div class="dragdrop-container">
-
-        <div
-            class="drag-source"
-            id="dragSource">
-
-        </div>
-
-        <div
-            class="drag-target"
-            id="dragTarget">
-
-        </div>
-
-    </div>
-
-</template>
-
-<!-- ===================================================== -->
-<!-- LAB TEMPLATE -->
-<!-- ===================================================== -->
-
-<template id="labTemplate">
-
-    <div class="lab-container">
-
-        <div
-            id="labInstructions"
-            class="lab-instructions">
-
-        </div>
-
-        <div
-            id="labWorkspace"
-            class="lab-workspace">
-
-        </div>
-
-    </div>
-
-</template>
-
-<!-- ===================================================== -->
-<!-- CLI QUESTION TEMPLATE -->
-<!-- ===================================================== -->
-
-<template id="cliQuestionTemplate">
-
-    <div class="cli-question">
-
-        <div
-            id="cliInstructions"
-            class="cli-instructions">
-
-        </div>
-
-        <div
-            id="cliWorkspace"
-            class="cli-workspace">
-
-        </div>
-
-    </div>
-
-</template>
-
-<!-- ===================================================== -->
-<!-- IMAGE VIEWER -->
-<!-- ===================================================== -->
-
-<div id="imageViewer"
-     class="image-viewer hidden">
-
-    <div class="image-viewer-overlay"></div>
-
-    <div class="image-viewer-content">
-
-        <button
-            id="closeImageViewer"
-            class="image-viewer-close">
-
-            ✕
-
-        </button>
-
-        <img
-            id="imageViewerImage"
-            src=""
-            alt="Question Image">
-
-    </div>
-
-</div>
-
-<!-- ===================================================== -->
-<!-- DEBUG PANEL (Development Only) -->
-<!-- ===================================================== -->
-
-<div id="debugPanel"
-     class="debug-panel hidden">
-
-    <div class="debug-header">
-
-        <h3>
-
-            Debug Console
-
-        </h3>
-
-    </div>
-
-    <div
-        id="debugContent"
-        class="debug-content">
-
-    </div>
-
-</div>
-
-</div>
-<!-- END APP -->
-
-<!-- ===================================================== -->
 <!-- JAVASCRIPT -->
 <!-- ===================================================== -->
 
-<script src="js/utils.js"></script>
+<script src="js/models/answer.js"></script>
 
-<script src="js/storage.js"></script>
+<script src="js/models/question.js"></script>
+
+<script src="js/models/exam.js"></script>
+
+<script src="js/storageManager.js"></script>
 
 <script src="js/questionManager.js"></script>
 
-<script src="js/examEngine.js"></script>
-
-<script src="js/renderer.js"></script>
-
-<script src="js/navigation.js"></script>
+<script src="js/navigationController.js"></script>
 
 <script src="js/timer.js"></script>
 
+<script src="js/uiManager.js"></script>
+
+<script src="js/renderer.js"></script>
+
+<script src="js/examEngine.js"></script>
+
 <script src="js/app.js"></script>
+
+</div>
 
 </body>
 
-</html>
+</html>			
