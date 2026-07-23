@@ -117,21 +117,15 @@ class QuestionManager {
 
         }
 
-        const response = await fetch(
+        const response = await fetch(domain.file);
 
-            domain.file
+console.log("URL:", domain.file);
+console.log("Status:", response.status);
+console.log("OK:", response.ok);
 
-        );
-
-        if (!response.ok) {
-
-            throw new Error(
-
-                `Unable to load ${domain.file}`
-
-            );
-
-        }
+if (!response.ok) {
+    throw new Error(`Unable to load ${domain.file}`);
+}
 
         const data = await response.json();
 
