@@ -62,13 +62,13 @@ class QuestionManager {
     async loadConfig() {
 
         const response = await fetch(
-            "database/exam.json"
+            "data/exam.json"
         );
 
         if (!response.ok) {
 
             throw new Error(
-                "Unable to load database/exam.json"
+                "Unable to load data/exam.json"
             );
 
         }
@@ -119,7 +119,7 @@ class QuestionManager {
 
         const response = await fetch(
 
-            `database/questions/${domain.file}`
+            domain.file
 
         );
 
@@ -399,7 +399,7 @@ class QuestionManager {
 
                 const quantity = Math.min(
 
-                    domain.questions,
+                    domain.questionsPerExam,
 
                     questions.length
 
@@ -494,7 +494,7 @@ class QuestionManager {
 
             domain =>
 
-                Number.isInteger(domain.questions)
+                Number.isInteger(domain.questionsPerExam)
 
         );
 
