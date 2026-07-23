@@ -359,27 +359,27 @@ if (
 
     validateQuestionType(question) {
 
-        const validTypes = [
+    const type = question.getType();
 
-            "single",
-            "multiple",
-            "dragdrop",
-            "cli",
-            "lab"
+    const validTypes = [
+        "single",
+        "single-choice",
+        "multiple",
+        "multiple-choice",
+        "dragdrop",
+        "cli",
+        "lab"
+    ];
 
-        ];
+    if (!validTypes.includes(type)) {
 
-        if (!validTypes.includes(question.getType())) {
-
-            throw new Error(
-
-                `Invalid question type: ${question.getType()}`
-
-            );
-
-        }
+        throw new Error(
+            `Invalid question type: ${type}`
+        );
 
     }
+
+}
 	
 	    /*
     ======================================================
