@@ -42,69 +42,25 @@ class App {
 
     async initialize() {
 
-        console.log("2 - Questões carregadas");
-
         if (this.initialized) {
             return;
         }
 
-       this.createModules();
+        this.createModules();
 
-this.ui.initialize();
+        this.ui.initialize();
 
-await this.loadQuestions();
+        await this.loadQuestions();
 
-/*
-=====================================================
-Atualiza tela inicial
-=====================================================
-*/
+        this.createExam();
 
-const bank = document.getElementById("questionBankSize");
+        this.restoreState();
 
-if(bank){
-
-    bank.textContent =
-        this.questionManager.questions.length;
-
-}
-
-/*
-=====================================================
-Esconde tela da prova
-=====================================================
-*/
-
-const examScreen =
-    document.getElementById("examScreen");
-
-if(examScreen){
-
-    examScreen.classList.add("hidden");
-
-}
-
-/*
-=====================================================
-Botão START EXAM
-=====================================================
-*/
-
-const startButton =
-    document.getElementById("startExamButton");
-
-    console.log("3 - Botão:", startButton);    
-
-startButton.addEventListener("click",()=>{
-
-    console.log("4 - Clique recebido");
-    this.startExam();
-
-});
-
-this.ui.hide("loading");
-
-this.initialized=true;
+        this.navigation.initialize();
+        this.renderer.initialize();
+        this.renderer.render();
+        this.ui.hide("loading");
+        this.initialized = true;
 
     }
 
@@ -164,39 +120,6 @@ this.initialized=true;
 
     }
 
-    /*
-=====================================================
-Iniciar Exame
-=====================================================
-*/
-
-startExam(){
-
-    const startScreen =
-        document.getElementById("startScreen");
-
-    const examScreen =
-        document.getElementById("examScreen");
-
-    startScreen.classList.remove("active");
-
-    startScreen.classList.add("hidden");
-
-    examScreen.classList.remove("hidden");
-
-    this.createExam();
-
-    this.restoreState();
-
-    this.navigation.initialize();
-
-    this.renderer.initialize();
-
-    this.renderer.render();
-
-}
-
-    
     /*
     ======================================================
     Restaurar Estado
