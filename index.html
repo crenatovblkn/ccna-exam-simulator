@@ -16,7 +16,7 @@
 
 <body>
 
-<div id="loading" class="loading">
+<div id="loading" class="loading" hidden>
 
     <div class="loading-box">
 
@@ -164,8 +164,8 @@
         id="explanation"
         hidden>
     </section>
-	
-<div class="exam-footer">
+
+	<div class="exam-footer">
 
     <button
         id="previousButton"
@@ -244,7 +244,7 @@
     <span>
 
         Time:
-        <strong id="statisticsTime">00:00:00</strong>
+        <strong id="statusTime">00:00:00</strong>
 
     </span>
 
@@ -259,11 +259,7 @@
 
         <div class="modal-header">
 
-            <h2>
-
-                Exam Results
-
-            </h2>
+            <h2>Exam Results</h2>
 
         </div>
 
@@ -272,43 +268,28 @@
             <table class="results-table">
 
                 <tr>
-
                     <td>Correct</td>
-
                     <td id="resultCorrect">0</td>
-
                 </tr>
 
                 <tr>
-
                     <td>Incorrect</td>
-
                     <td id="resultIncorrect">0</td>
-
                 </tr>
 
                 <tr>
-
                     <td>Total</td>
-
                     <td id="resultTotal">0</td>
-
                 </tr>
 
                 <tr>
-
                     <td>Percentage</td>
-
                     <td id="resultPercentage">0%</td>
-
                 </tr>
 
                 <tr>
-
                     <td>Status</td>
-
                     <td id="resultStatus">-</td>
-
                 </tr>
 
             </table>
@@ -317,51 +298,31 @@
 
             <table class="statistics-table">
 
-                <tr>
-
+			                <tr>
                     <td>Answered</td>
-
                     <td id="statisticsAnswered">0</td>
-
                 </tr>
 
                 <tr>
-
                     <td>Remaining</td>
-
                     <td id="statisticsRemaining">0</td>
-
                 </tr>
 
                 <tr>
-
                     <td>Review</td>
-
                     <td id="statisticsReview">0</td>
-
                 </tr>
 
-	                <tr>
-
+                <tr>
                     <td>Elapsed Time</td>
-
-                    <td id="statisticsTime">
-
-                        00:00:00
-
-                    </td>
-
+                    <td id="modalStatisticsTime">00:00:00</td>
                 </tr>
 
             </table>
 
             <hr>
 
-            <h3>
-
-                Review Summary
-
-            </h3>
+            <h3>Review Summary</h3>
 
             <p>
 
@@ -424,4 +385,4 @@
 
 </body>
 
-</html>			
+</html>	
