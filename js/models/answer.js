@@ -19,7 +19,7 @@ class Answer {
 
         this.validate(data);
 
-        this.id = data.id;
+        this.id = String(data.id);
 
         this.text = data.text;
 
@@ -42,41 +42,46 @@ class Answer {
     ======================================================
     */
 
-    validate(data) {
+validate(data) {
 
-        if (!data) {
+    if (!data) {
 
-            throw new Error(
-                "Answer: dados obrigatórios."
-            );
-
-        }
-
-        if (typeof data.id !== "string") {
-
-            throw new Error(
-                "Answer: id inválido."
-            );
-
-        }
-
-        if (typeof data.text !== "string") {
-
-            throw new Error(
-                "Answer: texto inválido."
-            );
-
-        }
-
-        if (typeof data.correct !== "boolean") {
-
-            throw new Error(
-                "Answer: 'correct' deve ser boolean."
-            );
-
-        }
+        throw new Error(
+            "Answer: dados obrigatórios."
+        );
 
     }
+
+    if (
+
+        typeof data.id !== "string" &&
+        typeof data.id !== "number"
+
+    ) {
+
+        throw new Error(
+            "Answer: id inválido."
+        );
+
+    }
+
+    if (typeof data.text !== "string") {
+
+        throw new Error(
+            "Answer: texto inválido."
+        );
+
+    }
+
+    if (typeof data.correct !== "boolean") {
+
+        throw new Error(
+            "Answer: 'correct' deve ser boolean."
+        );
+
+    }
+
+}
 
     /*
     ======================================================
