@@ -59,7 +59,7 @@ class App {
         this.navigation.initialize();
         this.renderer.initialize();
         this.renderer.render();
-
+        this.ui.hide("loading");
         this.initialized = true;
 
     }
