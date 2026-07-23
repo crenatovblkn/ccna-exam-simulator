@@ -109,47 +109,75 @@ class QuestionManager {
 
     async loadDomain(domain) {
 
-        if (!domain.file) {
+    if (!domain.file) {
 
-            throw new Error(
-                "Domain file not informed."
-            );
-
-        }
-
-        const response = await fetch(domain.file);
-
-console.log("URL:", domain.file);
-console.log("Status:", response.status);
-console.log("OK:", response.ok);
-
-if (!response.ok) {
-    throw new Error(`Unable to load ${domain.file}`);
-}
-
-        const data = await response.json();
-
-        if (!Array.isArray(data)) {
-
-            throw new Error(
-
-                `${domain.file} is not a valid question array.`
-
-            );
-
-        }
-
-        for (const questionData of data) {
-
-            this.questionBank.push(
-
-                new Question(questionData)
-
-            );
-
-        }
+        throw new Error(
+            "Domain file not informed."
+        );
 
     }
+
+    const response = await fetch(domain.file);
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Unable to load ${domain.file}`
+        );
+
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+
+        throw new Error(
+            `${domain.file} is not a valid question array.`
+        );
+
+    }
+
+    for (const questionData of data) {
+
+        /*
+        ==============================================
+        Compatibilização do banco de questões
+        ==============================================
+        */
+
+        const normalized = {
+
+            ...questionData,
+
+            type:
+                questionData.type === "single-choice"
+                    ? "single"
+                    : questionData.type,
+
+            correctAnswers:
+
+                Array.isArray(questionData.correctAnswers)
+                && questionData.correctAnswers.length > 0
+
+                    ? questionData.correctAnswers.map(String)
+
+                    : (questionData.answers || [])
+
+                        .filter(answer => answer.correct === true)
+
+                        .map(answer => String(answer.id))
+
+        };
+
+        this.questionBank.push(
+
+            new Question(normalized)
+
+        );
+
+    }
+
+}
 
     /*
     ======================================================
