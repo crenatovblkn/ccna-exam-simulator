@@ -1,1 +1,201 @@
-.
+/* ==========================================================
+   START SCREEN
+   ========================================================== */
+
+.start-screen{
+
+    position:fixed;
+
+    inset:0;
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+        linear-gradient(135deg,#0f172a,#1e3a5f,#0b5cab);
+
+    z-index:9999;
+
+}
+
+.start-screen.active{
+
+    display:flex;
+
+}
+
+.start-card{
+
+    width:720px;
+
+    background:#ffffff;
+
+    border-radius:20px;
+
+    padding:50px;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.35);
+
+    animation:showCard .45s ease;
+
+}
+
+@keyframes showCard{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.start-card h1{
+
+    text-align:center;
+
+    font-size:40px;
+
+    color:#0b5cab;
+
+    margin-bottom:8px;
+
+}
+
+.start-card h2{
+
+    text-align:center;
+
+    font-size:22px;
+
+    color:#666;
+
+    font-weight:500;
+
+    margin-bottom:35px;
+
+}
+
+.bank-info{
+
+    text-align:center;
+
+    font-size:18px;
+
+    margin-bottom:35px;
+
+    color:#444;
+
+}
+
+.exam-options{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    margin-bottom:40px;
+
+}
+
+.exam-option{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    padding:22px;
+
+    border:2px solid #d9e2ec;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.exam-option:hover{
+
+    border-color:#1976d2;
+
+    background:#f5faff;
+
+    transform:translateY(-2px);
+
+}
+
+.exam-option input{
+
+    transform:scale(1.45);
+
+}
+
+.exam-option strong{
+
+    display:block;
+
+    font-size:20px;
+
+    color:#222;
+
+    margin-bottom:6px;
+
+}
+
+.exam-option span{
+
+    color:#6b7280;
+
+    font-size:15px;
+
+}
+
+.start-button{
+
+    width:100%;
+
+    height:58px;
+
+    border-radius:10px;
+
+    background:#1976d2;
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    transition:.25s;
+
+}
+
+.start-button:hover{
+
+    background:#1565c0;
+
+    transform:translateY(-2px);
+
+}
