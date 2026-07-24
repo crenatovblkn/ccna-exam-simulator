@@ -73,8 +73,7 @@ class NavigationController {
     ["nextButton", "click", this.next],
     ["previousButton", "click", this.previous],
     ["finishButton", "click", this.finish],
-    ["reviewButton", "click", this.toggleReview],
-    ["closeResultsButton", "click", this.closeResults]
+    ["reviewButton", "click", this.toggleReview]
 
 ];
         events.forEach(
@@ -165,10 +164,6 @@ class NavigationController {
         this.refresh();
 
     }
-
-    closeResults() {
-
-    this.app.ui.hide("modal"); }
 
     /*
     ======================================================
