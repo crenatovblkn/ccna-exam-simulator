@@ -143,7 +143,10 @@ class UIManager {
             document.getElementById("modal"),
 
         loading:
-            document.getElementById("loading")
+            document.getElementById("loading"),
+
+       closeResultsButton:
+            document.getElementById("closeResultsButton")
 
     };
 
