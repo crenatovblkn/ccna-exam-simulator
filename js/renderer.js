@@ -743,14 +743,17 @@ class Renderer {
 
     renderResults() {
 
-        this.renderScore();
+    this.renderScore();
 
-        this.renderStatistics();
+    this.renderStatistics();
 
-        this.renderReviewSummary();
+    this.renderReviewSummary();
 
-    }
+    const ui = this.ui();
 
+    ui.show("modal");
+
+}
     renderScore() {
 
         const results =
