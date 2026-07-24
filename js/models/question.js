@@ -145,13 +145,27 @@ class Question {
 
     answer(answerId) {
 
-        answerId = String(answerId);
+    answerId = String(answerId);
 
-        if (!this.userAnswers.includes(answerId)) {
+    /*
+    ======================================================
+    QUESTÃO DE RESPOSTA ÚNICA
+    ======================================================
+    */
 
-            this.userAnswers.push(answerId);
+    if (this.type === "single") {
 
-        }
+        // Remove qualquer resposta anterior
+        this.userAnswers = [];
+
+        this.answers.forEach(answer => {
+
+            answer.reset();
+
+        });
+
+        // Registra somente a nova resposta
+        this.userAnswers.push(answerId);
 
         this.answers.forEach(answer => {
 
@@ -163,10 +177,60 @@ class Question {
 
         });
 
-        this.answered = this.userAnswers.length > 0;
+    }
+
+    /*
+    ======================================================
+    QUESTÃO DE MÚLTIPLAS RESPOSTAS
+    ======================================================
+    */
+
+    else {
+
+        const alreadySelected =
+            this.userAnswers.includes(answerId);
+
+        if (alreadySelected) {
+
+            // Desmarca
+            this.userAnswers =
+                this.userAnswers.filter(
+                    id => id !== answerId
+                );
+
+            this.answers.forEach(answer => {
+
+                if (String(answer.getId()) === answerId) {
+
+                    answer.reset();
+
+                }
+
+            });
+
+        } else {
+
+            // Marca
+            this.userAnswers.push(answerId);
+
+            this.answers.forEach(answer => {
+
+                if (String(answer.getId()) === answerId) {
+
+                    answer.select();
+
+                }
+
+            });
+
+        }
 
     }
 
+    this.answered =
+        this.userAnswers.length > 0;
+
+}
     setAnswers(answerIds = []) {
 
         this.clearAnswers();
