@@ -477,8 +477,7 @@ class Renderer {
 
     <input
         type="${inputType}"
-        ${checked}
-        disabled>
+        ${checked}>
 
     <span class="answer-letter">
 
