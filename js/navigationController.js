@@ -168,7 +168,7 @@ class NavigationController {
 
     closeResults() {
 
-    this.app.ui.hide("modal");
+    this.app.ui.hide("modal"); }
 
     /*
     ======================================================
