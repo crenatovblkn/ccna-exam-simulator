@@ -145,9 +145,6 @@ class UIManager {
         loading:
             document.getElementById("loading"),
 
-		closeResultsButton:
-            document.getElementById("closeResultsButton")
- 
     };
 
 }
