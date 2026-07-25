@@ -1593,7 +1593,7 @@ class ExamUI {
         */
 
         this.engine.on(
-            "timerTick",
+            "timeChanged",
             data => {
 
                 if (!data) {
