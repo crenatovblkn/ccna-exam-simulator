@@ -1,74 +1,158 @@
 /* ==========================================================
-   Cisco CCNA Exam Simulator
+   Cisco CCNA 200-301 Exam Simulator
    main.css
-   Version: 0.1.0
+
+   Base global do projeto
    ========================================================== */
+
 
 /* ==========================================================
-   GOOGLE FONT
+   GOOGLE FONTS
    ========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url(
+    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'
+);
 
 
 /* ==========================================================
    CSS VARIABLES
    ========================================================== */
 
-:root{
+:root {
 
-    /* Background */
+    /* ------------------------------------------------------
+       Cisco
+       ------------------------------------------------------ */
 
-    --bg:#eef2f7;
-    --bg-dark:#1b2430;
-    --panel:#ffffff;
-    --panel-dark:#263241;
+    --cisco-blue: #049fd9;
+    --cisco-blue-dark: #0077a8;
+    --cisco-blue-light: #e8f6fb;
 
-    /* Cisco */
 
-    --cisco-blue:#049fd9;
-    --cisco-blue-dark:#0077aa;
+    /* ------------------------------------------------------
+       Background
+       ------------------------------------------------------ */
 
-    /* Text */
+    --bg-page: #eef2f6;
+    --bg-soft: #f6f8fa;
+    --bg-muted: #e8edf2;
 
-    --text:#1c2430;
-    --text-light:#6c7784;
-    --text-white:#ffffff;
+    --panel: #ffffff;
 
-    /* Status */
+    --sidebar-bg: #1d2a38;
+    --sidebar-bg-light: #263747;
 
-    --success:#27ae60;
-    --warning:#f39c12;
-    --danger:#d63031;
-    --info:#3498db;
 
-    /* Borders */
+    /* ------------------------------------------------------
+       Text
+       ------------------------------------------------------ */
 
-    --border:#dfe6ec;
+    --text-primary: #1d2733;
+    --text-secondary: #5f6b76;
+    --text-muted: #87919b;
+    --text-light: #ffffff;
 
-    /* Buttons */
 
-    --primary:#1976d2;
-    --primary-hover:#1565c0;
+    /* ------------------------------------------------------
+       Status
+       ------------------------------------------------------ */
 
-    --secondary:#7f8c8d;
-    --secondary-hover:#69757a;
+    --success: #238636;
+    --success-light: #eaf6ed;
 
-    /* Radius */
+    --warning: #d97706;
+    --warning-light: #fff5e6;
 
-    --radius-small:6px;
-    --radius:10px;
-    --radius-large:18px;
+    --danger: #cf222e;
+    --danger-dark: #a40e26;
+    --danger-light: #ffebe9;
 
-    /* Shadows */
+    --info: #0969da;
+    --info-light: #eaf3ff;
+
+
+    /* ------------------------------------------------------
+       Borders
+       ------------------------------------------------------ */
+
+    --border: #d8dee4;
+    --border-light: #e8ecef;
+    --border-dark: #aeb7c0;
+
+
+    /* ------------------------------------------------------
+       Buttons
+       ------------------------------------------------------ */
+
+    --primary: #087ea4;
+    --primary-hover: #066b8d;
+
+    --secondary: #66727e;
+    --secondary-hover: #505b65;
+
+
+    /* ------------------------------------------------------
+       Radius
+       ------------------------------------------------------ */
+
+    --radius-xs: 4px;
+    --radius-small: 6px;
+    --radius: 10px;
+    --radius-large: 16px;
+    --radius-xl: 22px;
+
+
+    /* ------------------------------------------------------
+       Shadows
+       ------------------------------------------------------ */
+
+    --shadow-small:
+        0 1px 3px rgba(0, 0, 0, 0.08);
 
     --shadow:
-
-        0 2px 8px rgba(0,0,0,.08);
+        0 4px 14px rgba(0, 0, 0, 0.09);
 
     --shadow-large:
+        0 14px 40px rgba(0, 0, 0, 0.16);
 
-        0 10px 30px rgba(0,0,0,.15);
+
+    /* ------------------------------------------------------
+       Layout
+       ------------------------------------------------------ */
+
+    --topbar-height: 74px;
+
+    --statusbar-height: 48px;
+
+    --sidebar-width: 270px;
+
+    --content-max-width: 1500px;
+
+
+    /* ------------------------------------------------------
+       Typography
+       ------------------------------------------------------ */
+
+    --font-main:
+        'Inter',
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    --font-mono:
+        'JetBrains Mono',
+        'Courier New',
+        monospace;
+
+
+    /* ------------------------------------------------------
+       Animation
+       ------------------------------------------------------ */
+
+    --transition-fast: 0.15s ease;
+
+    --transition: 0.25s ease;
 
 }
 
@@ -77,31 +161,125 @@
    RESET
    ========================================================== */
 
-*{
+*,
+*::before,
+*::after {
 
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+    margin: 0;
 
-}
+    padding: 0;
 
-html{
-
-    scroll-behavior:smooth;
+    box-sizing: border-box;
 
 }
 
-body{
 
-    background:var(--bg);
+html {
 
-    color:var(--text);
+    width: 100%;
 
-    font-family:'Inter',sans-serif;
+    min-height: 100%;
 
-    min-height:100vh;
+    scroll-behavior: smooth;
 
-    overflow:hidden;
+}
+
+
+body {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    background: var(--bg-page);
+
+    color: var(--text-primary);
+
+    font-family: var(--font-main);
+
+    font-size: 16px;
+
+    line-height: 1.5;
+
+    -webkit-font-smoothing: antialiased;
+
+    -moz-osx-font-smoothing: grayscale;
+
+}
+
+
+/* ==========================================================
+   APPLICATION ROOT
+   ========================================================== */
+
+#app {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+}
+
+
+/* ==========================================================
+   HTML HIDDEN ATTRIBUTE
+   ========================================================== */
+
+[hidden] {
+
+    display: none !important;
+
+}
+
+
+/* ==========================================================
+   HEADINGS
+   ========================================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+
+    color: var(--text-primary);
+
+    font-weight: 600;
+
+    line-height: 1.25;
+
+}
+
+
+h1 {
+
+    font-size: 2rem;
+
+}
+
+
+h2 {
+
+    font-size: 1.5rem;
+
+}
+
+
+h3 {
+
+    font-size: 1.15rem;
+
+}
+
+
+/* ==========================================================
+   PARAGRAPHS
+   ========================================================== */
+
+p {
+
+    margin: 0;
 
 }
 
@@ -110,11 +288,18 @@ body{
    LINKS
    ========================================================== */
 
-a{
+a {
 
-    text-decoration:none;
+    color: inherit;
 
-    color:inherit;
+    text-decoration: none;
+
+}
+
+
+a:hover {
+
+    text-decoration: none;
 
 }
 
@@ -123,47 +308,19 @@ a{
    LISTS
    ========================================================== */
 
-ul{
+ul,
+ol {
 
-    list-style:none;
+    margin: 0;
 
-}
-
-
-/* ==========================================================
-   BUTTONS
-   ========================================================== */
-
-button{
-
-    font-family:inherit;
-
-    cursor:pointer;
-
-    border:none;
-
-    transition:.25s;
-
-}
-
-button:disabled{
-
-    opacity:.5;
-
-    cursor:not-allowed;
+    padding: 0;
 
 }
 
 
-/* ==========================================================
-   INPUTS
-   ========================================================== */
+ul {
 
-input{
-
-    font-family:inherit;
-
-    outline:none;
+    list-style: none;
 
 }
 
@@ -172,216 +329,335 @@ input{
    IMAGES
    ========================================================== */
 
-img{
+img {
 
-    max-width:100%;
+    display: block;
 
-    display:block;
+    max-width: 100%;
 
-}
-
-
-/* ==========================================================
-   APP
-   ========================================================== */
-
-#app{
-
-    display:flex;
-
-    flex-direction:column;
-
-    height:100vh;
+    height: auto;
 
 }
 
 
 /* ==========================================================
-   COMMON BUTTONS
+   BUTTON RESET
    ========================================================== */
 
-.btn{
+button {
 
-    padding:
+    margin: 0;
 
-        12px 22px;
+    border: 0;
 
-    border-radius:
+    font-family: inherit;
 
-        var(--radius-small);
+    font-size: inherit;
 
-    font-size:15px;
+    cursor: pointer;
 
-    font-weight:600;
+    appearance: none;
 
-    transition:.25s;
-
-}
-
-/* Primary */
-
-.btn-primary{
-
-    background:var(--primary);
-
-    color:white;
+    -webkit-appearance: none;
 
 }
 
-.btn-primary:hover{
 
-    background:var(--primary-hover);
+button:disabled {
 
-}
+    cursor: not-allowed;
 
-/* Secondary */
-
-.btn-secondary{
-
-    background:var(--secondary);
-
-    color:white;
-
-}
-
-.btn-secondary:hover{
-
-    background:var(--secondary-hover);
-
-}
-
-/* Danger */
-
-.btn-danger{
-
-    background:var(--danger);
-
-    color:white;
-
-}
-
-/* Warning */
-
-.btn-warning{
-
-    background:var(--warning);
-
-    color:white;
-
-}
-
-/* Light */
-
-.btn-light{
-
-    background:#ecf0f1;
+    opacity: 0.55;
 
 }
 
 
 /* ==========================================================
-   CARD
+   INPUTS
    ========================================================== */
 
-.card{
+input,
+select,
+textarea {
 
-    background:white;
+    font-family: inherit;
 
-    border-radius:var(--radius);
+    font-size: inherit;
 
-    box-shadow:var(--shadow);
+}
+
+
+input[type="radio"],
+input[type="checkbox"] {
+
+    cursor: pointer;
+
+}
+
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+
+    cursor: not-allowed;
 
 }
 
 
 /* ==========================================================
-   TEXT
+   BUTTON SYSTEM
    ========================================================== */
 
-.text-center{
+.button {
 
-    text-align:center;
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding: 10px 20px;
+
+    border: 1px solid transparent;
+
+    border-radius: var(--radius-small);
+
+    font-size: 0.92rem;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    user-select: none;
+
+    transition:
+        background-color var(--transition),
+        border-color var(--transition),
+        color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition-fast);
 
 }
 
-.text-right{
 
-    text-align:right;
+.button:hover:not(:disabled) {
+
+    transform: translateY(-1px);
 
 }
 
-.bold{
 
-    font-weight:600;
+.button:active:not(:disabled) {
+
+    transform: translateY(0);
 
 }
 
 
 /* ==========================================================
-   HIDDEN
+   PRIMARY BUTTON
    ========================================================== */
 
-.hidden{
+.button-primary {
 
-    display:none !important;
+    background: var(--primary);
+
+    color: var(--text-light);
+
+}
+
+
+.button-primary:hover:not(:disabled) {
+
+    background: var(--primary-hover);
 
 }
 
 
 /* ==========================================================
-   SCROLLBAR
+   SECONDARY BUTTON
    ========================================================== */
 
-::-webkit-scrollbar{
+.button-secondary {
 
-    width:10px;
+    background: var(--secondary);
 
-}
-
-::-webkit-scrollbar-track{
-
-    background:#eceff3;
+    color: var(--text-light);
 
 }
 
-::-webkit-scrollbar-thumb{
 
-    background:#b5bcc4;
+.button-secondary:hover:not(:disabled) {
 
-    border-radius:20px;
-
-}
-
-::-webkit-scrollbar-thumb:hover{
-
-    background:#8b949e;
+    background: var(--secondary-hover);
 
 }
 
 
 /* ==========================================================
-   TRANSITIONS
+   WARNING BUTTON
    ========================================================== */
 
-.fade{
+.button-warning {
 
-    animation:fade .25s ease;
+    background: var(--warning);
+
+    color: #ffffff;
 
 }
 
-@keyframes fade{
 
-    from{
+.button-warning:hover:not(:disabled) {
 
-        opacity:0;
+    background: #b96205;
 
-    }
+}
 
-    to{
 
-        opacity:1;
+/* ==========================================================
+   DANGER BUTTON
+   ========================================================== */
 
-    }
+.button-danger {
+
+    background: var(--danger);
+
+    color: #ffffff;
+
+}
+
+
+.button-danger:hover:not(:disabled) {
+
+    background: var(--danger-dark);
+
+}
+
+
+/* ==========================================================
+   LARGE BUTTON
+   ========================================================== */
+
+.button-large {
+
+    min-height: 52px;
+
+    padding: 14px 30px;
+
+    font-size: 1rem;
+
+}
+
+
+/* ==========================================================
+   SCREEN
+   ========================================================== */
+
+.screen {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+}
+
+
+/* ==========================================================
+   CARD BASE
+   ========================================================== */
+
+.card {
+
+    background: var(--panel);
+
+    border: 1px solid var(--border-light);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow-small);
+
+}
+
+
+/* ==========================================================
+   LOADING SCREEN
+   ========================================================== */
+
+.loading-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef4f8 0%,
+            #e4edf3 100%
+        );
+
+}
+
+
+.loading-card {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: min(420px, 100%);
+
+    padding: 46px 32px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border-light);
+
+    border-radius: var(--radius-large);
+
+    box-shadow: var(--shadow-large);
+
+    text-align: center;
+
+}
+
+
+.loading-card h1 {
+
+    margin-top: 22px;
+
+    font-size: 1.4rem;
+
+}
+
+
+.loading-card p {
+
+    margin-top: 8px;
+
+    color: var(--text-secondary);
+
+    font-size: 0.92rem;
 
 }
 
@@ -390,27 +666,28 @@ img{
    LOADING SPINNER
    ========================================================== */
 
-.spinner{
+.loading-spinner {
 
-    width:46px;
+    width: 52px;
 
-    height:46px;
+    height: 52px;
 
-    border-radius:50%;
+    border: 5px solid #dce5eb;
 
-    border:5px solid #dfe6ec;
+    border-top-color: var(--cisco-blue);
 
-    border-top:5px solid var(--cisco-blue);
+    border-radius: 50%;
 
-    animation:spin 1s linear infinite;
+    animation: spinnerRotation 0.85s linear infinite;
 
 }
 
-@keyframes spin{
 
-    to{
+@keyframes spinnerRotation {
 
-        transform:rotate(360deg);
+    to {
+
+        transform: rotate(360deg);
 
     }
 
@@ -418,183 +695,533 @@ img{
 
 
 /* ==========================================================
-   TERMINAL FONT
+   ERROR SCREEN
    ========================================================== */
 
-.terminal-font{
+.error-screen {
 
-    font-family:'JetBrains Mono',monospace;
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 24px;
+
+    background: var(--bg-page);
+
+}
+
+
+.error-card {
+
+    width: min(560px, 100%);
+
+    padding: 42px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-large);
+
+    box-shadow: var(--shadow-large);
+
+    text-align: center;
+
+}
+
+
+.error-card h1 {
+
+    margin-bottom: 14px;
+
+    color: var(--danger);
+
+    font-size: 1.45rem;
+
+}
+
+
+.error-card p {
+
+    margin-bottom: 26px;
+
+    color: var(--text-secondary);
 
 }
 
 
 /* ==========================================================
-   FOCUS
+   MODAL BASE
    ========================================================== */
 
-button:focus,
-input:focus{
+.modal {
 
-    outline:2px solid var(--cisco-blue);
+    position: fixed;
 
-    outline-offset:2px;
+    inset: 0;
+
+    z-index: 8000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 24px;
+
+}
+
+
+.modal-backdrop {
+
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(18, 28, 38, 0.68);
+
+    backdrop-filter: blur(2px);
+
+}
+
+
+.modal-dialog {
+
+    position: relative;
+
+    z-index: 1;
+
+    width: min(560px, 100%);
+
+    max-height: calc(100vh - 48px);
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: var(--radius-large);
+
+    box-shadow: var(--shadow-large);
+
+}
+
+
+.modal-header {
+
+    padding: 24px 26px 18px;
+
+    border-bottom: 1px solid var(--border-light);
+
+}
+
+
+.modal-header h2 {
+
+    font-size: 1.3rem;
+
+}
+
+
+.modal-body {
+
+    padding: 26px;
+
+    color: var(--text-secondary);
+
+}
+
+
+.modal-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding: 18px 26px;
+
+    background: var(--bg-soft);
+
+    border-top: 1px solid var(--border-light);
+
+    border-radius:
+        0
+        0
+        var(--radius-large)
+        var(--radius-large);
 
 }
 
 
 /* ==========================================================
-   SELECTION
+   PROGRESS
    ========================================================== */
 
-::selection{
+progress {
 
-    background:var(--cisco-blue);
+    appearance: none;
 
-    color:white;
+    -webkit-appearance: none;
+
+    width: 100%;
+
+    height: 7px;
+
+    overflow: hidden;
+
+    border: 0;
+
+    border-radius: 20px;
+
+    background: var(--bg-muted);
 
 }
+
+
+progress::-webkit-progress-bar {
+
+    background: var(--bg-muted);
+
+    border-radius: 20px;
+
+}
+
+
+progress::-webkit-progress-value {
+
+    background: var(--cisco-blue);
+
+    border-radius: 20px;
+
+    transition: width var(--transition);
+
+}
+
+
+progress::-moz-progress-bar {
+
+    background: var(--cisco-blue);
+
+    border-radius: 20px;
+
+}
+
 
 /* ==========================================================
-   START SCREEN
+   TERMINAL GLOBAL
    ========================================================== */
 
-.start-screen{
+.terminal-font {
 
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    width:100%;
-
-    height:100vh;
-
-    background:linear-gradient(135deg,#eef4fb,#dce8f5);
+    font-family: var(--font-mono);
 
 }
 
-.start-card{
 
-    width:700px;
+/* ==========================================================
+   ACCESSIBILITY / FOCUS
+   ========================================================== */
 
-    background:white;
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
 
-    border-radius:18px;
+    outline: 3px solid rgba(4, 159, 217, 0.35);
 
-    padding:50px;
-
-    box-shadow:0 20px 45px rgba(0,0,0,.15);
-
-    text-align:center;
-
-}
-
-.start-card h1{
-
-    font-size:36px;
-
-    color:#0b5cab;
-
-    margin-bottom:10px;
+    outline-offset: 2px;
 
 }
 
-.start-card h2{
 
-    font-size:22px;
+/* ==========================================================
+   TEXT SELECTION
+   ========================================================== */
 
-    font-weight:500;
+::selection {
 
-    color:#555;
+    background: var(--cisco-blue);
 
-    margin-bottom:35px;
-
-}
-
-.bank-info{
-
-    font-size:18px;
-
-    margin-bottom:35px;
+    color: #ffffff;
 
 }
 
-.exam-options{
 
-    display:flex;
+/* ==========================================================
+   SCROLLBAR
+   ========================================================== */
 
-    flex-direction:column;
+* {
 
-    gap:18px;
+    scrollbar-width: thin;
 
-    margin-bottom:40px;
-
-}
-
-.exam-option{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:18px;
-
-    padding:18px;
-
-    border:2px solid #d8dee8;
-
-    border-radius:12px;
-
-    cursor:pointer;
-
-    transition:.25s;
+    scrollbar-color:
+        #aeb8c2
+        #edf1f4;
 
 }
 
-.exam-option:hover{
 
-    border-color:var(--primary);
+::-webkit-scrollbar {
 
-    background:#f7fbff;
+    width: 10px;
 
-}
-
-.exam-option input{
-
-    transform:scale(1.35);
+    height: 10px;
 
 }
 
-.exam-option strong{
 
-    display:block;
+::-webkit-scrollbar-track {
 
-    font-size:18px;
-
-    margin-bottom:4px;
+    background: #edf1f4;
 
 }
 
-.exam-option span{
 
-    color:#666;
+::-webkit-scrollbar-thumb {
 
-    font-size:14px;
+    background: #aeb8c2;
 
-}
+    border: 2px solid #edf1f4;
 
-.start-button{
-
-    width:100%;
-
-    height:55px;
-
-    font-size:18px;
-
-    letter-spacing:1px;
+    border-radius: 20px;
 
 }
 
-/* hidden support */
-[hidden]{display:none !important;}
+
+::-webkit-scrollbar-thumb:hover {
+
+    background: #8e99a4;
+
+}
+
+
+/* ==========================================================
+   COMMON UTILITIES
+   ========================================================== */
+
+.text-center {
+
+    text-align: center;
+
+}
+
+
+.text-left {
+
+    text-align: left;
+
+}
+
+
+.text-right {
+
+    text-align: right;
+
+}
+
+
+.text-muted {
+
+    color: var(--text-muted);
+
+}
+
+
+.text-success {
+
+    color: var(--success);
+
+}
+
+
+.text-warning {
+
+    color: var(--warning);
+
+}
+
+
+.text-danger {
+
+    color: var(--danger);
+
+}
+
+
+.font-mono {
+
+    font-family: var(--font-mono);
+
+}
+
+
+.font-medium {
+
+    font-weight: 500;
+
+}
+
+
+.font-semibold {
+
+    font-weight: 600;
+
+}
+
+
+.font-bold {
+
+    font-weight: 700;
+
+}
+
+
+/* ==========================================================
+   FLEX UTILITIES
+   ========================================================== */
+
+.flex {
+
+    display: flex;
+
+}
+
+
+.flex-center {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.flex-between {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+.flex-column {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+/* ==========================================================
+   VISIBILITY UTILITIES
+   ========================================================== */
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+.invisible {
+
+    visibility: hidden !important;
+
+}
+
+
+/* ==========================================================
+   ANIMATIONS
+   ========================================================== */
+
+.fade-in {
+
+    animation: fadeIn 0.25s ease;
+
+}
+
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        opacity: 1;
+
+    }
+
+}
+
+
+.slide-up {
+
+    animation: slideUp 0.3s ease;
+
+}
+
+
+@keyframes slideUp {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(12px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+/* ==========================================================
+   NOSCRIPT
+   ========================================================== */
+
+noscript {
+
+    display: block;
+
+    padding: 20px;
+
+    background: var(--danger-light);
+
+    color: var(--danger);
+
+    text-align: center;
+
+    font-weight: 600;
+
+}
