@@ -53,6 +53,9 @@ class ExamUI {
         this.labRenderer =
             options.labRenderer || null;
 
+        this.reviewRenderer =
+            options.reviewRenderer || null;
+
 
         /*
         ==================================================
@@ -85,7 +88,7 @@ class ExamUI {
         60 questões / 90 minutos
 
         full:
-        banco completo / modo de estudo
+        banco completo / sem limite de tempo
         ==================================================
         */
 
@@ -816,6 +819,16 @@ class ExamUI {
                             .previousQuestion();
 
                     }
+                    else if (
+                        typeof this.engine
+                            .previous ===
+                            "function"
+                    ) {
+
+                        this.engine
+                            .previous();
+
+                    }
 
                 }
             );
@@ -850,6 +863,16 @@ class ExamUI {
 
                         this.engine
                             .nextQuestion();
+
+                    }
+                    else if (
+                        typeof this.engine
+                            .next ===
+                            "function"
+                    ) {
+
+                        this.engine
+                            .next();
 
                     }
 
@@ -1323,12 +1346,6 @@ class ExamUI {
         }
 
 
-        /*
-        --------------------------------------------------
-        Método principal esperado
-        --------------------------------------------------
-        */
-
         if (
             typeof this.engine
                 .finishExam ===
@@ -1342,12 +1359,6 @@ class ExamUI {
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Compatibilidade
-        --------------------------------------------------
-        */
 
         if (
             typeof this.engine
@@ -1378,7 +1389,8 @@ class ExamUI {
 
     bindEngineEvents() {
 
-        /*
+
+            /*
         --------------------------------------------------
         EXAME INICIADO
         --------------------------------------------------
@@ -1700,12 +1712,6 @@ class ExamUI {
             this.questionRenderer
         ) {
 
-            /*
-            ----------------------------------------------
-            Callback genérico
-            ----------------------------------------------
-            */
-
             if (
                 typeof this.questionRenderer
                     .setOnAnswer ===
@@ -1725,12 +1731,6 @@ class ExamUI {
 
             }
 
-
-            /*
-            ----------------------------------------------
-            Compatibilidade com callback direto
-            ----------------------------------------------
-            */
 
             if (
                 "onAnswer" in
@@ -1958,28 +1958,54 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Configuração do exame
+        CORREÇÃO DA INTEGRAÇÃO COM O EXAM ENGINE
+
+        ExamUI:
+        quick / standard / full
+
+        ExamEngine:
+        practice / standard / full
+
+        ExamEngine espera:
+        questions
+        duration
+        shuffle
+
+        e NÃO:
+        questionCount
+        shuffleQuestions
+        shuffleAnswers
         --------------------------------------------------
         */
+
+        const engineMode =
+            this.selectedMode ===
+            "quick"
+                ? "practice"
+                : this.selectedMode;
+
 
         const config = {
 
             mode:
-                this.selectedMode,
+                engineMode,
 
-            questionCount:
+            questions:
                 questionCount,
 
             duration:
                 mode.duration,
 
-            shuffleQuestions:
-                true,
-
-            shuffleAnswers:
+            shuffle:
                 true
 
         };
+
+
+        console.log(
+            "ExamUI: iniciando exame.",
+            config
+        );
 
 
         /*
@@ -2004,26 +2030,33 @@ class ExamUI {
 
             /*
             ----------------------------------------------
-            API principal
+            API PRINCIPAL DO EXAM ENGINE
+
+            begin(config):
+            1. cria o exame
+            2. aplica quantidade
+            3. aplica duração
+            4. inicia o exame
+            5. inicia o timer
             ----------------------------------------------
             */
 
             if (
                 typeof this.engine
-                    .startExam ===
+                    .begin ===
                     "function"
             ) {
 
                 const result =
                     this.engine
-                        .startExam(
+                        .begin(
                             config
                         );
 
 
                 /*
                 ------------------------------------------
-                Compatibilidade caso startExam seja async
+                Compatibilidade caso begin() seja async
                 ------------------------------------------
                 */
 
@@ -2053,21 +2086,31 @@ class ExamUI {
 
             /*
             ----------------------------------------------
-            Compatibilidade com start()
+            FALLBACK
+
+            Caso o ExamEngine ofereça createExam()
+            e startExam() separadamente.
             ----------------------------------------------
             */
 
             if (
                 typeof this.engine
-                    .start ===
+                    .createExam ===
+                    "function" &&
+                typeof this.engine
+                    .startExam ===
                     "function"
             ) {
 
+                this.engine
+                    .createExam(
+                        config
+                    );
+
+
                 const result =
                     this.engine
-                        .start(
-                            config
-                        );
+                        .startExam();
 
 
                 if (
@@ -2095,7 +2138,7 @@ class ExamUI {
 
 
             throw new Error(
-                "ExamEngine não possui método startExam() ou start()."
+                "ExamEngine não possui begin() nem createExam()/startExam()."
             );
 
         }
@@ -2193,6 +2236,28 @@ class ExamUI {
 
             this.engine
                 .answerCurrentQuestion(
+                    answer
+                );
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        API do ExamEngine atual
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.engine
+                .answer ===
+                "function"
+        ) {
+
+            this.engine
+                .answer(
                     answer
                 );
 
@@ -2304,6 +2369,28 @@ class ExamUI {
         }
 
 
+        /*
+        --------------------------------------------------
+        API do ExamEngine atual
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.engine
+                .goTo ===
+                "function"
+        ) {
+
+            this.engine
+                .goTo(
+                    target
+                );
+
+            return;
+
+        }
+
+
         if (
             typeof this.engine
                 .setCurrentQuestion ===
@@ -2391,6 +2478,34 @@ class ExamUI {
                 Number(
                     this.engine
                         .getCurrentQuestionIndex()
+                );
+
+
+            return Number.isFinite(
+                index
+            )
+                ? index
+                : 0;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        API do ExamEngine atual
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.engine
+                .getCurrentIndex ===
+                "function"
+        ) {
+
+            const index =
+                Number(
+                    this.engine
+                        .getCurrentIndex()
                 );
 
 
@@ -2888,6 +3003,26 @@ class ExamUI {
         }
 
 
+        /*
+        --------------------------------------------------
+        API do ExamEngine atual
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.engine
+                .getTotalQuestions ===
+                "function"
+        ) {
+
+            return Number(
+                this.engine
+                    .getTotalQuestions()
+            ) || 0;
+
+        }
+
+
         if (
             typeof this.engine
                 .getQuestions ===
@@ -3085,12 +3220,6 @@ class ExamUI {
                     : "false"
             );
 
-
-        /*
-        --------------------------------------------------
-        Mantém texto coerente
-        --------------------------------------------------
-        */
 
         const label =
             this.elements
@@ -3292,7 +3421,7 @@ class ExamUI {
 
     updateNavigationRenderer() {
 
-        if (
+            if (
             !this.navigationRenderer
         ) {
 
@@ -3303,7 +3432,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Renderização inicial / completa
+        Renderização completa
         --------------------------------------------------
         */
 
@@ -3423,14 +3552,14 @@ class ExamUI {
 
         try {
 
-            /*
-            ----------------------------------------------
-            Obtém estado
-            ----------------------------------------------
-            */
-
             let state = null;
 
+
+            /*
+            ------------------------------------------------
+            ExamEngine atual
+            ------------------------------------------------
+            */
 
             if (
                 typeof this.engine
@@ -3464,9 +3593,9 @@ class ExamUI {
 
 
             /*
-            ----------------------------------------------
-            Persiste
-            ----------------------------------------------
+            ------------------------------------------------
+            StorageManager
+            ------------------------------------------------
             */
 
             if (
@@ -3502,7 +3631,7 @@ class ExamUI {
         catch (error) {
 
             /*
-            Falha de autosave não deve interromper
+            Falha no autosave não deve interromper
             o exame.
             */
 
@@ -3678,7 +3807,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Reseta o engine
+        Reseta ExamEngine
         --------------------------------------------------
         */
 
@@ -3694,9 +3823,9 @@ class ExamUI {
 
 
             /*
-            Se o ExamEngine emitir "examReset",
-            prepareInitialScreen() será chamado
-            pelo listener configurado anteriormente.
+            O ExamEngine poderá emitir examReset.
+            Nesse caso prepareInitialScreen() será
+            executado pelo listener.
             */
 
             return;
@@ -3706,7 +3835,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Fallback caso não exista reset()
+        Fallback
         --------------------------------------------------
         */
 
@@ -3730,12 +3859,6 @@ class ExamUI {
 
     resetStatusDisplay() {
 
-        /*
-        --------------------------------------------------
-        Questão atual
-        --------------------------------------------------
-        */
-
         if (
             this.elements.questionCounter
         ) {
@@ -3747,12 +3870,6 @@ class ExamUI {
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Respondidas
-        --------------------------------------------------
-        */
 
         if (
             this.elements.answeredCount
@@ -3766,12 +3883,6 @@ class ExamUI {
         }
 
 
-        /*
-        --------------------------------------------------
-        Restantes
-        --------------------------------------------------
-        */
-
         if (
             this.elements.remainingCount
         ) {
@@ -3783,12 +3894,6 @@ class ExamUI {
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Revisão
-        --------------------------------------------------
-        */
 
         if (
             this.elements.reviewCount
@@ -3849,7 +3954,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Barra de progresso
+        Progresso
         --------------------------------------------------
         */
 
@@ -4062,12 +4167,6 @@ class ExamUI {
         }
 
 
-        /*
-        --------------------------------------------------
-        Esconde as outras telas principais
-        --------------------------------------------------
-        */
-
         const screens = [
 
             this.elements.startScreen,
@@ -4123,7 +4222,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Mostra tela solicitada
+        Mostra a tela solicitada
         --------------------------------------------------
         */
 
@@ -4377,7 +4476,7 @@ class ExamUI {
 
     /*
     ======================================================
-    OBTER CONFIGURAÇÃO DO MODO
+    CONFIGURAÇÃO DO MODO SELECIONADO
     ======================================================
     */
 
@@ -4513,7 +4612,7 @@ class ExamUI {
 
     /*
     ======================================================
-    SINCRONIZAR ESTADO DA QUESTÃO
+    SINCRONIZAR QUESTÃO ATUAL
     ======================================================
     */
 
@@ -4539,7 +4638,7 @@ class ExamUI {
 
     /*
     ======================================================
-    ATUALIZAR RESULTADO MANUALMENTE
+    RENDERIZAR RESULTADO MANUALMENTE
     ======================================================
     */
 
@@ -4646,22 +4745,10 @@ class ExamUI {
         }
 
 
-        /*
-        --------------------------------------------------
-        Limpa renderizadores
-        --------------------------------------------------
-        */
-
         this.clearNavigation();
 
         this.clearResult();
 
-
-        /*
-        --------------------------------------------------
-        Estado local
-        --------------------------------------------------
-        */
 
         this.examRunning =
             false;
@@ -4677,7 +4764,7 @@ class ExamUI {
 
     /*
     ======================================================
-    DIAGNÓSTICO DA INTERFACE
+    DIAGNÓSTICO
     ======================================================
     */
 
@@ -4716,212 +4803,7 @@ class ExamUI {
 
     /*
     ======================================================
-    VERIFICAR MODAL DE FINALIZAÇÃO
-    ======================================================
-    */
-
-    isFinishModalOpen() {
-
-        const modal =
-            this.elements.finishModal;
-
-        if (!modal) {
-
-            return false;
-
-        }
-
-
-        if (
-            modal.hasAttribute(
-                "hidden"
-            )
-        ) {
-
-            return false;
-
-        }
-
-
-        if (
-            modal.classList.contains(
-                "hidden"
-            )
-        ) {
-
-            return false;
-
-        }
-
-
-        return true;
-
-    }
-
-
-    /*
-    ======================================================
-    ABRIR MODAL DE FINALIZAÇÃO
-    ======================================================
-    */
-
-    openFinishModal() {
-
-        const modal =
-            this.elements.finishModal;
-
-
-        /*
-        --------------------------------------------------
-        Se não existir modal no HTML, finaliza
-        diretamente pelo engine.
-        --------------------------------------------------
-        */
-
-        if (!modal) {
-
-            this.finishExam();
-
-            return;
-
-        }
-
-
-        modal.classList
-            .remove(
-                "hidden"
-            );
-
-
-        modal.classList
-            .add(
-                "active"
-            );
-
-
-        modal.removeAttribute(
-            "hidden"
-        );
-
-
-        modal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
-
-
-        /*
-        --------------------------------------------------
-        Foco no botão de confirmação
-        --------------------------------------------------
-        */
-
-        const confirmButton =
-            this.elements.confirmFinishButton;
-
-
-        if (
-            confirmButton &&
-            typeof confirmButton.focus ===
-                "function"
-        ) {
-
-            window.setTimeout(
-                () => {
-
-                    confirmButton.focus();
-
-                },
-                0
-            );
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    FECHAR MODAL DE FINALIZAÇÃO
-    ======================================================
-    */
-
-    closeFinishModal() {
-
-        const modal =
-            this.elements.finishModal;
-
-        if (!modal) {
-
-            return;
-
-        }
-
-
-        modal.classList
-            .remove(
-                "active"
-            );
-
-
-        modal.classList
-            .add(
-                "hidden"
-            );
-
-
-        modal.setAttribute(
-            "hidden",
-            ""
-        );
-
-
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-
-        /*
-        --------------------------------------------------
-        Devolve foco ao botão de finalizar
-        --------------------------------------------------
-        */
-
-        const finishButton =
-            this.elements.finishExamButton;
-
-
-        if (
-            finishButton &&
-            typeof finishButton.focus ===
-                "function"
-        ) {
-
-            window.setTimeout(
-                () => {
-
-                    finishButton.focus();
-
-                },
-                0
-            );
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    ALIAS DE COMPATIBILIDADE
-    ======================================================
-
-    Algumas versões anteriores do app.js/renderizadores
-    podem chamar nomes diferentes para as mesmas ações.
-
-    Estes aliases evitam quebrar a aplicação durante
-    a integração dos módulos.
+    ALIASES DO MODAL
     ======================================================
     */
 
@@ -4935,15 +4817,6 @@ class ExamUI {
     hideFinishModal() {
 
         this.closeFinishModal();
-
-    }
-
-
-    confirmFinishExam() {
-
-        this.closeFinishModal();
-
-        this.finishExam();
 
     }
 
@@ -5065,7 +4938,7 @@ class ExamUI {
 
     /*
     ======================================================
-    OBTER RENDERIZADOR DE QUESTÃO
+    OBTER RENDERIZADORES
     ======================================================
     */
 
@@ -5076,24 +4949,12 @@ class ExamUI {
     }
 
 
-    /*
-    ======================================================
-    OBTER RENDERIZADOR DE NAVEGAÇÃO
-    ======================================================
-    */
-
     getNavigationRenderer() {
 
         return this.navigationRenderer;
 
     }
 
-
-    /*
-    ======================================================
-    OBTER RENDERIZADOR DE RESULTADO
-    ======================================================
-    */
 
     getResultRenderer() {
 
@@ -5102,12 +4963,6 @@ class ExamUI {
     }
 
 
-    /*
-    ======================================================
-    OBTER RENDERIZADOR DE LAB
-    ======================================================
-    */
-
     getLabRenderer() {
 
         return this.labRenderer;
@@ -5115,19 +4970,14 @@ class ExamUI {
     }
 
 
-    /*
-    ======================================================
-    OBTER RENDERIZADOR DE REVISÃO
-    ======================================================
-    */
-
     getReviewRenderer() {
 
         return this.reviewRenderer;
 
     }
 
-}
+
+   }
 
 
 /*
@@ -5135,11 +4985,10 @@ class ExamUI {
 DISPONIBILIZAÇÃO GLOBAL
 ==========================================================
 
-O projeto atual utiliza scripts JavaScript tradicionais.
+O projeto utiliza scripts JavaScript tradicionais.
 
-Por isso, ExamUI precisa estar disponível em window para
-que js/app.js possa localizar a classe durante a
-inicialização da aplicação.
+ExamUI precisa estar disponível em window para que
+js/app.js consiga localizar e instanciar a classe.
 ==========================================================
 */
 
@@ -5156,8 +5005,3 @@ DIAGNÓSTICO DE CARREGAMENTO
 console.log(
     "ExamUI loaded successfully."
 );
-
-
-
-
-    
