@@ -905,6 +905,51 @@ class ExamUI {
                     this.openFinishModal();
 
                 }
+
+                    /*
+    ======================================================
+    FECHAR MODAL DE FINALIZAÇÃO
+    ======================================================
+    */
+
+    closeFinishModal() {
+
+        if (
+            !this.elements ||
+            !this.elements.finishModal
+        ) {
+
+            return;
+
+        }
+
+
+        const modal =
+            this.elements.finishModal;
+
+
+        modal.classList.remove(
+            "active"
+        );
+
+
+        modal.classList.add(
+            "hidden"
+        );
+
+
+        modal.setAttribute(
+            "hidden",
+            ""
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+    }
             );
 
 
