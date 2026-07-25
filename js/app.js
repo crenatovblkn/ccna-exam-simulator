@@ -220,7 +220,7 @@ Este é o ponto de entrada principal da aplicação.
 
                     container:
                         document.getElementById(
-                            "resultScreen"
+                            "resultsScreen"
                         )
 
                 });
@@ -268,8 +268,6 @@ Este é o ponto de entrada principal da aplicação.
             /*
             ------------------------------------------------
             12. Exposição para debug
-
-            Útil durante desenvolvimento.
             ------------------------------------------------
             */
 
@@ -359,14 +357,6 @@ Este é o ponto de entrada principal da aplicação.
 
     async function loadQuestionBank() {
 
-        /*
-        --------------------------------------------------
-        Método principal
-
-        QuestionManager poderá possuir loadFromURL().
-        --------------------------------------------------
-        */
-
         if (
             typeof questionManager
                 .loadFromURL ===
@@ -389,9 +379,7 @@ Este é o ponto de entrada principal da aplicação.
 
         /*
         --------------------------------------------------
-        Fallback
-
-        Carregamento direto usando fetch.
+        Fallback usando fetch
         --------------------------------------------------
         */
 
@@ -418,23 +406,6 @@ Este é o ponto de entrada principal da aplicação.
             await response.json();
 
 
-        /*
-        --------------------------------------------------
-        O JSON pode possuir:
-
-        [
-            {...},
-            {...}
-        ]
-
-        ou:
-
-        {
-            "questions": [...]
-        }
-        --------------------------------------------------
-        */
-
         const questions =
             Array.isArray(data)
                 ? data
@@ -453,12 +424,6 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Adiciona ao manager
-        --------------------------------------------------
-        */
 
         if (
             typeof questionManager
@@ -548,16 +513,6 @@ Este é o ponto de entrada principal da aplicação.
         );
 
 
-        /*
-        --------------------------------------------------
-        Aviso durante desenvolvimento.
-
-        O domínio inicial deverá possuir 180 questões.
-        Não impede a execução enquanto o banco estiver
-        sendo construído.
-        --------------------------------------------------
-        */
-
         if (
             total < 180
         ) {
@@ -646,21 +601,20 @@ Este é o ponto de entrada principal da aplicação.
 
     function showFatalError(error) {
 
-        /*
-        --------------------------------------------------
-        Esconde telas que não devem aparecer.
-        --------------------------------------------------
-        */
-
         const examScreen =
             document.getElementById(
                 "examScreen"
             );
 
 
+        /*
+        CORREÇÃO:
+        O ID utilizado pelo index.html é resultsScreen.
+        */
+
         const resultScreen =
             document.getElementById(
-                "resultScreen"
+                "resultsScreen"
             );
 
 
@@ -681,12 +635,6 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Tenta utilizar a Start Screen.
-        --------------------------------------------------
-        */
 
         const startScreen =
             document.getElementById(
@@ -711,12 +659,6 @@ Este é o ponto de entrada principal da aplicação.
         );
 
 
-        /*
-        --------------------------------------------------
-        Remove erro anterior, caso exista.
-        --------------------------------------------------
-        */
-
         const previous =
             document.getElementById(
                 "applicationFatalError"
@@ -729,12 +671,6 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Cria mensagem
-        --------------------------------------------------
-        */
 
         const errorBox =
             document.createElement(
@@ -781,12 +717,6 @@ Este é o ponto de entrada principal da aplicação.
         );
 
 
-        /*
-        --------------------------------------------------
-        Insere na tela inicial.
-        --------------------------------------------------
-        */
-
         const card =
             startScreen.querySelector(
                 ".start-card"
@@ -807,12 +737,6 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Desabilita START
-        --------------------------------------------------
-        */
 
         const startButton =
             document.getElementById(
@@ -846,13 +770,6 @@ Este é o ponto de entrada principal da aplicação.
                 ? error.message
                 : String(error);
 
-
-        /*
-        --------------------------------------------------
-        Erro típico quando index.html é aberto diretamente
-        com file:// e o navegador bloqueia fetch().
-        --------------------------------------------------
-        */
 
         if (
             window.location.protocol ===
