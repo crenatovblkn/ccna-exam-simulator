@@ -1,181 +1,47 @@
 /*
 ==========================================================
 Cisco CCNA 200-301 Exam Simulator
-ExamEngine
+Exam Engine
 
-Motor central do simulador.
+Arquivo:
+js/core/ExamEngine.js
 
 Responsabilidade:
-- Criar sessões de exame
-- Definir modos de prova
-- Selecionar questões
+- Criar e controlar uma tentativa de exame
+- Selecionar questões através do QuestionManager
 - Controlar navegação
-- Controlar respostas
+- Registrar respostas
 - Controlar revisão
-- Controlar cronômetro
-- Finalizar prova
-- Expor estatísticas
-- Disparar eventos para a interface
+- Controlar tempo
+- Finalizar a prova
+- Entregar resultado
+- Emitir eventos para a interface
 
-Este componente NÃO renderiza HTML diretamente.
+O ExamEngine NÃO manipula HTML.
 ==========================================================
 */
 
 class ExamEngine {
 
-    /*
-    ======================================================
-    CONSTRUCTOR
-    ======================================================
-    */
-
     constructor(questionManager = null) {
 
         this.questionManager =
-            questionManager ||
-            new QuestionManager();
+            questionManager;
 
+        this.exam =
+            null;
 
-        this.exam = null;
+        this.listeners =
+            {};
 
+        this.timerInterval =
+            null;
 
-        /*
-        --------------------------------------------------
-        Timer
-        --------------------------------------------------
-        */
+        this.remainingTime =
+            0;
 
-        this.timerInterval = null;
-
-        this.timerRunning = false;
-
-        this.lastTickTime = null;
-
-
-        /*
-        --------------------------------------------------
-        Eventos
-        --------------------------------------------------
-        */
-
-        this.listeners = {};
-
-
-        /*
-        --------------------------------------------------
-        Configurações padrão
-        --------------------------------------------------
-        */
-
-        this.config = {
-
-            title:
-                "Cisco CCNA 200-301",
-
-            domain:
-                "Network Fundamentals",
-
-            passingScore:
-                70,
-
-            autoSave:
-                true,
-
-            timerInterval:
-                1000
-
-        };
-
-
-        /*
-        --------------------------------------------------
-        Modos de exame
-
-        duration em segundos.
-        --------------------------------------------------
-        */
-
-        this.examModes = {
-
-            practice: {
-
-                id:
-                    "practice",
-
-                name:
-                    "Quick Practice",
-
-                questions:
-                    20,
-
-                duration:
-                    30 * 60
-
-            },
-
-
-            standard: {
-
-                id:
-                    "standard",
-
-                name:
-                    "Standard Exam",
-
-                questions:
-                    45,
-
-                duration:
-                    60 * 60
-
-            },
-
-
-            full: {
-
-                id:
-                    "full",
-
-                name:
-                    "Full Exam",
-
-                questions:
-                    90,
-
-                duration:
-                    120 * 60
-
-            }
-
-        };
-
-    }
-
-
-    /*
-    ======================================================
-    CONFIGURAÇÃO
-    ======================================================
-    */
-
-    configure(options = {}) {
-
-        if (
-            !options ||
-            typeof options !== "object"
-        ) {
-
-            return;
-
-        }
-
-
-        this.config = {
-
-            ...this.config,
-            ...options
-
-        };
+        this.duration =
+            0;
 
     }
 
@@ -190,22 +56,10 @@ class ExamEngine {
         questionManager
     ) {
 
-        if (
-            !(
-                questionManager instanceof
-                QuestionManager
-            )
-        ) {
-
-            throw new Error(
-                "Invalid QuestionManager."
-            );
-
-        }
-
-
         this.questionManager =
             questionManager;
+
+        return this;
 
     }
 
@@ -219,278 +73,20 @@ class ExamEngine {
 
     /*
     ======================================================
-    MODOS DE EXAME
+    EXAME
     ======================================================
     */
 
-    getExamModes() {
-
-        return {
-            ...this.examModes
-        };
-
-    }
-
-
-    getExamMode(mode) {
-
-        return (
-            this.examModes[mode] ||
-            null
-        );
-
-    }
-
-
-    /*
-    ======================================================
-    CRIAR EXAME
-    ======================================================
-    */
-
-    createExam(options = {}) {
-
-        if (
-            !this.questionManager ||
-            !this.questionManager.isLoaded()
-        ) {
-
-            throw new Error(
-                "Question bank is not loaded."
-            );
-
-        }
-
-
-        if (
-            this.questionManager.getCount() === 0
-        ) {
-
-            throw new Error(
-                "Question bank is empty."
-            );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Modo
-        --------------------------------------------------
-        */
-
-        const modeId =
-            options.mode ||
-            "practice";
-
-
-        const mode =
-            this.getExamMode(
-                modeId
-            );
-
-
-        if (!mode) {
-
-            throw new Error(
-                `Unknown exam mode: ${modeId}`
-            );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Quantidade
-        --------------------------------------------------
-        */
-
-        const requestedCount =
-            Number.isInteger(
-                options.questions
-            )
-                ? options.questions
-                : mode.questions;
-
-
-        const available =
-            this.questionManager
-                .filter({
-
-                    domain:
-                        options.domain ||
-                        this.config.domain
-
-                })
-                .length;
-
-
-        const questionCount =
-            Math.min(
-                requestedCount,
-                available
-            );
-
-
-        if (
-            questionCount <= 0
-        ) {
-
-            throw new Error(
-                "No questions are available for the selected domain."
-            );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Seleção das questões
-        --------------------------------------------------
-        */
-
-        let selectedQuestions;
-
-
-        if (
-            options.distribution &&
-            typeof options.distribution ===
-                "object"
-        ) {
-
-            selectedQuestions =
-                this.questionManager
-                    .selectBalanced(
-                        options.distribution,
-                        {
-
-                            domain:
-                                options.domain ||
-                                this.config.domain,
-
-                            difficulty:
-                                options.difficulty,
-
-                            shuffle:
-                                true
-
-                        }
-                    );
-
-
-            selectedQuestions =
-                this.questionManager
-                    .fillSelection(
-                        selectedQuestions,
-                        questionCount,
-                        {
-
-                            domain:
-                                options.domain ||
-                                this.config.domain,
-
-                            difficulty:
-                                options.difficulty,
-
-                            shuffle:
-                                true
-
-                        }
-                    );
-
-        } else {
-
-            selectedQuestions =
-                this.questionManager
-                    .selectQuestions({
-
-                        domain:
-                            options.domain ||
-                            this.config.domain,
-
-                        difficulty:
-                            options.difficulty,
-
-                        count:
-                            questionCount,
-
-                        shuffle:
-                            options.shuffle !==
-                            false
-
-                    });
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Duração
-        --------------------------------------------------
-        */
-
-        const duration =
-            Number.isFinite(
-                options.duration
-            )
-                ? Math.max(
-                    0,
-                    options.duration
-                )
-                : mode.duration;
-
-
-        /*
-        --------------------------------------------------
-        Cria sessão
-        --------------------------------------------------
-        */
-
-        this.exam =
-            new Exam({
-
-                title:
-                    options.title ||
-                    this.config.title,
-
-                domain:
-                    options.domain ||
-                    this.config.domain,
-
-                mode:
-                    modeId,
-
-                questions:
-                    selectedQuestions,
-
-                duration:
-                    duration,
-
-                remainingTime:
-                    duration
-
-            });
-
-
-        this.emit(
-            "examCreated",
-            {
-
-                exam:
-                    this.exam,
-
-                mode:
-                    mode,
-
-                totalQuestions:
-                    this.exam
-                        .getTotalQuestions()
-
-            }
-        );
-
+    getExam() {
 
         return this.exam;
+
+    }
+
+
+    hasExam() {
+
+        return this.exam !== null;
 
     }
 
@@ -501,39 +97,206 @@ class ExamEngine {
     ======================================================
     */
 
-    startExam() {
+    startExam(options = {}) {
 
-        if (!this.exam) {
+        if (!this.questionManager) {
 
             throw new Error(
-                "Exam has not been created."
+                "ExamEngine: QuestionManager não foi configurado."
             );
 
         }
 
 
+        /*
+        --------------------------------------------------
+        Quantidade solicitada
+        --------------------------------------------------
+        */
+
+        let questionCount =
+            Number(
+                options.questionCount
+            );
+
+
         if (
-            this.exam.isFinished()
+            !Number.isInteger(
+                questionCount
+            ) ||
+            questionCount <= 0
         ) {
 
-            return false;
+            questionCount = 20;
 
         }
 
 
-        const started =
+        /*
+        --------------------------------------------------
+        Quantidade disponível
+        --------------------------------------------------
+        */
+
+        const available =
+            this.getAvailableQuestionCount();
+
+
+        if (available <= 0) {
+
+            throw new Error(
+                "ExamEngine: o banco de questões está vazio."
+            );
+
+        }
+
+
+        questionCount =
+            Math.min(
+                questionCount,
+                available
+            );
+
+
+        /*
+        --------------------------------------------------
+        Seleciona questões
+        --------------------------------------------------
+        */
+
+        const questions =
+            this.selectQuestions(
+                questionCount
+            );
+
+
+        if (
+            !Array.isArray(
+                questions
+            ) ||
+            questions.length === 0
+        ) {
+
+            throw new Error(
+                "ExamEngine: não foi possível selecionar questões para o exame."
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Duração em segundos
+        --------------------------------------------------
+        */
+
+        let duration =
+            Number(
+                options.duration
+            );
+
+
+        if (
+            !Number.isFinite(
+                duration
+            ) ||
+            duration < 0
+        ) {
+
+            duration = 0;
+
+        }
+
+
+        duration =
+            Math.floor(
+                duration
+            );
+
+
+        this.duration =
+            duration;
+
+        this.remainingTime =
+            duration;
+
+
+        /*
+        --------------------------------------------------
+        Interrompe timer anterior
+        --------------------------------------------------
+        */
+
+        this.stopTimer();
+
+
+        /*
+        --------------------------------------------------
+        Cria Exam
+
+        Mantemos a criação flexível para o modelo Exam
+        utilizado pelo projeto.
+        --------------------------------------------------
+        */
+
+        this.exam =
+            this.createExam(
+                questions,
+                options
+            );
+
+
+        if (!this.exam) {
+
+            throw new Error(
+                "ExamEngine: não foi possível criar o exame."
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Inicia o modelo
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.exam.start ===
+            "function"
+        ) {
+
             this.exam.start();
 
+        }
 
-        if (!started) {
 
-            return false;
+        /*
+        --------------------------------------------------
+        Primeira questão visitada
+        --------------------------------------------------
+        */
+
+        const currentQuestion =
+            this.getCurrentQuestion();
+
+
+        if (
+            currentQuestion &&
+            typeof currentQuestion.visit ===
+            "function"
+        ) {
+
+            currentQuestion.visit();
 
         }
 
 
-        this.startTimer();
-
+        /*
+        --------------------------------------------------
+        Eventos
+        --------------------------------------------------
+        */
 
         this.emit(
             "examStarted",
@@ -542,13 +305,705 @@ class ExamEngine {
                 exam:
                     this.exam,
 
-                question:
-                    this.exam
-                        .getCurrentQuestion(),
+                questionCount:
+                    this.getTotalQuestions(),
+
+                duration:
+                    this.duration
+
+            }
+        );
+
+
+        this.emitState();
+
+
+        return this.exam;
+
+    }
+
+
+    /*
+    ======================================================
+    CRIAR MODELO EXAM
+    ======================================================
+    */
+
+    createExam(
+        questions,
+        options = {}
+    ) {
+
+        /*
+        O modelo Exam já pertence ao projeto.
+
+        Primeiro tentamos o formato baseado em objeto.
+        Caso o modelo aceite simplesmente as questões,
+        mantemos compatibilidade.
+        */
+
+        let exam = null;
+
+
+        try {
+
+            exam =
+                new Exam({
+
+                    title:
+                        options.title ||
+                        "Cisco CCNA 200-301",
+
+                    domain:
+                        options.domain ||
+                        "Network Fundamentals",
+
+                    questions:
+                        questions,
+
+                    duration:
+                        this.duration,
+
+                    passingScore:
+                        Number(
+                            options.passingScore
+                        ) || 70
+
+                });
+
+        } catch (error) {
+
+            exam =
+                new Exam(
+                    questions
+                );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Proteção para modelos que não recebem questions
+        corretamente pelo construtor.
+        --------------------------------------------------
+        */
+
+        if (
+            exam &&
+            typeof exam.getTotalQuestions ===
+            "function" &&
+            exam.getTotalQuestions() === 0
+        ) {
+
+            if (
+                typeof exam.setQuestions ===
+                "function"
+            ) {
+
+                exam.setQuestions(
+                    questions
+                );
+
+            } else if (
+                Array.isArray(
+                    exam.questions
+                )
+            ) {
+
+                exam.questions =
+                    questions;
+
+            }
+
+        }
+
+
+        /*
+        Duração.
+        */
+
+        if (
+            exam &&
+            this.duration > 0
+        ) {
+
+            if (
+                typeof exam.setDuration ===
+                "function"
+            ) {
+
+                exam.setDuration(
+                    this.duration
+                );
+
+            } else {
+
+                exam.duration =
+                    this.duration;
+
+            }
+
+        }
+
+
+        return exam;
+
+    }
+
+
+    /*
+    ======================================================
+    SELECIONAR QUESTÕES
+    ======================================================
+    */
+
+    selectQuestions(
+        questionCount
+    ) {
+
+        const manager =
+            this.questionManager;
+
+
+        /*
+        --------------------------------------------------
+        Método específico de seleção
+        --------------------------------------------------
+        */
+
+        if (
+            typeof manager.selectQuestions ===
+            "function"
+        ) {
+
+            const selected =
+                manager.selectQuestions(
+                    questionCount
+                );
+
+
+            if (
+                Array.isArray(
+                    selected
+                )
+            ) {
+
+                return selected;
+
+            }
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Método getRandomQuestions
+        --------------------------------------------------
+        */
+
+        if (
+            typeof manager.getRandomQuestions ===
+            "function"
+        ) {
+
+            const selected =
+                manager.getRandomQuestions(
+                    questionCount
+                );
+
+
+            if (
+                Array.isArray(
+                    selected
+                )
+            ) {
+
+                return selected;
+
+            }
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Método getRandom
+        --------------------------------------------------
+        */
+
+        if (
+            typeof manager.getRandom ===
+            "function"
+        ) {
+
+            const selected =
+                manager.getRandom(
+                    questionCount
+                );
+
+
+            if (
+                Array.isArray(
+                    selected
+                )
+            ) {
+
+                return selected;
+
+            }
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Recupera coleção completa
+        --------------------------------------------------
+        */
+
+        let questions = [];
+
+
+        if (
+            typeof manager.getAll ===
+            "function"
+        ) {
+
+            questions =
+                manager.getAll();
+
+        } else if (
+            typeof manager.getQuestions ===
+            "function"
+        ) {
+
+            questions =
+                manager.getQuestions();
+
+        } else if (
+            Array.isArray(
+                manager.questions
+            )
+        ) {
+
+            questions =
+                manager.questions;
+
+        }
+
+
+        if (
+            !Array.isArray(
+                questions
+            )
+        ) {
+
+            return [];
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Clone
+
+        Evita que uma tentativa altere o banco original.
+        --------------------------------------------------
+        */
+
+        const cloned =
+            questions.map(
+                question => {
+
+                    if (
+                        question &&
+                        typeof question.clone ===
+                        "function"
+                    ) {
+
+                        return question.clone();
+
+                    }
+
+
+                    if (
+                        question instanceof Question
+                    ) {
+
+                        return new Question(
+                            question.toJSON()
+                        );
+
+                    }
+
+
+                    return new Question(
+                        question
+                    );
+
+                }
+            );
+
+
+        /*
+        --------------------------------------------------
+        Embaralhamento Fisher-Yates
+        --------------------------------------------------
+        */
+
+        for (
+            let index =
+                cloned.length - 1;
+
+            index > 0;
+
+            index--
+        ) {
+
+            const randomIndex =
+                Math.floor(
+                    Math.random() *
+                    (index + 1)
+                );
+
+
+            [
+                cloned[index],
+                cloned[randomIndex]
+            ] =
+            [
+                cloned[randomIndex],
+                cloned[index]
+            ];
+
+        }
+
+
+        return cloned.slice(
+            0,
+            questionCount
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    QUANTIDADE DISPONÍVEL
+    ======================================================
+    */
+
+    getAvailableQuestionCount() {
+
+        const manager =
+            this.questionManager;
+
+
+        if (!manager) {
+
+            return 0;
+
+        }
+
+
+        if (
+            typeof manager.getCount ===
+            "function"
+        ) {
+
+            return Number(
+                manager.getCount()
+            ) || 0;
+
+        }
+
+
+        if (
+            typeof manager.getTotalQuestions ===
+            "function"
+        ) {
+
+            return Number(
+                manager.getTotalQuestions()
+            ) || 0;
+
+        }
+
+
+        if (
+            typeof manager.getAll ===
+            "function"
+        ) {
+
+            const questions =
+                manager.getAll();
+
+
+            return Array.isArray(
+                questions
+            )
+                ? questions.length
+                : 0;
+
+        }
+
+
+        if (
+            Array.isArray(
+                manager.questions
+            )
+        ) {
+
+            return manager
+                .questions
+                .length;
+
+        }
+
+
+        return 0;
+
+    }
+
+
+    /*
+    ======================================================
+    QUESTÃO ATUAL
+    ======================================================
+    */
+
+    getCurrentQuestion() {
+
+        if (!this.exam) {
+
+            return null;
+
+        }
+
+
+        if (
+            typeof this.exam
+                .getCurrentQuestion ===
+                "function"
+        ) {
+
+            return this.exam
+                .getCurrentQuestion();
+
+        }
+
+
+        const index =
+            this.getCurrentIndex();
+
+
+        if (
+            typeof this.exam.getQuestion ===
+            "function"
+        ) {
+
+            return this.exam
+                .getQuestion(
+                    index
+                );
+
+        }
+
+
+        const questions =
+            this.getQuestions();
+
+
+        return (
+            questions[index] ||
+            null
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    ÍNDICE ATUAL
+    ======================================================
+    */
+
+    getCurrentIndex() {
+
+        if (!this.exam) {
+
+            return 0;
+
+        }
+
+
+        if (
+            typeof this.exam
+                .getCurrentIndex ===
+                "function"
+        ) {
+
+            return Number(
+                this.exam
+                    .getCurrentIndex()
+            ) || 0;
+
+        }
+
+
+        return Number(
+            this.exam.currentIndex
+        ) || 0;
+
+    }
+
+
+    /*
+    ======================================================
+    TOTAL
+    ======================================================
+    */
+
+    getTotalQuestions() {
+
+        if (!this.exam) {
+
+            return 0;
+
+        }
+
+
+        if (
+            typeof this.exam
+                .getTotalQuestions ===
+                "function"
+        ) {
+
+            return Number(
+                this.exam
+                    .getTotalQuestions()
+            ) || 0;
+
+        }
+
+
+        return this
+            .getQuestions()
+            .length;
+
+    }
+
+
+    /*
+    ======================================================
+    QUESTÕES
+    ======================================================
+    */
+
+    getQuestions() {
+
+        if (!this.exam) {
+
+            return [];
+
+        }
+
+
+        if (
+            typeof this.exam
+                .getQuestions ===
+                "function"
+        ) {
+
+            const questions =
+                this.exam
+                    .getQuestions();
+
+
+            return Array.isArray(
+                questions
+            )
+                ? questions
+                : [];
+
+        }
+
+
+        return Array.isArray(
+            this.exam.questions
+        )
+            ? this.exam.questions
+            : [];
+
+    }
+
+
+    /*
+    ======================================================
+    NAVEGAÇÃO - PRÓXIMA
+    ======================================================
+    */
+
+    nextQuestion() {
+
+        if (!this.exam) {
+
+            return false;
+
+        }
+
+
+        if (!this.hasNext()) {
+
+            return false;
+
+        }
+
+
+        let moved = false;
+
+
+        if (
+            typeof this.exam.nextQuestion ===
+            "function"
+        ) {
+
+            const result =
+                this.exam.nextQuestion();
+
+            moved =
+                result !== false;
+
+        } else {
+
+            moved =
+                this.goToQuestion(
+                    this.getCurrentIndex() + 1,
+                    false
+                );
+
+        }
+
+
+        if (!moved) {
+
+            return false;
+
+        }
+
+
+        this.visitCurrentQuestion();
+
+
+        this.emit(
+            "questionChanged",
+            {
 
                 index:
-                    this.exam
-                        .getCurrentIndex()
+                    this.getCurrentIndex(),
+
+                question:
+                    this.getCurrentQuestion()
 
             }
         );
@@ -564,63 +1019,261 @@ class ExamEngine {
 
     /*
     ======================================================
-    CRIAR E INICIAR
+    ALIAS NEXT
     ======================================================
     */
 
-    begin(options = {}) {
+    next() {
 
-        this.stopTimer();
-
-        this.createExam(options);
-
-        this.startExam();
-
-
-        return this.exam;
+        return this.nextQuestion();
 
     }
 
 
     /*
     ======================================================
-    EXAME ATUAL
+    NAVEGAÇÃO - ANTERIOR
     ======================================================
     */
 
-    getExam() {
-
-        return this.exam;
-
-    }
-
-
-    getCurrentQuestion() {
+    previousQuestion() {
 
         if (!this.exam) {
 
-            return null;
+            return false;
 
         }
 
 
-        return this.exam
-            .getCurrentQuestion();
+        if (!this.hasPrevious()) {
 
-    }
-
-
-    getCurrentIndex() {
-
-        if (!this.exam) {
-
-            return 0;
+            return false;
 
         }
 
 
-        return this.exam
-            .getCurrentIndex();
+        let moved = false;
+
+
+        if (
+            typeof this.exam
+                .previousQuestion ===
+                "function"
+        ) {
+
+            const result =
+                this.exam
+                    .previousQuestion();
+
+            moved =
+                result !== false;
+
+        } else {
+
+            moved =
+                this.goToQuestion(
+                    this.getCurrentIndex() - 1,
+                    false
+                );
+
+        }
+
+
+        if (!moved) {
+
+            return false;
+
+        }
+
+
+        this.visitCurrentQuestion();
+
+
+        this.emit(
+            "questionChanged",
+            {
+
+                index:
+                    this.getCurrentIndex(),
+
+                question:
+                    this.getCurrentQuestion()
+
+            }
+        );
+
+
+        this.emitState();
+
+
+        return true;
+
+    }
+
+
+    /*
+    ======================================================
+    ALIAS PREVIOUS
+    ======================================================
+    */
+
+    previous() {
+
+        return this.previousQuestion();
+
+    }
+
+
+    /*
+    ======================================================
+    IR PARA QUESTÃO
+    ======================================================
+    */
+
+    goToQuestion(
+        index,
+        emitEvent = true
+    ) {
+
+        if (!this.exam) {
+
+            return false;
+
+        }
+
+
+        index =
+            Number(index);
+
+
+        if (
+            !Number.isInteger(
+                index
+            ) ||
+            index < 0 ||
+            index >=
+                this.getTotalQuestions()
+        ) {
+
+            return false;
+
+        }
+
+
+        let moved = false;
+
+
+        if (
+            typeof this.exam
+                .goToQuestion ===
+                "function"
+        ) {
+
+            const result =
+                this.exam
+                    .goToQuestion(
+                        index
+                    );
+
+            moved =
+                result !== false;
+
+        } else if (
+            typeof this.exam
+                .goTo ===
+                "function"
+        ) {
+
+            const result =
+                this.exam.goTo(
+                    index
+                );
+
+            moved =
+                result !== false;
+
+        } else {
+
+            this.exam.currentIndex =
+                index;
+
+            moved = true;
+
+        }
+
+
+        if (!moved) {
+
+            return false;
+
+        }
+
+
+        this.visitCurrentQuestion();
+
+
+        if (emitEvent) {
+
+            this.emit(
+                "questionChanged",
+                {
+
+                    index:
+                        this.getCurrentIndex(),
+
+                    question:
+                        this.getCurrentQuestion()
+
+                }
+            );
+
+
+            this.emitState();
+
+        }
+
+
+        return true;
+
+    }
+
+
+    /*
+    ======================================================
+    ALIAS GOTO
+    ======================================================
+    */
+
+    goTo(index) {
+
+        return this.goToQuestion(
+            index
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    VISITAR ATUAL
+    ======================================================
+    */
+
+    visitCurrentQuestion() {
+
+        const question =
+            this.getCurrentQuestion();
+
+
+        if (
+            question &&
+            typeof question.visit ===
+            "function"
+        ) {
+
+            question.visit();
+
+        }
 
     }
 
@@ -631,92 +1284,85 @@ class ExamEngine {
     ======================================================
     */
 
-    goToQuestion(index) {
+    hasNext() {
+
+        if (!this.exam) {
+
+            return false;
+
+        }
+
 
         if (
-            !this.canInteract()
+            typeof this.exam.hasNext ===
+            "function"
         ) {
 
-            return false;
+            return Boolean(
+                this.exam.hasNext()
+            );
 
         }
 
 
-        const changed =
-            this.exam
-                .goToQuestion(index);
-
-
-        if (!changed) {
-
-            return false;
-
-        }
-
-
-        this.emitQuestionChange();
-
-        return true;
+        return (
+            this.getCurrentIndex() <
+            this.getTotalQuestions() - 1
+        );
 
     }
 
 
-    nextQuestion() {
+    hasPrevious() {
+
+        if (!this.exam) {
+
+            return false;
+
+        }
+
 
         if (
-            !this.canInteract()
+            typeof this.exam.hasPrevious ===
+            "function"
         ) {
 
-            return false;
+            return Boolean(
+                this.exam.hasPrevious()
+            );
 
         }
 
 
-        const changed =
-            this.exam
-                .nextQuestion();
-
-
-        if (!changed) {
-
-            return false;
-
-        }
-
-
-        this.emitQuestionChange();
-
-        return true;
+        return (
+            this.getCurrentIndex() >
+            0
+        );
 
     }
 
 
-    previousQuestion() {
+    isFirstQuestion() {
 
-        if (
-            !this.canInteract()
-        ) {
+        return (
+            this.getCurrentIndex() ===
+            0
+        );
 
-            return false;
-
-        }
-
-
-        const changed =
-            this.exam
-                .previousQuestion();
+    }
 
 
-        if (!changed) {
+    isLastQuestion() {
 
-            return false;
+        const total =
+            this.getTotalQuestions();
 
-        }
 
-
-        this.emitQuestionChange();
-
-        return true;
+        return (
+            total > 0 &&
+            this.getCurrentIndex() ===
+                total - 1
+        );
 
     }
 
@@ -729,15 +1375,6 @@ class ExamEngine {
 
     answer(answerId) {
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
         const question =
             this.getCurrentQuestion();
 
@@ -749,38 +1386,25 @@ class ExamEngine {
         }
 
 
-        const changed =
-            question.answer(
-                answerId
-            );
-
-
-        if (!changed) {
+        if (
+            typeof question.answer !==
+            "function"
+        ) {
 
             return false;
 
         }
 
 
-        this.emit(
-            "answerChanged",
-            {
-
-                question:
-                    question,
-
-                index:
-                    this.getCurrentIndex(),
-
-                userAnswers:
-                    question
-                        .getUserAnswers()
-
-            }
+        question.answer(
+            answerId
         );
 
 
-        this.emitState();
+        this.emitAnswerChanged(
+            question
+        );
+
 
         return true;
 
@@ -789,14 +1413,20 @@ class ExamEngine {
 
     /*
     ======================================================
-    DEFINE RESPOSTAS
+    DEFINIR RESPOSTAS
     ======================================================
     */
 
     setAnswers(answerIds = []) {
 
+        const question =
+            this.getCurrentQuestion();
+
+
         if (
-            !this.canInteract()
+            !question ||
+            typeof question.setAnswers !==
+            "function"
         ) {
 
             return false;
@@ -804,49 +1434,15 @@ class ExamEngine {
         }
 
 
-        const question =
-            this.getCurrentQuestion();
-
-
-        if (!question) {
-
-            return false;
-
-        }
-
-
-        const changed =
-            question.setAnswers(
-                answerIds
-            );
-
-
-        if (!changed) {
-
-            return false;
-
-        }
-
-
-        this.emit(
-            "answerChanged",
-            {
-
-                question:
-                    question,
-
-                index:
-                    this.getCurrentIndex(),
-
-                userAnswers:
-                    question
-                        .getUserAnswers()
-
-            }
+        question.setAnswers(
+            answerIds
         );
 
 
-        this.emitState();
+        this.emitAnswerChanged(
+            question
+        );
+
 
         return true;
 
@@ -861,15 +1457,6 @@ class ExamEngine {
 
     clearAnswer() {
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
         const question =
             this.getCurrentQuestion();
 
@@ -881,166 +1468,18 @@ class ExamEngine {
         }
 
 
-        switch (
-            question.getType()
-        ) {
-
-            case "single":
-
-            case "multiple":
-
-            case "cli":
-
-            case "exhibit":
-
-                question.clearAnswers();
-
-                break;
-
-
-            case "dragdrop":
-
-                question.clearDragdrop();
-
-                break;
-
-
-            case "matching":
-
-                question.clearMatching();
-
-                break;
-
-
-            case "ordering":
-
-                question.clearOrder();
-
-                break;
-
-
-            case "lab":
-
-                question.clearLabState();
-
-                break;
-
-
-            default:
-
-                return false;
-
-        }
-
-
-        this.emit(
-            "answerChanged",
-            {
-
-                question:
-                    question,
-
-                index:
-                    this.getCurrentIndex()
-
-            }
-        );
-
-
-        this.emitState();
-
-        return true;
-
-    }
-
-
-    /*
-    ======================================================
-    DRAG AND DROP
-    ======================================================
-    */
-
-    setDragdropAnswer(
-        targetId,
-        itemId
-    ) {
-
         if (
-            !this.canInteract()
+            typeof question.clearAnswers ===
+            "function"
         ) {
+
+            question.clearAnswers();
+
+        } else {
 
             return false;
 
         }
-
-
-        const question =
-            this.getCurrentQuestion();
-
-
-        if (
-            !question ||
-            !question.isDragDrop()
-        ) {
-
-            return false;
-
-        }
-
-
-        const changed =
-            question
-                .setDragdropAnswer(
-                    targetId,
-                    itemId
-                );
-
-
-        if (changed) {
-
-            this.emitAnswerChanged(
-                question
-            );
-
-        }
-
-
-        return changed;
-
-    }
-
-
-    removeDragdropAnswer(
-        targetId
-    ) {
-
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
-        const question =
-            this.getCurrentQuestion();
-
-
-        if (
-            !question ||
-            !question.isDragDrop()
-        ) {
-
-            return false;
-
-        }
-
-
-        question
-            .removeDragdropAnswer(
-                targetId
-            );
 
 
         this.emitAnswerChanged(
@@ -1064,22 +1503,15 @@ class ExamEngine {
         rightId
     ) {
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
         const question =
             this.getCurrentQuestion();
 
 
         if (
             !question ||
-            !question.isMatching()
+            typeof question
+                .setMatchingAnswer !==
+                "function"
         ) {
 
             return false;
@@ -1087,24 +1519,18 @@ class ExamEngine {
         }
 
 
-        const changed =
+        question.setMatchingAnswer(
+            leftId,
+            rightId
+        );
+
+
+        this.emitAnswerChanged(
             question
-                .setMatchingAnswer(
-                    leftId,
-                    rightId
-                );
+        );
 
 
-        if (changed) {
-
-            this.emitAnswerChanged(
-                question
-            );
-
-        }
-
-
-        return changed;
+        return true;
 
     }
 
@@ -1117,22 +1543,14 @@ class ExamEngine {
 
     setOrder(order = []) {
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
         const question =
             this.getCurrentQuestion();
 
 
         if (
             !question ||
-            !question.isOrdering()
+            typeof question.setOrder !==
+                "function"
         ) {
 
             return false;
@@ -1140,70 +1558,17 @@ class ExamEngine {
         }
 
 
-        const changed =
-            question.setOrder(order);
+        question.setOrder(
+            order
+        );
 
 
-        if (changed) {
-
-            this.emitAnswerChanged(
-                question
-            );
-
-        }
-
-
-        return changed;
-
-    }
-
-
-    moveOrderItem(
-        fromIndex,
-        toIndex
-    ) {
-
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
-        const question =
-            this.getCurrentQuestion();
-
-
-        if (
-            !question ||
-            !question.isOrdering()
-        ) {
-
-            return false;
-
-        }
-
-
-        const changed =
+        this.emitAnswerChanged(
             question
-                .moveOrderItem(
-                    fromIndex,
-                    toIndex
-                );
+        );
 
 
-        if (changed) {
-
-            this.emitAnswerChanged(
-                question
-            );
-
-        }
-
-
-        return changed;
+        return true;
 
     }
 
@@ -1216,22 +1581,14 @@ class ExamEngine {
 
     setLabState(state = {}) {
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
         const question =
             this.getCurrentQuestion();
 
 
         if (
             !question ||
-            !question.isLab()
+            typeof question.setLabState !==
+                "function"
         ) {
 
             return false;
@@ -1239,73 +1596,46 @@ class ExamEngine {
         }
 
 
-        const changed =
+        question.setLabState(
+            state
+        );
+
+
+        this.emitAnswerChanged(
             question
-                .setLabState(
-                    state
-                );
+        );
 
 
-        if (changed) {
-
-            this.emitAnswerChanged(
-                question
-            );
-
-        }
-
-
-        return changed;
+        return true;
 
     }
 
 
-    updateLabState(
-        key,
-        value
+    /*
+    ======================================================
+    EVENTO DE RESPOSTA
+    ======================================================
+    */
+
+    emitAnswerChanged(
+        question
     ) {
 
-        if (
-            !this.canInteract()
-        ) {
+        this.emit(
+            "answerChanged",
+            {
 
-            return false;
+                index:
+                    this.getCurrentIndex(),
 
-        }
+                question:
+                    question
 
-
-        const question =
-            this.getCurrentQuestion();
-
-
-        if (
-            !question ||
-            !question.isLab()
-        ) {
-
-            return false;
-
-        }
+            }
+        );
 
 
-        const changed =
-            question
-                .updateLabState(
-                    key,
-                    value
-                );
-
-
-        if (changed) {
-
-            this.emitAnswerChanged(
-                question
-            );
-
-        }
-
-
-        return changed;
+        this.emitState();
 
     }
 
@@ -1318,15 +1648,6 @@ class ExamEngine {
 
     toggleReview() {
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
-
         const question =
             this.getCurrentQuestion();
 
@@ -1338,22 +1659,42 @@ class ExamEngine {
         }
 
 
-        const review =
-            question.toggleReview();
+        let review;
+
+
+        if (
+            typeof question.toggleReview ===
+            "function"
+        ) {
+
+            review =
+                question.toggleReview();
+
+        } else {
+
+            question.review =
+                !Boolean(
+                    question.review
+                );
+
+            review =
+                question.review;
+
+        }
 
 
         this.emit(
             "reviewChanged",
             {
 
-                question:
-                    question,
-
                 index:
                     this.getCurrentIndex(),
 
+                question:
+                    question,
+
                 review:
-                    review
+                    Boolean(review)
 
             }
         );
@@ -1362,21 +1703,20 @@ class ExamEngine {
         this.emitState();
 
 
-        return review;
+        return Boolean(
+            review
+        );
 
     }
 
 
-    setReview(value = true) {
+    /*
+    ======================================================
+    ESTADO DA QUESTÃO
+    ======================================================
+    */
 
-        if (
-            !this.canInteract()
-        ) {
-
-            return false;
-
-        }
-
+    hasAnsweredCurrentQuestion() {
 
         const question =
             this.getCurrentQuestion();
@@ -1389,33 +1729,186 @@ class ExamEngine {
         }
 
 
-        const review =
-            question.setReview(
-                value
+        if (
+            typeof question.isAnswered ===
+            "function"
+        ) {
+
+            return Boolean(
+                question.isAnswered()
             );
 
+        }
 
-        this.emit(
-            "reviewChanged",
-            {
 
-                question:
-                    question,
+        return false;
 
-                index:
-                    this.getCurrentIndex(),
+    }
 
-                review:
-                    review
 
-            }
+    isCurrentQuestionMarkedForReview() {
+
+        const question =
+            this.getCurrentQuestion();
+
+
+        if (!question) {
+
+            return false;
+
+        }
+
+
+        if (
+            typeof question
+                .isMarkedForReview ===
+                "function"
+        ) {
+
+            return Boolean(
+                question
+                    .isMarkedForReview()
+            );
+
+        }
+
+
+        return Boolean(
+            question.review
         );
 
+    }
 
-        this.emitState();
+
+    /*
+    ======================================================
+    CONTADORES
+    ======================================================
+    */
+
+    getAnsweredCount() {
+
+        return this
+            .getQuestions()
+            .filter(
+                question =>
+                    question &&
+                    typeof question
+                        .isAnswered ===
+                        "function" &&
+                    question.isAnswered()
+            )
+            .length;
+
+    }
 
 
-        return review;
+    getUnansweredCount() {
+
+        return Math.max(
+            0,
+            this.getTotalQuestions() -
+            this.getAnsweredCount()
+        );
+
+    }
+
+
+    getRemainingCount() {
+
+        return this
+            .getUnansweredCount();
+
+    }
+
+
+    getReviewCount() {
+
+        return this
+            .getQuestions()
+            .filter(
+                question => {
+
+                    if (!question) {
+
+                        return false;
+
+                    }
+
+
+                    if (
+                        typeof question
+                            .isMarkedForReview ===
+                            "function"
+                    ) {
+
+                        return question
+                            .isMarkedForReview();
+
+                    }
+
+
+                    return Boolean(
+                        question.review
+                    );
+
+                }
+            )
+            .length;
+
+    }
+
+
+    /*
+    ======================================================
+    PROGRESSO
+    ======================================================
+    */
+
+    getProgress() {
+
+        const total =
+            this.getTotalQuestions();
+
+
+        const current =
+            total > 0
+                ? this.getCurrentIndex() + 1
+                : 0;
+
+
+        const answered =
+            this.getAnsweredCount();
+
+
+        const percent =
+            total > 0
+                ? Math.round(
+                    (
+                        answered /
+                        total
+                    ) * 100
+                )
+                : 0;
+
+
+        return {
+
+            current,
+
+            total,
+
+            answered,
+
+            remaining:
+                this.getRemainingCount(),
+
+            review:
+                this.getReviewCount(),
+
+            percent
+
+        };
 
     }
 
@@ -1432,8 +1925,7 @@ class ExamEngine {
 
 
         if (
-            !this.exam ||
-            this.exam.isFinished()
+            this.remainingTime <= 0
         ) {
 
             return false;
@@ -1441,164 +1933,87 @@ class ExamEngine {
         }
 
 
-        this.timerRunning = true;
-
-        this.lastTickTime =
-            Date.now();
-
-
         this.timerInterval =
             window.setInterval(
                 () => {
 
-                    this.processTimer();
+                    this.remainingTime =
+                        Math.max(
+                            0,
+                            this.remainingTime - 1
+                        );
+
+
+                    /*
+                    Mantém o Exam sincronizado
+                    quando o modelo possuir suporte.
+                    */
+
+                    if (this.exam) {
+
+                        if (
+                            typeof this.exam
+                                .setRemainingTime ===
+                                "function"
+                        ) {
+
+                            this.exam
+                                .setRemainingTime(
+                                    this.remainingTime
+                                );
+
+                        } else {
+
+                            this.exam.remainingTime =
+                                this.remainingTime;
+
+                        }
+
+                    }
+
+
+                    this.emit(
+                        "timeChanged",
+                        {
+
+                            remainingTime:
+                                this.remainingTime,
+
+                            elapsedTime:
+                                this.getElapsedTime()
+
+                        }
+                    );
+
+
+                    if (
+                        this.remainingTime <= 0
+                    ) {
+
+                        this.stopTimer();
+
+
+                        this.emit(
+                            "timeExpired",
+                            {}
+                        );
+
+
+                        this.finishExam(
+                            "timer"
+                        );
+
+                    }
 
                 },
-                this.config.timerInterval
+                1000
             );
-
-
-        this.emitTimer();
 
 
         return true;
 
     }
 
-
-    /*
-    ======================================================
-    PROCESSAMENTO DO TIMER
-    ======================================================
-    */
-
-    processTimer() {
-
-        if (
-            !this.exam ||
-            !this.timerRunning
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            this.exam.isFinished()
-        ) {
-
-            this.stopTimer();
-
-            return;
-
-        }
-
-
-        if (
-            this.exam.isPaused()
-        ) {
-
-            this.lastTickTime =
-                Date.now();
-
-            return;
-
-        }
-
-
-        const now =
-            Date.now();
-
-
-        const difference =
-            now -
-            this.lastTickTime;
-
-
-        const elapsedSeconds =
-            Math.floor(
-                difference / 1000
-            );
-
-
-        if (
-            elapsedSeconds < 1
-        ) {
-
-            return;
-
-        }
-
-
-        this.lastTickTime +=
-            elapsedSeconds * 1000;
-
-
-        this.exam.tick(
-            elapsedSeconds
-        );
-
-
-        this.emitTimer();
-
-
-        /*
-        --------------------------------------------------
-        Exam.tick() finaliza automaticamente
-        quando o tempo chega a zero.
-        --------------------------------------------------
-        */
-
-        if (
-            this.exam.isFinished()
-        ) {
-
-            this.stopTimer();
-
-
-            this.emit(
-                "timeExpired",
-                {
-
-                    exam:
-                        this.exam,
-
-                    result:
-                        this.exam
-                            .getResult()
-
-                }
-            );
-
-
-            this.emit(
-                "examFinished",
-                {
-
-                    exam:
-                        this.exam,
-
-                    result:
-                        this.exam
-                            .getResult()
-
-                }
-            );
-
-
-            this.emitState();
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    PARAR TIMER
-    ======================================================
-    */
 
     stopTimer() {
 
@@ -1611,96 +2026,128 @@ class ExamEngine {
                 this.timerInterval
             );
 
+            this.timerInterval =
+                null;
+
         }
-
-
-        this.timerInterval = null;
-
-        this.timerRunning = false;
-
-        this.lastTickTime = null;
 
     }
 
 
     /*
     ======================================================
-    PAUSAR EXAME
+    TEMPO RESTANTE
     ======================================================
     */
 
-    pauseExam() {
+    getRemainingTime() {
 
-        if (!this.exam) {
+        if (
+            this.remainingTime > 0
+        ) {
 
-            return false;
+            return this.remainingTime;
 
         }
 
 
-        const paused =
-            this.exam.pause();
+        if (!this.exam) {
+
+            return 0;
+
+        }
 
 
-        if (paused) {
+        if (
+            typeof this.exam
+                .getRemainingTime ===
+                "function"
+        ) {
 
-            this.emit(
-                "examPaused",
-                {
-
-                    exam:
-                        this.exam
-
-                }
+            return Math.max(
+                0,
+                Number(
+                    this.exam
+                        .getRemainingTime()
+                ) || 0
             );
 
         }
 
 
-        return paused;
+        return Math.max(
+            0,
+            Number(
+                this.exam.remainingTime
+            ) || 0
+        );
 
     }
 
 
     /*
     ======================================================
-    CONTINUAR EXAME
+    TEMPO DECORRIDO
     ======================================================
     */
 
-    resumeExam() {
+    getElapsedTime() {
 
         if (!this.exam) {
 
-            return false;
+            return 0;
 
         }
 
 
-        const resumed =
-            this.exam.resume();
+        if (
+            typeof this.exam
+                .getElapsedSeconds ===
+                "function"
+        ) {
 
-
-        if (resumed) {
-
-            this.lastTickTime =
-                Date.now();
-
-
-            this.emit(
-                "examResumed",
-                {
-
-                    exam:
-                        this.exam
-
-                }
+            return Math.max(
+                0,
+                Number(
+                    this.exam
+                        .getElapsedSeconds()
+                ) || 0
             );
 
         }
 
 
-        return resumed;
+        if (
+            typeof this.exam
+                .getElapsedTime ===
+                "function"
+        ) {
+
+            return Math.max(
+                0,
+                Number(
+                    this.exam
+                        .getElapsedTime()
+                ) || 0
+            );
+
+        }
+
+
+        if (
+            this.duration > 0
+        ) {
+
+            return Math.max(
+                0,
+                this.duration -
+                this.remainingTime
+            );
+
+        }
+
+
+        return 0;
 
     }
 
@@ -1712,22 +2159,27 @@ class ExamEngine {
     */
 
     finishExam(
-        reason = "user"
+        reason = "manual"
     ) {
 
         if (!this.exam) {
 
-            return null;
+            return false;
 
         }
 
 
+        /*
+        Evita finalizar duas vezes.
+        */
+
         if (
+            typeof this.exam.isFinished ===
+                "function" &&
             this.exam.isFinished()
         ) {
 
-            return this.exam
-                .getResult();
+            return this.getResult();
 
         }
 
@@ -1735,25 +2187,41 @@ class ExamEngine {
         this.stopTimer();
 
 
-        const result =
-            this.exam.finish(
-                reason
-            );
+        /*
+        --------------------------------------------------
+        Finaliza modelo
+        --------------------------------------------------
+        */
+
+        let modelResult =
+            null;
+
+
+        if (
+            typeof this.exam.finish ===
+            "function"
+        ) {
+
+            modelResult =
+                this.exam.finish();
+
+        }
 
 
         /*
         --------------------------------------------------
-        Adiciona informação de aprovação.
+        Resultado normalizado
         --------------------------------------------------
         */
 
-        result.passingScore =
-            this.config.passingScore;
+        const result =
+            this.buildResult(
+                modelResult
+            );
 
 
-        result.passed =
-            result.score >=
-            this.config.passingScore;
+        result.finishReason =
+            reason;
 
 
         this.emit(
@@ -1764,7 +2232,10 @@ class ExamEngine {
                     this.exam,
 
                 result:
-                    result
+                    result,
+
+                reason:
+                    reason
 
             }
         );
@@ -1780,126 +2251,744 @@ class ExamEngine {
 
     /*
     ======================================================
-    RESET
+    ALIAS FINISH
     ======================================================
     */
 
-    resetExam() {
+    finish() {
 
-        this.stopTimer();
+        return this.finishExam(
+            "manual"
+        );
 
+    }
+
+
+    /*
+    ======================================================
+    RESULTADO
+    ======================================================
+    */
+
+    getResult() {
 
         if (!this.exam) {
 
-            return false;
+            return null;
 
         }
 
 
-        this.exam.reset();
+        let result =
+            null;
 
 
-        this.emit(
-            "examReset",
-            {
+        if (
+            typeof this.exam.getResult ===
+            "function"
+        ) {
 
-                exam:
-                    this.exam
+            result =
+                this.exam.getResult();
+
+        }
+
+
+        return this.buildResult(
+            result
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    NORMALIZAR RESULTADO
+    ======================================================
+    */
+
+    buildResult(
+        baseResult = null
+    ) {
+
+        const questions =
+            this.getQuestions();
+
+
+        const totalQuestions =
+            questions.length;
+
+
+        let correct = 0;
+
+        let incorrect = 0;
+
+        let unanswered = 0;
+
+        let review = 0;
+
+
+        const questionResults =
+            questions.map(
+                (
+                    question,
+                    index
+                ) => {
+
+                    const answered =
+                        question &&
+                        typeof question
+                            .isAnswered ===
+                            "function"
+                            ? Boolean(
+                                question
+                                    .isAnswered()
+                            )
+                            : false;
+
+
+                    const isCorrect =
+                        answered &&
+                        question &&
+                        typeof question
+                            .isCorrect ===
+                            "function"
+                            ? Boolean(
+                                question
+                                    .isCorrect()
+                            )
+                            : false;
+
+
+                    const marked =
+                        question &&
+                        typeof question
+                            .isMarkedForReview ===
+                            "function"
+                            ? Boolean(
+                                question
+                                    .isMarkedForReview()
+                            )
+                            : Boolean(
+                                question &&
+                                question.review
+                            );
+
+
+                    if (!answered) {
+
+                        unanswered++;
+
+                    } else if (
+                        isCorrect
+                    ) {
+
+                        correct++;
+
+                    } else {
+
+                        incorrect++;
+
+                    }
+
+
+                    if (marked) {
+
+                        review++;
+
+                    }
+
+
+                    return {
+
+                        number:
+                            index + 1,
+
+                        id:
+                            this.getQuestionId(
+                                question
+                            ),
+
+                        domain:
+                            this.getQuestionDomain(
+                                question
+                            ),
+
+                        type:
+                            this.getQuestionType(
+                                question
+                            ),
+
+                        question:
+                            this.getQuestionText(
+                                question
+                            ),
+
+                        answered:
+                            answered,
+
+                        correct:
+                            isCorrect,
+
+                        review:
+                            marked,
+
+                        userAnswers:
+                            this.getUserAnswers(
+                                question
+                            ),
+
+                        correctAnswers:
+                            this.getCorrectAnswers(
+                                question
+                            ),
+
+                        explanation:
+                            this.getQuestionExplanation(
+                                question
+                            )
+
+                    };
+
+                }
+            );
+
+
+        const score =
+            totalQuestions > 0
+                ? Math.round(
+                    (
+                        correct /
+                        totalQuestions
+                    ) * 100
+                )
+                : 0;
+
+
+        /*
+        --------------------------------------------------
+        Resultado base do Exam
+
+        Preservamos dados adicionais produzidos pelo
+        modelo, mas os campos críticos abaixo são
+        recalculados diretamente das Question.
+        --------------------------------------------------
+        */
+
+        const normalized =
+            (
+                baseResult &&
+                typeof baseResult ===
+                "object"
+            )
+                ? {
+                    ...baseResult
+                }
+                : {};
+
+
+        normalized.title =
+            normalized.title ||
+            "Cisco CCNA 200-301";
+
+
+        normalized.domain =
+            normalized.domain ||
+            "Network Fundamentals";
+
+
+        normalized.total =
+            totalQuestions;
+
+
+        normalized.totalQuestions =
+            totalQuestions;
+
+
+        normalized.answered =
+            correct +
+            incorrect;
+
+
+        normalized.correct =
+            correct;
+
+
+        normalized.incorrect =
+            incorrect;
+
+
+        normalized.unanswered =
+            unanswered;
+
+
+        normalized.review =
+            review;
+
+
+        normalized.score =
+            score;
+
+
+        normalized.percentage =
+            score;
+
+
+        normalized.passingScore =
+            Number.isFinite(
+                Number(
+                    normalized
+                        .passingScore
+                )
+            )
+                ? Number(
+                    normalized
+                        .passingScore
+                )
+                : 70;
+
+
+        normalized.passed =
+            score >=
+            normalized.passingScore;
+
+
+        normalized.elapsedTime =
+            this.getElapsedTime();
+
+
+        normalized.elapsedSeconds =
+            normalized.elapsedTime;
+
+
+        normalized.formattedElapsedTime =
+            this.formatTime(
+                normalized.elapsedTime
+            );
+
+
+        normalized.questions =
+            questionResults;
+
+
+        normalized.domains =
+            this.buildDomainResults(
+                questionResults
+            );
+
+
+        return normalized;
+
+    }
+
+
+    /*
+    ======================================================
+    RESULTADO POR DOMÍNIO
+    ======================================================
+    */
+
+    buildDomainResults(
+        questionResults
+    ) {
+
+        const domains = {};
+
+
+        questionResults.forEach(
+            item => {
+
+                const name =
+                    item.domain ||
+                    "Network Fundamentals";
+
+
+                if (!domains[name]) {
+
+                    domains[name] = {
+
+                        domain:
+                            name,
+
+                        total:
+                            0,
+
+                        correct:
+                            0,
+
+                        incorrect:
+                            0,
+
+                        unanswered:
+                            0,
+
+                        percentage:
+                            0
+
+                    };
+
+                }
+
+
+                const domain =
+                    domains[name];
+
+
+                domain.total++;
+
+
+                if (!item.answered) {
+
+                    domain.unanswered++;
+
+                } else if (
+                    item.correct
+                ) {
+
+                    domain.correct++;
+
+                } else {
+
+                    domain.incorrect++;
+
+                }
 
             }
         );
 
 
-        this.emitState();
+        Object
+            .values(
+                domains
+            )
+            .forEach(
+                domain => {
+
+                    domain.percentage =
+                        domain.total > 0
+                            ? Math.round(
+                                (
+                                    domain.correct /
+                                    domain.total
+                                ) * 100
+                            )
+                            : 0;
+
+                }
+            );
 
 
-        return true;
-
-    }
-
-
-    /*
-    ======================================================
-    DESTRUIR SESSÃO
-    ======================================================
-    */
-
-    destroyExam() {
-
-        this.stopTimer();
-
-        this.exam = null;
-
-
-        this.emit(
-            "examDestroyed",
-            {}
-        );
+        return domains;
 
     }
 
 
     /*
     ======================================================
-    PODE INTERAGIR?
+    HELPERS DE QUESTION
     ======================================================
     */
 
-    canInteract() {
+    getQuestionId(
+        question
+    ) {
 
-        return Boolean(
+        if (!question) {
 
-            this.exam &&
-
-            this.exam.isStarted() &&
-
-            !this.exam.isFinished()
-
-        );
-
-    }
-
-
-    /*
-    ======================================================
-    ESTATÍSTICAS
-    ======================================================
-    */
-
-    getStatistics() {
-
-        if (!this.exam) {
-
-            return {
-
-                total:
-                    0,
-
-                answered:
-                    0,
-
-                unanswered:
-                    0,
-
-                review:
-                    0,
-
-                correct:
-                    0,
-
-                incorrect:
-                    0,
-
-                progress:
-                    0
-
-            };
+            return "";
 
         }
 
 
-        return this.exam
-            .getStatistics();
+        if (
+            typeof question.getId ===
+            "function"
+        ) {
+
+            return String(
+                question.getId() || ""
+            );
+
+        }
+
+
+        return String(
+            question.id || ""
+        );
+
+    }
+
+
+    getQuestionDomain(
+        question
+    ) {
+
+        if (!question) {
+
+            return "";
+
+        }
+
+
+        if (
+            typeof question.getDomain ===
+            "function"
+        ) {
+
+            return String(
+                question.getDomain() || ""
+            );
+
+        }
+
+
+        return String(
+            question.domain || ""
+        );
+
+    }
+
+
+    getQuestionType(
+        question
+    ) {
+
+        if (!question) {
+
+            return "single";
+
+        }
+
+
+        if (
+            typeof question.getType ===
+            "function"
+        ) {
+
+            return String(
+                question.getType() ||
+                "single"
+            );
+
+        }
+
+
+        return String(
+            question.type ||
+            "single"
+        );
+
+    }
+
+
+    getQuestionText(
+        question
+    ) {
+
+        if (!question) {
+
+            return "";
+
+        }
+
+
+        if (
+            typeof question.getQuestion ===
+            "function"
+        ) {
+
+            return String(
+                question.getQuestion() ||
+                ""
+            );
+
+        }
+
+
+        return String(
+            question.question ||
+            ""
+        );
+
+    }
+
+
+    getQuestionExplanation(
+        question
+    ) {
+
+        if (!question) {
+
+            return "";
+
+        }
+
+
+        if (
+            typeof question.getExplanation ===
+            "function"
+        ) {
+
+            return String(
+                question
+                    .getExplanation() ||
+                ""
+            );
+
+        }
+
+
+        return String(
+            question.explanation ||
+            ""
+        );
+
+    }
+
+
+    getUserAnswers(
+        question
+    ) {
+
+        if (!question) {
+
+            return [];
+
+        }
+
+
+        if (
+            typeof question
+                .getUserAnswers ===
+                "function"
+        ) {
+
+            const answers =
+                question
+                    .getUserAnswers();
+
+
+            return Array.isArray(
+                answers
+            )
+                ? [...answers]
+                : [];
+
+        }
+
+
+        return Array.isArray(
+            question.userAnswers
+        )
+            ? [
+                ...question.userAnswers
+            ]
+            : [];
+
+    }
+
+
+    getCorrectAnswers(
+        question
+    ) {
+
+        if (!question) {
+
+            return [];
+
+        }
+
+
+        if (
+            typeof question
+                .getCorrectAnswers ===
+                "function"
+        ) {
+
+            const answers =
+                question
+                    .getCorrectAnswers();
+
+
+            return Array.isArray(
+                answers
+            )
+                ? [...answers]
+                : [];
+
+        }
+
+
+        return Array.isArray(
+            question.correctAnswers
+        )
+            ? [
+                ...question.correctAnswers
+            ]
+            : [];
+
+    }
+
+
+    /*
+    ======================================================
+    FORMATAR TEMPO
+    ======================================================
+    */
+
+    formatTime(
+        totalSeconds
+    ) {
+
+        const seconds =
+            Math.max(
+                0,
+                Math.floor(
+                    Number(
+                        totalSeconds
+                    ) || 0
+                )
+            );
+
+
+        const hours =
+            Math.floor(
+                seconds / 3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (
+                    seconds % 3600
+                ) / 60
+            );
+
+
+        const remainingSeconds =
+            seconds % 60;
+
+
+        return (
+            String(hours)
+                .padStart(
+                    2,
+                    "0"
+                ) +
+            ":" +
+            String(minutes)
+                .padStart(
+                    2,
+                    "0"
+                ) +
+            ":" +
+            String(
+                remainingSeconds
+            ).padStart(
+                2,
+                "0"
+            )
+        );
 
     }
 
@@ -1912,61 +3001,34 @@ class ExamEngine {
 
     getState() {
 
-        if (!this.exam) {
-
-            return {
-
-                active:
-                    false,
-
-                exam:
-                    null
-
-            };
-
-        }
-
-
         return {
 
-            active:
-                this.canInteract(),
-
-            started:
-                this.exam
-                    .isStarted(),
-
-            finished:
-                this.exam
-                    .isFinished(),
-
-            paused:
-                this.exam
-                    .isPaused(),
+            exam:
+                this.exam,
 
             currentIndex:
-                this.exam
-                    .getCurrentIndex(),
-
-            currentQuestion:
-                this.exam
-                    .getCurrentQuestion(),
+                this.getCurrentIndex(),
 
             totalQuestions:
-                this.exam
-                    .getTotalQuestions(),
+                this.getTotalQuestions(),
+
+            answered:
+                this.getAnsweredCount(),
+
+            unanswered:
+                this.getUnansweredCount(),
+
+            review:
+                this.getReviewCount(),
 
             remainingTime:
-                this.exam
-                    .getRemainingTime(),
+                this.getRemainingTime(),
 
-            formattedRemainingTime:
-                this.exam
-                    .getFormattedRemainingTime(),
+            elapsedTime:
+                this.getElapsedTime(),
 
-            statistics:
-                this.exam
-                    .getStatistics()
+            progress:
+                this.getProgress()
 
         };
 
@@ -1975,102 +3037,7 @@ class ExamEngine {
 
     /*
     ======================================================
-    EMISSÃO DE MUDANÇA DE QUESTÃO
-    ======================================================
-    */
-
-    emitQuestionChange() {
-
-        this.emit(
-            "questionChanged",
-            {
-
-                question:
-                    this.getCurrentQuestion(),
-
-                index:
-                    this.getCurrentIndex(),
-
-                total:
-                    this.exam
-                        .getTotalQuestions()
-
-            }
-        );
-
-
-        this.emitState();
-
-    }
-
-
-    /*
-    ======================================================
-    EMISSÃO DE ALTERAÇÃO DE RESPOSTA
-    ======================================================
-    */
-
-    emitAnswerChanged(question) {
-
-        this.emit(
-            "answerChanged",
-            {
-
-                question:
-                    question,
-
-                index:
-                    this.getCurrentIndex()
-
-            }
-        );
-
-
-        this.emitState();
-
-    }
-
-
-    /*
-    ======================================================
-    EMISSÃO DO TIMER
-    ======================================================
-    */
-
-    emitTimer() {
-
-        if (!this.exam) {
-
-            return;
-
-        }
-
-
-        this.emit(
-            "timer",
-            {
-
-                remainingTime:
-                    this.exam
-                        .getRemainingTime(),
-
-                elapsedTime:
-                    this.exam
-                        .getElapsedTime(),
-
-                formatted:
-                    this.exam
-                        .getFormattedRemainingTime()
-
-            }
-        );
-
-    }
-
-
-    /*
-    ======================================================
-    EMISSÃO DO ESTADO
+    EMITIR ESTADO
     ======================================================
     */
 
@@ -2096,8 +3063,10 @@ class ExamEngine {
     ) {
 
         if (
+            typeof eventName !==
+                "string" ||
             typeof callback !==
-            "function"
+                "function"
         ) {
 
             return () => {};
@@ -2106,9 +3075,11 @@ class ExamEngine {
 
 
         if (
-            !this.listeners[
-                eventName
-            ]
+            !Array.isArray(
+                this.listeners[
+                    eventName
+                ]
+            )
         ) {
 
             this.listeners[
@@ -2125,12 +3096,6 @@ class ExamEngine {
         );
 
 
-        /*
-        --------------------------------------------------
-        Retorna função para remover listener.
-        --------------------------------------------------
-        */
-
         return () => {
 
             this.off(
@@ -2143,21 +3108,17 @@ class ExamEngine {
     }
 
 
-    /*
-    ======================================================
-    REMOVER EVENTO
-    ======================================================
-    */
-
     off(
         eventName,
         callback
     ) {
 
         if (
-            !this.listeners[
-                eventName
-            ]
+            !Array.isArray(
+                this.listeners[
+                    eventName
+                ]
+            )
         ) {
 
             return;
@@ -2179,12 +3140,6 @@ class ExamEngine {
     }
 
 
-    /*
-    ======================================================
-    DISPARAR EVENTO
-    ======================================================
-    */
-
     emit(
         eventName,
         payload = {}
@@ -2197,7 +3152,9 @@ class ExamEngine {
 
 
         if (
-            !Array.isArray(listeners)
+            !Array.isArray(
+                listeners
+            )
         ) {
 
             return;
@@ -2205,35 +3162,32 @@ class ExamEngine {
         }
 
 
-        listeners.forEach(
-            listener => {
+        [...listeners]
+            .forEach(
+                listener => {
 
-                try {
+                    try {
 
-                    listener(
-                        payload
-                    );
+                        listener(
+                            payload
+                        );
 
-                } catch (error) {
-
-                    console.error(
-                        `ExamEngine event error (${eventName}):`,
+                    } catch (
                         error
-                    );
+                    ) {
+
+                        console.error(
+                            `ExamEngine event error (${eventName}):`,
+                            error
+                        );
+
+                    }
 
                 }
-
-            }
-        );
+            );
 
     }
 
-
-    /*
-    ======================================================
-    LIMPAR EVENTOS
-    ======================================================
-    */
 
     clearListeners() {
 
@@ -2245,8 +3199,6 @@ class ExamEngine {
     /*
     ======================================================
     RESTAURAR EXAME
-
-    Será utilizado posteriormente pelo StorageManager.
     ======================================================
     */
 
@@ -2255,12 +3207,69 @@ class ExamEngine {
         this.stopTimer();
 
 
+        if (!data) {
+
+            return false;
+
+        }
+
+
         this.exam =
             data instanceof Exam
                 ? data
-                : Exam.fromJSON(
-                    data
+                : (
+                    typeof Exam.fromJSON ===
+                        "function"
+                        ? Exam.fromJSON(
+                            data
+                        )
+                        : new Exam(
+                            data
+                        )
                 );
+
+
+        if (!this.exam) {
+
+            return false;
+
+        }
+
+
+        /*
+        Recupera duração/tempo quando disponível.
+        */
+
+        this.duration =
+            Number(
+                this.exam.duration
+            ) || 0;
+
+
+        if (
+            typeof this.exam
+                .getRemainingTime ===
+                "function"
+        ) {
+
+            this.remainingTime =
+                Number(
+                    this.exam
+                        .getRemainingTime()
+                ) || 0;
+
+        } else {
+
+            this.remainingTime =
+                Number(
+                    this.exam
+                        .remainingTime
+                ) || 0;
+
+        }
+
+
+        this.visitCurrentQuestion();
 
 
         this.emit(
@@ -2274,21 +3283,68 @@ class ExamEngine {
         );
 
 
-        if (
-            this.exam.isStarted() &&
-            !this.exam.isFinished() &&
-            !this.exam.isPaused()
-        ) {
-
-            this.startTimer();
-
-        }
-
-
         this.emitState();
 
 
         return this.exam;
+
+    }
+
+
+    /*
+    ======================================================
+    RESET
+    ======================================================
+    */
+
+    reset() {
+
+        this.stopTimer();
+
+        this.exam =
+            null;
+
+        this.remainingTime =
+            0;
+
+        this.duration =
+            0;
+
+
+        this.emit(
+            "examReset",
+            {}
+        );
+
+
+        return true;
+
+    }
+
+
+    /*
+    ======================================================
+    DESTROY
+    ======================================================
+    */
+
+    destroy() {
+
+        this.stopTimer();
+
+        this.clearListeners();
+
+        this.exam =
+            null;
+
+        this.questionManager =
+            null;
+
+        this.remainingTime =
+            0;
+
+        this.duration =
+            0;
 
     }
 
