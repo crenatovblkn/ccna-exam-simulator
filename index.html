@@ -41,6 +41,16 @@
 
     <link
         rel="stylesheet"
+        href="css/question-types.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/review.css"
+    >
+
+    <link
+        rel="stylesheet"
         href="css/responsive.css"
     >
 
@@ -359,8 +369,6 @@
                 </div>
 
 
-                <!-- QUESTION NAVIGATION -->
-
                 <nav
                     id="questionNavigation"
                     class="question-navigation"
@@ -430,8 +438,6 @@
 
             <main class="question-area">
 
-
-                <!-- QUESTION CARD -->
 
                 <article
                     id="questionCard"
@@ -526,7 +532,7 @@
                     </section>
 
 
-                    <!-- IMAGE / TOPOLOGY -->
+                    <!-- IMAGE -->
 
                     <section
                         id="imageContainer"
@@ -557,19 +563,7 @@
 
 
                     <!-- =================================================
-                         ANSWER RENDERING AREA
-
-                         Os renderizadores JavaScript usarão este
-                         container para:
-
-                         single
-                         multiple
-                         dragdrop
-                         matching
-                         ordering
-                         exhibit
-                         lab
-                         CLI
+                         ANSWER AREA
                          ================================================= -->
 
                     <section
@@ -579,7 +573,9 @@
                     </section>
 
 
-                    <!-- LAB AREA -->
+                    <!-- =================================================
+                         LAB
+                         ================================================= -->
 
                     <section
                         id="labContainer"
@@ -648,8 +644,6 @@
 
                     <!-- =================================================
                          EXPLANATION
-
-                         Nunca será exibida durante uma prova ativa.
                          ================================================= -->
 
                     <section
@@ -672,7 +666,7 @@
 
 
                 <!-- =============================================
-                     QUESTION CONTROLS
+                     CONTROLS
                      ============================================= -->
 
                 <footer class="question-controls">
@@ -689,7 +683,6 @@
 
                     <div class="question-controls-center">
 
-
                         <button
                             id="reviewButton"
                             class="button button-warning"
@@ -697,7 +690,6 @@
                         >
                             Marcar para Revisão
                         </button>
-
 
                     </div>
 
@@ -803,6 +795,7 @@
         hidden
     >
 
+
         <div
             class="modal-backdrop"
             data-modal-close="finishModal"
@@ -828,6 +821,7 @@
 
 
             <div class="modal-body">
+
 
                 <p>
                     Após finalizar, suas respostas não poderão
@@ -879,6 +873,7 @@
 
                 </div>
 
+
             </div>
 
 
@@ -907,6 +902,7 @@
 
 
         </div>
+
 
     </div>
 
@@ -1062,6 +1058,7 @@
 
             <section class="results-review">
 
+
                 <div class="results-review-header">
 
                     <h2>
@@ -1079,10 +1076,11 @@
                 <div id="resultsQuestionList">
                 </div>
 
+
             </section>
 
 
-            <!-- RESULT ACTIONS -->
+            <!-- ACTIONS -->
 
             <footer class="results-actions">
 
@@ -1110,6 +1108,7 @@
 
         </div>
 
+
     </section>
 
 
@@ -1122,6 +1121,7 @@
         class="error-screen"
         hidden
     >
+
 
         <div class="error-card">
 
@@ -1143,6 +1143,7 @@
 
         </div>
 
+
     </div>
 
 
@@ -1154,57 +1155,82 @@
      ========================================================= -->
 
 
-<!-- MODELS -->
+<!-- =========================================================
+     MODELS
+     ========================================================= -->
 
 <script src="js/models/Answer.js"></script>
-
 <script src="js/models/Question.js"></script>
-
 <script src="js/models/Exam.js"></script>
 
 
-<!-- CORE -->
+<!-- =========================================================
+     CORE - CONFIGURATION / EVENTS
+     ========================================================= -->
 
+<script src="js/core/ExamConfig.js"></script>
+<script src="js/core/ExamEventBus.js"></script>
+
+
+<!-- =========================================================
+     CORE - STATE / STORAGE / QUESTIONS
+     ========================================================= -->
+
+<script src="js/core/ExamState.js"></script>
 <script src="js/core/StorageManager.js"></script>
+<script src="js/core/ExamValidator.js"></script>
+<script src="js/core/QuestionManager.js"></script>
+<script src="js/core/ScoreCalculator.js"></script>
 
-<script src="js/core/QuestionEngine.js"></script>
 
-<script src="js/core/ScoringEngine.js"></script>
+<!-- =========================================================
+     EXAM COMPONENTS
+     ========================================================= -->
 
-<script src="js/core/TimerEngine.js"></script>
+<script src="js/QuestionBank.js"></script>
+<script src="js/ExamTimer.js"></script>
+<script src="js/ExamNavigation.js"></script>
+<script src="js/ExamResult.js"></script>
+<script src="js/ExamSession.js"></script>
+
+
+<!-- =========================================================
+     UI - QUESTION RENDERING
+     ========================================================= -->
+
+<script src="js/ui/QuestionTypeRenderer.js"></script>
+<script src="js/ui/LabRenderer.js"></script>
+<script src="js/ui/QuestionRenderer.js"></script>
+
+
+<!-- =========================================================
+     UI
+     ========================================================= -->
+
+<script src="js/ui/NavigationRenderer.js"></script>
+<script src="js/ui/ResultRenderer.js"></script>
+<script src="js/ui/ReviewRenderer.js"></script>
+<script src="js/ui/ExamUI.js"></script>
+
+
+<!-- =========================================================
+     ENGINE
+     ========================================================= -->
 
 <script src="js/core/ExamEngine.js"></script>
 
 
-<!-- QUESTION RENDERERS -->
+<!-- =========================================================
+     LEGACY / HIGH LEVEL CONTROLLERS CURRENTLY IN PROJECT
+     ========================================================= -->
 
-<script src="js/renderers/SingleChoiceRenderer.js"></script>
-
-<script src="js/renderers/MultipleChoiceRenderer.js"></script>
-
-<script src="js/renderers/DragDropRenderer.js"></script>
-
-<script src="js/renderers/MatchingRenderer.js"></script>
-
-<script src="js/renderers/OrderingRenderer.js"></script>
-
-<script src="js/renderers/ExhibitRenderer.js"></script>
-
-<script src="js/renderers/LabRenderer.js"></script>
-
-<script src="js/renderers/QuestionRenderer.js"></script>
+<script src="js/QuestionRenderer.js"></script>
+<script src="js/ExamController.js"></script>
 
 
-<!-- UI CONTROLLERS -->
-
-<script src="js/ui/NavigationController.js"></script>
-
-<script src="js/ui/ExamController.js"></script>
-
-<script src="js/ui/ResultsController.js"></script>
-
-
-<!-- APPLICATION -->
+<!-- =========================================================
+     APPLICATION
+     ========================================================= -->
 
 <script src="js/app.js"></script>
 
