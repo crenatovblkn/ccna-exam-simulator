@@ -1,0 +1,609 @@
+/*
+==========================================================
+CCNA Exam Simulator
+Question Types
+
+Arquivo: css/question-types.css
+==========================================================
+*/
+
+
+/*
+==========================================================
+BASE
+==========================================================
+*/
+
+.question-type-container {
+    width: 100%;
+}
+
+.question-instruction {
+    margin: 0 0 18px;
+    padding: 12px 16px;
+
+    border-left: 4px solid #0d6efd;
+    border-radius: 4px;
+
+    background: #f4f8fc;
+
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #475569;
+}
+
+
+/*
+==========================================================
+ALTERNATIVAS
+Single Choice / Multiple Response
+==========================================================
+*/
+
+.answer-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+.answer-option {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 14px 16px;
+
+    border: 1px solid #d8e0e8;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.answer-option:hover {
+    border-color: #7aaee6;
+
+    background: #f8fbff;
+}
+
+.answer-option:focus-within {
+    border-color: #0d6efd;
+
+    box-shadow:
+        0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.answer-option.selected {
+    border-color: #0d6efd;
+
+    background: #eef6ff;
+}
+
+.answer-option input {
+    flex-shrink: 0;
+
+    margin-top: 3px;
+
+    cursor: pointer;
+}
+
+.answer-text {
+    flex: 1;
+
+    line-height: 1.5;
+    color: #1e293b;
+}
+
+
+/*
+==========================================================
+QUESTÃO COM IMAGEM
+==========================================================
+*/
+
+.question-image-container {
+    display: flex;
+    justify-content: center;
+
+    width: 100%;
+
+    margin: 20px 0 24px;
+}
+
+.question-image {
+    display: block;
+
+    max-width: 100%;
+    max-height: 520px;
+
+    width: auto;
+    height: auto;
+
+    border: 1px solid #d8e0e8;
+    border-radius: 6px;
+
+    object-fit: contain;
+
+    background: #ffffff;
+}
+
+
+/*
+==========================================================
+MULTIPLE RESPONSE
+==========================================================
+*/
+
+.multiple-response-instruction {
+    margin-bottom: 14px;
+
+    font-size: 0.88rem;
+    font-weight: 600;
+
+    color: #475569;
+}
+
+
+/*
+==========================================================
+MATCHING / DRAG AND DROP
+==========================================================
+*/
+
+.matching-container {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 24px;
+
+    width: 100%;
+
+    margin-top: 20px;
+}
+
+.matching-column {
+    min-width: 0;
+}
+
+.matching-column-title {
+    margin: 0 0 12px;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    color: #334155;
+}
+
+.matching-items {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.matching-item {
+    padding: 12px 14px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    cursor: grab;
+
+    user-select: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+}
+
+.matching-item:hover {
+    border-color: #0d6efd;
+
+    box-shadow:
+        0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.matching-item:active {
+    cursor: grabbing;
+}
+
+.matching-item.dragging {
+    opacity: 0.55;
+
+    transform: scale(0.98);
+}
+
+.matching-target {
+    min-height: 48px;
+
+    padding: 10px;
+
+    border: 2px dashed #cbd5e1;
+    border-radius: 6px;
+
+    background: #f8fafc;
+
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.matching-target.drag-over {
+    border-color: #0d6efd;
+
+    background: #eef6ff;
+}
+
+.matching-target.filled {
+    border-style: solid;
+
+    background: #ffffff;
+}
+
+
+/*
+==========================================================
+ORDERING
+==========================================================
+*/
+
+.ordering-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    width: 100%;
+
+    margin-top: 18px;
+}
+
+.ordering-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 50px;
+
+    padding: 12px 14px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    cursor: grab;
+
+    user-select: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+}
+
+.ordering-item:hover {
+    border-color: #0d6efd;
+
+    box-shadow:
+        0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.ordering-item:active {
+    cursor: grabbing;
+}
+
+.ordering-item.dragging {
+    opacity: 0.55;
+
+    transform: scale(0.98);
+}
+
+.ordering-handle {
+    flex-shrink: 0;
+
+    font-size: 1.1rem;
+
+    color: #64748b;
+}
+
+.ordering-position {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background: #eaf3fc;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    color: #0b5cab;
+}
+
+.ordering-text {
+    flex: 1;
+
+    line-height: 1.45;
+
+    color: #1e293b;
+}
+
+
+/*
+==========================================================
+CLI / SIMULATION
+==========================================================
+*/
+
+.cli-container {
+    width: 100%;
+
+    margin: 20px 0;
+
+    overflow: hidden;
+
+    border: 1px solid #263445;
+    border-radius: 7px;
+
+    background: #101820;
+}
+
+.cli-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 38px;
+
+    padding: 0 14px;
+
+    background: #263445;
+
+    font-size: 0.8rem;
+    color: #e2e8f0;
+}
+
+.cli-title {
+    font-weight: 600;
+}
+
+.cli-terminal {
+    min-height: 220px;
+    max-height: 460px;
+
+    overflow: auto;
+
+    padding: 18px;
+
+    font-family:
+        "Courier New",
+        Courier,
+        monospace;
+
+    font-size: 0.9rem;
+    line-height: 1.55;
+
+    color: #e5e7eb;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.cli-line {
+    min-height: 1.4em;
+}
+
+.cli-prompt {
+    font-weight: 700;
+}
+
+.cli-input-row {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.cli-input {
+    flex: 1;
+
+    min-width: 0;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    font: inherit;
+    color: inherit;
+
+    caret-color: #ffffff;
+}
+
+
+/*
+==========================================================
+LAB / SIMULAÇÃO
+==========================================================
+*/
+
+.lab-container {
+    width: 100%;
+
+    margin-top: 18px;
+}
+
+.lab-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+.lab-title {
+    margin: 0;
+
+    font-size: 1rem;
+    font-weight: 700;
+
+    color: #1e293b;
+}
+
+.lab-workspace {
+    width: 100%;
+
+    min-height: 300px;
+
+    padding: 18px;
+
+    border: 1px solid #d8e0e8;
+    border-radius: 7px;
+
+    background: #f8fafc;
+}
+
+
+/*
+==========================================================
+FEEDBACK DE RESULTADO
+Usado somente quando o modo permitir feedback.
+==========================================================
+*/
+
+.answer-option.correct {
+    border-color: #16a34a;
+
+    background: #f0fdf4;
+}
+
+.answer-option.incorrect {
+    border-color: #dc2626;
+
+    background: #fef2f2;
+}
+
+.answer-option.correct .answer-text {
+    color: #166534;
+}
+
+.answer-option.incorrect .answer-text {
+    color: #991b1b;
+}
+
+
+/*
+==========================================================
+ESTADO DESABILITADO
+==========================================================
+*/
+
+.answer-option.disabled,
+.matching-item.disabled,
+.ordering-item.disabled {
+    cursor: default;
+
+    opacity: 0.75;
+}
+
+.answer-option.disabled:hover,
+.matching-item.disabled:hover,
+.ordering-item.disabled:hover {
+    box-shadow: none;
+
+    transform: none;
+}
+
+
+/*
+==========================================================
+ACESSIBILIDADE
+==========================================================
+*/
+
+.answer-option:focus-visible,
+.matching-item:focus-visible,
+.ordering-item:focus-visible {
+    outline: 3px solid rgba(13, 110, 253, 0.25);
+    outline-offset: 2px;
+}
+
+
+/*
+==========================================================
+RESPONSIVIDADE
+==========================================================
+*/
+
+@media (max-width: 768px) {
+
+    .matching-container {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+    .question-image {
+        max-height: 380px;
+    }
+
+    .cli-terminal {
+        min-height: 180px;
+
+        padding: 14px;
+
+        font-size: 0.82rem;
+    }
+
+    .lab-workspace {
+        min-height: 240px;
+
+        padding: 14px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .answer-option {
+        padding: 12px;
+    }
+
+    .ordering-item {
+        padding: 10px 12px;
+    }
+
+    .question-instruction {
+        padding: 10px 12px;
+    }
+
+}
