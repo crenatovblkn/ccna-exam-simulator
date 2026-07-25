@@ -1978,29 +1978,24 @@ class ExamUI {
         --------------------------------------------------
         */
 
-        const engineMode =
-            this.selectedMode ===
-            "quick"
-                ? "practice"
-                : this.selectedMode;
-
-
         const config = {
 
-            mode:
-                engineMode,
+    mode:
+        this.selectedMode,
 
-            questions:
-                questionCount,
+    questionCount:
+        questionCount,
 
-            duration:
-                mode.duration,
+    duration:
+        mode.duration,
 
-            shuffle:
-                true
+    shuffleQuestions:
+        true,
 
-        };
+    shuffleAnswers:
+        true
 
+};
 
         console.log(
             "ExamUI: iniciando exame.",
@@ -2042,104 +2037,45 @@ class ExamUI {
             */
 
             if (
-                typeof this.engine
-                    .begin ===
-                    "function"
-            ) {
+    typeof this.engine
+        .startExam ===
+        "function"
+) {
 
-                const result =
-                    this.engine
-                        .begin(
-                            config
-                        );
-
-
-                /*
-                ------------------------------------------
-                Compatibilidade caso begin() seja async
-                ------------------------------------------
-                */
-
-                if (
-                    result &&
-                    typeof result.then ===
-                        "function"
-                ) {
-
-                    result.catch(
-                        error => {
-
-                            this.handleStartError(
-                                error
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                return;
-
-            }
-
-
-            /*
-            ----------------------------------------------
-            FALLBACK
-
-            Caso o ExamEngine ofereça createExam()
-            e startExam() separadamente.
-            ----------------------------------------------
-            */
-
-            if (
-                typeof this.engine
-                    .createExam ===
-                    "function" &&
-                typeof this.engine
-                    .startExam ===
-                    "function"
-            ) {
-
-                this.engine
-                    .createExam(
-                        config
-                    );
-
-
-                const result =
-                    this.engine
-                        .startExam();
-
-
-                if (
-                    result &&
-                    typeof result.then ===
-                        "function"
-                ) {
-
-                    result.catch(
-                        error => {
-
-                            this.handleStartError(
-                                error
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                return;
-
-            }
-
-
-            throw new Error(
-                "ExamEngine não possui begin() nem createExam()/startExam()."
+    const result =
+        this.engine
+            .startExam(
+                config
             );
+
+
+    if (
+        result &&
+        typeof result.then ===
+            "function"
+    ) {
+
+        result.catch(
+            error => {
+
+                this.handleStartError(
+                    error
+                );
+
+            }
+        );
+
+    }
+
+
+    return;
+
+}
+
+
+throw new Error(
+    "ExamEngine não possui startExam()."
+);
 
         }
         catch (error) {
