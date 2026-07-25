@@ -1,0 +1,1074 @@
+/* ==========================================================
+   Cisco CCNA 200-301 Exam Simulator
+   responsive.css
+
+   Responsividade do simulador
+   ========================================================== */
+
+
+/* ==========================================================
+   LARGE DESKTOP
+   ========================================================== */
+
+@media (min-width: 1600px) {
+
+    :root {
+        --sidebar-width: 300px;
+    }
+
+    .question-card {
+        margin-right: 34px;
+        margin-left: 34px;
+        padding: 34px 40px;
+    }
+
+    .question-controls {
+        margin-right: 34px;
+        margin-left: 34px;
+    }
+
+}
+
+
+/* ==========================================================
+   NOTEBOOK / SMALL DESKTOP
+   ========================================================== */
+
+@media (max-width: 1200px) {
+
+    :root {
+        --sidebar-width: 235px;
+    }
+
+    .question-navigation {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+    }
+
+    .question-card {
+        margin: 18px 18px 0;
+        padding: 24px 26px;
+    }
+
+    .question-controls {
+        margin: 0 18px;
+    }
+
+    .lab-workspace {
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+
+    .lab-topology,
+    .lab-terminal {
+        min-height: 380px;
+    }
+
+    .results-statistics {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ==========================================================
+   TABLET LANDSCAPE
+   ========================================================== */
+
+@media (max-width: 992px) {
+
+    :root {
+        --sidebar-width: 210px;
+    }
+
+    .exam-topbar {
+        grid-template-columns:
+            minmax(190px, 1fr)
+            auto
+            minmax(190px, 1fr);
+
+        padding: 0 18px;
+    }
+
+    .exam-question-counter {
+        padding: 0 16px;
+    }
+
+    .question-navigation {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        padding: 14px;
+    }
+
+    .navigation-legend {
+        padding: 14px;
+    }
+
+    .question-card {
+        margin: 14px 14px 0;
+        padding: 22px;
+    }
+
+    .question-controls {
+        margin: 0 14px;
+        padding: 14px;
+    }
+
+    .exam-statusbar {
+        gap: 20px;
+    }
+
+    .exam-mode-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .dragdrop-container,
+    .matching-container {
+        gap: 18px;
+    }
+
+    .domain-result-item {
+        grid-template-columns:
+            minmax(150px, 1fr)
+            minmax(150px, 2fr)
+            auto;
+    }
+
+}
+
+
+/* ==========================================================
+   TABLET PORTRAIT
+   ========================================================== */
+
+@media (max-width: 768px) {
+
+    :root {
+        --topbar-height: auto;
+        --statusbar-height: auto;
+    }
+
+
+    /* ------------------------------------------------------
+       START
+       ------------------------------------------------------ */
+
+    .start-screen {
+        align-items: flex-start;
+        padding: 24px 16px;
+    }
+
+    .start-card {
+        padding: 30px 22px;
+        border-radius: var(--radius-large);
+    }
+
+    .brand h1 {
+        font-size: 2.1rem;
+    }
+
+    .exam-mode-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exam-mode-content {
+        min-height: 94px;
+    }
+
+
+    /* ------------------------------------------------------
+       EXAM SCREEN
+       ------------------------------------------------------ */
+
+    .exam-screen {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+
+    /* ------------------------------------------------------
+       TOPBAR
+       ------------------------------------------------------ */
+
+    .exam-topbar {
+        position: sticky;
+        top: 0;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+
+        grid-template-areas:
+            "brand timer"
+            "counter counter";
+
+        height: auto;
+
+        padding: 13px 16px 10px;
+    }
+
+    .exam-brand {
+        grid-area: brand;
+    }
+
+    .exam-brand strong {
+        font-size: 0.9rem;
+    }
+
+    .exam-brand span {
+        max-width: 240px;
+        font-size: 0.68rem;
+    }
+
+    .exam-timer {
+        grid-area: timer;
+    }
+
+    .exam-timer strong {
+        font-size: 0.92rem;
+    }
+
+    .exam-question-counter {
+        grid-area: counter;
+
+        flex-direction: row;
+
+        gap: 7px;
+
+        width: 100%;
+
+        min-width: 0;
+
+        margin-top: 10px;
+
+        padding: 8px 0 0;
+
+        border: 0;
+
+        border-top:
+            1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .exam-question-counter strong {
+        margin-top: 0;
+        font-size: 0.82rem;
+    }
+
+
+    /* ------------------------------------------------------
+       LAYOUT
+       ------------------------------------------------------ */
+
+    .exam-layout {
+        display: block;
+        height: auto;
+    }
+
+
+    /* ------------------------------------------------------
+       SIDEBAR
+       ------------------------------------------------------ */
+
+    .exam-sidebar {
+        position: relative;
+
+        width: 100%;
+
+        max-height: none;
+
+        overflow: visible;
+
+        border-right: 0;
+
+        border-bottom:
+            1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar-header {
+        padding: 12px 16px 8px;
+    }
+
+    .question-navigation {
+        display: flex;
+
+        gap: 7px;
+
+        padding: 10px 16px 14px;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .question-nav-button {
+        flex: 0 0 38px;
+
+        width: 38px;
+        height: 38px;
+
+        aspect-ratio: auto;
+    }
+
+    .navigation-legend {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 10px 16px;
+
+        padding: 10px 16px 12px;
+    }
+
+
+    /* ------------------------------------------------------
+       QUESTION AREA
+       ------------------------------------------------------ */
+
+    .question-area {
+        display: block;
+        overflow: visible;
+    }
+
+    .question-card {
+        margin: 14px 12px 0;
+
+        padding: 20px 17px;
+
+        overflow: visible;
+
+        border-radius:
+            var(--radius)
+            var(--radius)
+            0
+            0;
+    }
+
+    .question-header {
+        align-items: flex-start;
+    }
+
+    .question-domain span {
+        white-space: normal;
+    }
+
+    .question-text {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+
+    /* ------------------------------------------------------
+       CONTROLS
+       ------------------------------------------------------ */
+
+    .question-controls {
+        position: sticky;
+        bottom: 0;
+
+        z-index: 200;
+
+        grid-template-columns:
+            auto
+            minmax(0, 1fr)
+            auto;
+
+        margin: 0 12px;
+
+        padding: 11px;
+
+        border-radius:
+            0
+            0
+            var(--radius)
+            var(--radius);
+
+        box-shadow:
+            0 -3px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .question-controls .button {
+        min-height: 40px;
+        padding: 9px 12px;
+        font-size: 0.75rem;
+    }
+
+    .question-controls-center {
+        min-width: 0;
+    }
+
+    #reviewButton {
+        width: 100%;
+    }
+
+
+    /* ------------------------------------------------------
+       STATUS BAR
+       ------------------------------------------------------ */
+
+    .exam-statusbar {
+        flex-wrap: wrap;
+
+        height: auto;
+
+        gap: 7px 18px;
+
+        padding: 12px 16px;
+
+        font-size: 0.68rem;
+    }
+
+
+    /* ------------------------------------------------------
+       DRAG DROP / MATCHING
+       ------------------------------------------------------ */
+
+    .dragdrop-container,
+    .matching-container {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* ------------------------------------------------------
+       LAB
+       ------------------------------------------------------ */
+
+    .lab-workspace {
+        grid-template-columns: 1fr;
+    }
+
+    .lab-topology,
+    .lab-terminal {
+        min-height: 340px;
+    }
+
+
+    /* ------------------------------------------------------
+       RESULTS
+       ------------------------------------------------------ */
+
+    .results-screen {
+        padding: 28px 16px;
+    }
+
+    .score-card {
+        padding: 24px;
+    }
+
+    .score-main strong {
+        font-size: 2.7rem;
+    }
+
+    .results-statistics {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .domain-result-item {
+        grid-template-columns: 1fr auto;
+        gap: 7px 12px;
+    }
+
+    .domain-result-bar {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .result-question-item {
+        grid-template-columns:
+            38px
+            minmax(0, 1fr);
+    }
+
+    .result-question-status {
+        grid-column: 2;
+    }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 576px) {
+
+    body {
+        font-size: 15px;
+    }
+
+
+    /* ------------------------------------------------------
+       START
+       ------------------------------------------------------ */
+
+    .start-screen {
+        padding: 14px 10px;
+    }
+
+    .start-card {
+        padding: 25px 17px;
+    }
+
+    .start-header {
+        margin-bottom: 22px;
+    }
+
+    .brand-cisco {
+        font-size: 0.68rem;
+    }
+
+    .brand h1 {
+        font-size: 1.8rem;
+    }
+
+    .brand h2 {
+        font-size: 0.95rem;
+    }
+
+    .domain-card {
+        margin-bottom: 24px;
+        padding: 16px;
+    }
+
+    .start-section {
+        margin-bottom: 24px;
+    }
+
+
+    /* ------------------------------------------------------
+       TOPBAR
+       ------------------------------------------------------ */
+
+    .exam-topbar {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .exam-brand strong {
+        font-size: 0.8rem;
+    }
+
+    .exam-brand span {
+        max-width: 180px;
+    }
+
+    .exam-timer span {
+        font-size: 0.52rem;
+    }
+
+    .exam-timer strong {
+        font-size: 0.8rem;
+    }
+
+
+    /* ------------------------------------------------------
+       SIDEBAR
+       ------------------------------------------------------ */
+
+    .sidebar-header {
+        display: none;
+    }
+
+    .navigation-legend {
+        display: none;
+    }
+
+    .question-navigation {
+        padding: 9px 10px;
+    }
+
+    .question-nav-button {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+        font-size: 0.68rem;
+    }
+
+
+    /* ------------------------------------------------------
+       QUESTION CARD
+       ------------------------------------------------------ */
+
+    .question-card {
+        margin: 9px 7px 0;
+        padding: 17px 13px;
+    }
+
+    .question-header {
+        gap: 8px;
+        margin-bottom: 11px;
+    }
+
+    .question-domain span {
+        font-size: 0.62rem;
+    }
+
+    .question-type {
+        padding: 4px 7px;
+        font-size: 0.58rem;
+    }
+
+    .progress-container {
+        margin-bottom: 18px;
+    }
+
+    .question-instruction {
+        margin-bottom: 16px;
+        padding: 10px 12px;
+        font-size: 0.76rem;
+    }
+
+    .question-content {
+        margin-bottom: 19px;
+    }
+
+    .question-text {
+        font-size: 0.94rem;
+        line-height: 1.55;
+    }
+
+
+    /* ------------------------------------------------------
+       ANSWERS
+       ------------------------------------------------------ */
+
+    .answer-container {
+        gap: 9px;
+    }
+
+    .answer-option {
+        gap: 10px;
+
+        min-height: 54px;
+
+        padding: 12px;
+    }
+
+    .answer-option input[type="radio"],
+    .answer-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    .answer-content {
+        gap: 8px;
+    }
+
+    .answer-letter {
+        width: 25px;
+        height: 25px;
+
+        font-size: 0.65rem;
+    }
+
+    .answer-text {
+        font-size: 0.82rem;
+    }
+
+
+    /* ------------------------------------------------------
+       CONTROLS
+       ------------------------------------------------------ */
+
+    .question-controls {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 7px;
+
+        margin: 0 7px;
+
+        padding: 9px 8px;
+    }
+
+    .question-controls > #previousButton {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .question-controls-center {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .question-controls-right {
+        display: contents;
+    }
+
+    #nextButton,
+    #finishExamButton {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .question-controls .button {
+        width: 100%;
+        min-width: 0;
+    }
+
+
+    /* ------------------------------------------------------
+       STATUS BAR
+       ------------------------------------------------------ */
+
+    .exam-statusbar {
+        justify-content: flex-start;
+
+        gap: 6px 14px;
+
+        padding: 10px 12px;
+    }
+
+
+    /* ------------------------------------------------------
+       EXHIBITS
+       ------------------------------------------------------ */
+
+    #exhibitContent {
+        padding: 11px;
+    }
+
+    .question-image-container {
+        padding: 10px;
+    }
+
+
+    /* ------------------------------------------------------
+       CLI
+       ------------------------------------------------------ */
+
+    .code-block pre,
+    .cli-block pre,
+    .terminal-output {
+        font-size: 0.68rem;
+    }
+
+
+    /* ------------------------------------------------------
+       DRAG DROP
+       ------------------------------------------------------ */
+
+    .dragdrop-container,
+    .matching-container {
+        gap: 18px;
+    }
+
+    .drag-item,
+    .matching-item {
+        font-size: 0.77rem;
+    }
+
+
+    /* ------------------------------------------------------
+       ORDERING
+       ------------------------------------------------------ */
+
+    .order-item {
+        grid-template-columns:
+            34px
+            minmax(0, 1fr)
+            auto;
+
+        gap: 8px;
+
+        padding: 9px;
+    }
+
+    .order-position {
+        width: 29px;
+        height: 29px;
+    }
+
+    .order-text {
+        font-size: 0.77rem;
+    }
+
+
+    /* ------------------------------------------------------
+       LAB
+       ------------------------------------------------------ */
+
+    .lab-topology,
+    .lab-terminal {
+        min-height: 300px;
+    }
+
+    .terminal-output {
+        padding: 12px;
+    }
+
+
+    /* ------------------------------------------------------
+       MODAL
+       ------------------------------------------------------ */
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-header {
+        padding: 19px 18px 14px;
+    }
+
+    .modal-body {
+        padding: 19px 18px;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+
+        padding: 14px 18px;
+    }
+
+    .modal-footer .button {
+        width: 100%;
+    }
+
+    .finish-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .finish-summary > div {
+        min-height: 68px;
+    }
+
+
+    /* ------------------------------------------------------
+       RESULTS
+       ------------------------------------------------------ */
+
+    .results-screen {
+        padding: 22px 10px;
+    }
+
+    .results-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .score-card {
+        flex-direction: column;
+
+        align-items: center;
+
+        gap: 18px;
+
+        padding: 22px;
+
+        text-align: center;
+    }
+
+    .score-main {
+        align-items: center;
+    }
+
+    .score-main strong {
+        font-size: 2.8rem;
+    }
+
+    .result-status {
+        min-width: 130px;
+    }
+
+    .results-statistics {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 8px;
+    }
+
+    .result-stat {
+        min-height: 90px;
+        padding: 13px 8px;
+    }
+
+    .result-stat span {
+        font-size: 0.66rem;
+    }
+
+    .result-stat strong {
+        font-size: 1.25rem;
+    }
+
+    .domain-results,
+    .results-review {
+        padding: 18px 14px;
+    }
+
+    .results-actions {
+        flex-direction: column;
+    }
+
+    .results-actions .button {
+        width: 100%;
+    }
+
+}
+
+
+/* ==========================================================
+   VERY SMALL MOBILE
+   ========================================================== */
+
+@media (max-width: 380px) {
+
+    .brand h1 {
+        font-size: 1.6rem;
+    }
+
+    .exam-brand span {
+        max-width: 145px;
+    }
+
+    .question-card {
+        padding-right: 11px;
+        padding-left: 11px;
+    }
+
+    .answer-option {
+        padding: 11px 9px;
+    }
+
+    .answer-letter {
+        display: none;
+    }
+
+    .exam-statusbar div:last-child {
+        width: 100%;
+    }
+
+}
+
+
+/* ==========================================================
+   SHORT HEIGHT SCREENS
+   ========================================================== */
+
+@media (min-width: 769px) and (max-height: 720px) {
+
+    :root {
+        --topbar-height: 62px;
+        --statusbar-height: 42px;
+    }
+
+    .exam-topbar {
+        padding-right: 22px;
+        padding-left: 22px;
+    }
+
+    .sidebar-header {
+        padding-top: 15px;
+        padding-bottom: 10px;
+    }
+
+    .question-navigation {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .navigation-legend {
+        padding-top: 11px;
+        padding-bottom: 12px;
+    }
+
+    .question-card {
+        margin-top: 12px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    .question-controls {
+        padding-top: 11px;
+        padding-bottom: 11px;
+    }
+
+}
+
+
+/* ==========================================================
+   TOUCH DEVICES
+   ========================================================== */
+
+@media (hover: none) {
+
+    .button:hover:not(:disabled),
+    .answer-option:hover,
+    .question-nav-button:hover,
+    .drag-item:hover,
+    .order-item:hover,
+    .lab-device:hover {
+        transform: none;
+    }
+
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+    }
+
+}
+
+
+/* ==========================================================
+   PRINT
+
+   Utilizado principalmente para impressão dos resultados.
+   ========================================================== */
+
+@media print {
+
+    body {
+        background: #ffffff;
+    }
+
+    .start-screen,
+    .exam-screen,
+    .loading-screen,
+    .error-screen,
+    .modal,
+    .results-actions {
+        display: none !important;
+    }
+
+    .results-screen {
+        display: block !important;
+
+        min-height: auto;
+
+        padding: 0;
+
+        background: #ffffff;
+    }
+
+    .results-container {
+        width: 100%;
+        max-width: none;
+    }
+
+    .score-card,
+    .result-stat,
+    .domain-results,
+    .results-review,
+    .review-question-card {
+        box-shadow: none;
+
+        break-inside: avoid;
+    }
+
+}
