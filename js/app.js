@@ -13,15 +13,12 @@ Responsabilidade:
 - Criar ExamUI
 - Conectar todos os componentes
 - Iniciar o simulador
-
-Este é o ponto de entrada principal da aplicação.
 ==========================================================
 */
 
 (function () {
 
     "use strict";
-
 
     /*
     ======================================================
@@ -33,11 +30,6 @@ Este é o ponto de entrada principal da aplicação.
 
         title:
             "Cisco CCNA 200-301",
-
-        /*
-        Banco inicial:
-        Domain 1 — Network Fundamentals
-        */
 
         questionBank:
             "data/network-fundamentals.json",
@@ -56,7 +48,7 @@ Este é o ponto de entrada principal da aplicação.
 
     /*
     ======================================================
-    REFERÊNCIAS GLOBAIS DA APLICAÇÃO
+    REFERÊNCIAS GLOBAIS
     ======================================================
     */
 
@@ -88,13 +80,13 @@ Este é o ponto de entrada principal da aplicação.
         try {
 
             console.log(
-                "CCNA Exam Simulator: initializing..."
+                "CCNA Exam Simulator: initializing."
             );
 
 
             /*
             ------------------------------------------------
-            1. Verifica dependências
+            1. Dependências
             ------------------------------------------------
             */
 
@@ -141,16 +133,17 @@ Este é o ponto de entrada principal da aplicação.
             /*
             ------------------------------------------------
             5. Exam Engine
+
+            IMPORTANTE:
+            O ExamEngine consolidado recebe o
+            QuestionManager diretamente.
             ------------------------------------------------
             */
 
             examEngine =
-                new ExamEngine({
-
-                    questionManager:
-                        questionManager
-
-                });
+                new ExamEngine(
+                    questionManager
+                );
 
 
             /*
@@ -220,7 +213,7 @@ Este é o ponto de entrada principal da aplicação.
 
                     container:
                         document.getElementById(
-                            "resultsScreen"
+                            "resultScreen"
                         )
 
                 });
@@ -267,7 +260,7 @@ Este é o ponto de entrada principal da aplicação.
 
             /*
             ------------------------------------------------
-            12. Exposição para debug
+            12. Debug
             ------------------------------------------------
             */
 
@@ -357,6 +350,43 @@ Este é o ponto de entrada principal da aplicação.
 
     async function loadQuestionBank() {
 
+        /*
+        --------------------------------------------------
+        QuestionManager baseado em exam.json.
+
+        A versão existente do QuestionManager possui
+        load() sem parâmetros, que carrega a configuração
+        e os domínios.
+        --------------------------------------------------
+        */
+
+        if (
+            typeof questionManager
+                .load ===
+                "function" &&
+            questionManager
+                .load.length === 0
+        ) {
+
+            await questionManager
+                .load();
+
+
+            validateQuestionBank();
+
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Compatibilidade com QuestionManager que ofereça
+        loadFromURL().
+        --------------------------------------------------
+        */
+
         if (
             typeof questionManager
                 .loadFromURL ===
@@ -379,7 +409,7 @@ Este é o ponto de entrada principal da aplicação.
 
         /*
         --------------------------------------------------
-        Fallback usando fetch
+        Fallback: fetch direto.
         --------------------------------------------------
         */
 
@@ -427,16 +457,6 @@ Este é o ponto de entrada principal da aplicação.
 
         if (
             typeof questionManager
-                .load ===
-                "function"
-        ) {
-
-            questionManager.load(
-                questions
-            );
-
-        } else if (
-            typeof questionManager
                 .setQuestions ===
                 "function"
         ) {
@@ -453,13 +473,13 @@ Este é o ponto de entrada principal da aplicação.
         ) {
 
             questions.forEach(
-                data => {
+                questionData => {
 
                     const question =
-                        data instanceof Question
-                            ? data
+                        questionData instanceof Question
+                            ? questionData
                             : new Question(
-                                data
+                                questionData
                             );
 
 
@@ -470,6 +490,38 @@ Este é o ponto de entrada principal da aplicação.
 
                 }
             );
+
+        } else if (
+            Array.isArray(
+                questionManager.questions
+            )
+        ) {
+
+            questionManager.questions =
+                questions.map(
+                    questionData =>
+                        questionData instanceof Question
+                            ? questionData
+                            : new Question(
+                                questionData
+                            )
+                );
+
+        } else if (
+            Array.isArray(
+                questionManager.questionBank
+            )
+        ) {
+
+            questionManager.questionBank =
+                questions.map(
+                    questionData =>
+                        questionData instanceof Question
+                            ? questionData
+                            : new Question(
+                                questionData
+                            )
+                );
 
         } else {
 
@@ -484,8 +536,7 @@ Este é o ponto de entrada principal da aplicação.
 
     }
 
-
-    /*
+     /*
     ======================================================
     VALIDAR BANCO
     ======================================================
@@ -541,6 +592,32 @@ Este é o ponto de entrada principal da aplicação.
         }
 
 
+        /*
+        --------------------------------------------------
+        Método oficial do QuestionManager atual
+        --------------------------------------------------
+        */
+
+        if (
+            typeof questionManager
+                .getCount ===
+                "function"
+        ) {
+
+            return Number(
+                questionManager
+                    .getCount()
+            ) || 0;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Compatibilidade
+        --------------------------------------------------
+        */
+
         if (
             typeof questionManager
                 .getTotalQuestions ===
@@ -554,6 +631,38 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
+
+        /*
+        --------------------------------------------------
+        getAll()
+        --------------------------------------------------
+        */
+
+        if (
+            typeof questionManager
+                .getAll ===
+                "function"
+        ) {
+
+            const questions =
+                questionManager
+                    .getAll();
+
+
+            return Array.isArray(
+                questions
+            )
+                ? questions.length
+                : 0;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        getQuestions()
+        --------------------------------------------------
+        */
 
         if (
             typeof questionManager
@@ -575,6 +684,12 @@ Este é o ponto de entrada principal da aplicação.
         }
 
 
+        /*
+        --------------------------------------------------
+        Propriedade questions
+        --------------------------------------------------
+        */
+
         if (
             Array.isArray(
                 questionManager.questions
@@ -583,6 +698,25 @@ Este é o ponto de entrada principal da aplicação.
 
             return questionManager
                 .questions
+                .length;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Propriedade questionBank
+        --------------------------------------------------
+        */
+
+        if (
+            Array.isArray(
+                questionManager.questionBank
+            )
+        ) {
+
+            return questionManager
+                .questionBank
                 .length;
 
         }
@@ -607,34 +741,51 @@ Este é o ponto de entrada principal da aplicação.
             );
 
 
-        /*
-        CORREÇÃO:
-        O ID utilizado pelo index.html é resultsScreen.
-        */
-
         const resultScreen =
             document.getElementById(
-                "resultsScreen"
+                "resultScreen"
             );
 
 
-        if (examScreen) {
+        /*
+        --------------------------------------------------
+        Esconde telas que não devem permanecer visíveis
+        --------------------------------------------------
+        */
 
-            examScreen.classList.add(
-                "hidden"
-            );
+        [
+            examScreen,
+            resultScreen
+        ].forEach(
+            element => {
 
-        }
+                if (!element) {
+
+                    return;
+
+                }
 
 
-        if (resultScreen) {
+                element.classList
+                    .remove(
+                        "active"
+                    );
 
-            resultScreen.classList.add(
-                "hidden"
-            );
 
-        }
+                element.classList
+                    .add(
+                        "hidden"
+                    );
 
+            }
+        );
+
+
+        /*
+        --------------------------------------------------
+        Recupera tela inicial
+        --------------------------------------------------
+        */
 
         const startScreen =
             document.getElementById(
@@ -649,15 +800,23 @@ Este é o ponto de entrada principal da aplicação.
         }
 
 
-        startScreen.classList.remove(
-            "hidden"
-        );
+        startScreen.classList
+            .remove(
+                "hidden"
+            );
 
 
-        startScreen.classList.add(
-            "active"
-        );
+        startScreen.classList
+            .add(
+                "active"
+            );
 
+
+        /*
+        --------------------------------------------------
+        Remove mensagem anterior
+        --------------------------------------------------
+        */
 
         const previous =
             document.getElementById(
@@ -671,6 +830,12 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Cria caixa de erro
+        --------------------------------------------------
+        */
 
         const errorBox =
             document.createElement(
@@ -686,6 +851,12 @@ Este é o ponto de entrada principal da aplicação.
             "application-error";
 
 
+        /*
+        --------------------------------------------------
+        Título
+        --------------------------------------------------
+        */
+
         const title =
             document.createElement(
                 "strong"
@@ -695,6 +866,12 @@ Este é o ponto de entrada principal da aplicação.
         title.textContent =
             "Unable to initialize exam simulator";
 
+
+        /*
+        --------------------------------------------------
+        Mensagem
+        --------------------------------------------------
+        */
 
         const message =
             document.createElement(
@@ -712,10 +889,17 @@ Este é o ponto de entrada principal da aplicação.
             title
         );
 
+
         errorBox.appendChild(
             message
         );
 
+
+        /*
+        --------------------------------------------------
+        Insere mensagem
+        --------------------------------------------------
+        */
 
         const card =
             startScreen.querySelector(
@@ -737,6 +921,12 @@ Este é o ponto de entrada principal da aplicação.
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Desabilita botão de início
+        --------------------------------------------------
+        */
 
         const startButton =
             document.getElementById(
@@ -760,16 +950,22 @@ Este é o ponto de entrada principal da aplicação.
     ======================================================
     */
 
-    function getFriendlyErrorMessage(
-        error
-    ) {
+    function getFriendlyErrorMessage(error) {
 
         const message =
             error &&
             error.message
                 ? error.message
-                : String(error);
+                : String(
+                    error
+                );
 
+
+        /*
+        --------------------------------------------------
+        Projeto aberto diretamente por file://
+        --------------------------------------------------
+        */
 
         if (
             window.location.protocol ===
@@ -788,7 +984,6 @@ Este é o ponto de entrada principal da aplicação.
         return message;
 
     }
-
 
     /*
     ======================================================
@@ -894,4 +1089,4 @@ Este é o ponto de entrada principal da aplicação.
 
     }
 
-})();
+})(); 
