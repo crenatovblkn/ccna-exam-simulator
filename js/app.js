@@ -348,37 +348,62 @@ Responsabilidade:
     ======================================================
     */
 
+        /*
+    ======================================================
+    CARREGAR BANCO DE QUESTÕES
+    ======================================================
+    */
+
     async function loadQuestionBank() {
+
+        console.log(
+            "CCNA Exam Simulator: loading question bank..."
+        );
 
         /*
         --------------------------------------------------
-        QuestionManager baseado em exam.json.
-
-        A versão existente do QuestionManager possui
-        load() sem parâmetros, que carrega a configuração
-        e os domínios.
+        O QuestionManager atual possui loadFromURL(),
+        responsável por:
+        
+        1. buscar o arquivo JSON;
+        2. converter a resposta para objeto;
+        3. chamar load(data);
+        4. criar/validar as questões.
         --------------------------------------------------
         */
 
         if (
-            typeof questionManager
-                .load ===
-                "function" &&
-            questionManager
-                .load.length === 0
+            typeof questionManager.loadFromURL !==
+            "function"
         ) {
 
-            await questionManager
-                .load();
-
-
-            validateQuestionBank();
-
-
-            return;
+            throw new Error(
+                "QuestionManager.loadFromURL() is not available."
+            );
 
         }
 
+
+        const loadedCount =
+            await questionManager.loadFromURL(
+                APP_CONFIG.questionBank
+            );
+
+
+        console.log(
+            `CCNA Exam Simulator: ${loadedCount} questions loaded.`
+        );
+
+
+        /*
+        --------------------------------------------------
+        Validação final
+        --------------------------------------------------
+        */
+
+        validateQuestionBank();
+
+    }
 
         /*
         --------------------------------------------------
