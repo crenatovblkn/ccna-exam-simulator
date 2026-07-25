@@ -93,8 +93,7 @@ class ExamUI {
 
             quick: {
 
-                questionCount:
-                    20,
+                questionCount: 20,
 
                 duration:
                     30 * 60,
@@ -106,8 +105,7 @@ class ExamUI {
 
             standard: {
 
-                questionCount:
-                    60,
+                questionCount: 60,
 
                 duration:
                     90 * 60,
@@ -119,15 +117,13 @@ class ExamUI {
 
             full: {
 
-                questionCount:
-                    180,
+                questionCount: 180,
 
                 /*
-                0 significa sem limite de tempo.
+                0 = sem limite de tempo
                 */
 
-                duration:
-                    0,
+                duration: 0,
 
                 label:
                     "Banco Completo"
@@ -140,8 +136,6 @@ class ExamUI {
         /*
         ==================================================
         ELEMENTOS DA INTERFACE
-
-        Serão preenchidos em cacheElements().
         ==================================================
         */
 
@@ -270,11 +264,7 @@ class ExamUI {
 
 
         /*
-        O projeto consolidado utiliza resultScreen.
-
-        Há fallback para resultsScreen para impedir que uma
-        diferença temporária no HTML impeça a inicialização.
-        --------------------------------------------------
+        Compatibilidade entre resultScreen/resultsScreen.
         */
 
         this.elements.resultScreen =
@@ -516,7 +506,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        RADIOS DOS MODOS
+        MODOS DE EXAME
         --------------------------------------------------
         */
 
@@ -580,17 +570,15 @@ class ExamUI {
 
 
         const missing =
-            Object.entries(
-                required
-            )
-            .filter(
-                ([, element]) =>
-                    !element
-            )
-            .map(
-                ([name]) =>
-                    name
-            );
+            Object.entries(required)
+                .filter(
+                    ([, element]) =>
+                        !element
+                )
+                .map(
+                    ([name]) =>
+                        name
+                );
 
 
         if (
@@ -662,7 +650,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Banco de questões
+        Quantidade de questões
         --------------------------------------------------
         */
 
@@ -700,7 +688,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Seleciona modo marcado no HTML
+        Modo selecionado
         --------------------------------------------------
         */
 
@@ -728,7 +716,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Contadores iniciais
+        Contadores
         --------------------------------------------------
         */
 
@@ -747,7 +735,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        MODOS DE EXAME
+        SELEÇÃO DO MODO
         --------------------------------------------------
         */
 
@@ -781,7 +769,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        INICIAR
+        INICIAR EXAME
         --------------------------------------------------
         */
 
@@ -799,7 +787,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        ANTERIOR
+        QUESTÃO ANTERIOR
         --------------------------------------------------
         */
 
@@ -818,8 +806,16 @@ class ExamUI {
                     }
 
 
-                    this.engine
-                        .previousQuestion();
+                    if (
+                        typeof this.engine
+                            .previousQuestion ===
+                            "function"
+                    ) {
+
+                        this.engine
+                            .previousQuestion();
+
+                    }
 
                 }
             );
@@ -827,7 +823,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        PRÓXIMA
+        PRÓXIMA QUESTÃO
         --------------------------------------------------
         */
 
@@ -846,8 +842,16 @@ class ExamUI {
                     }
 
 
-                    this.engine
-                        .nextQuestion();
+                    if (
+                        typeof this.engine
+                            .nextQuestion ===
+                            "function"
+                    ) {
+
+                        this.engine
+                            .nextQuestion();
+
+                    }
 
                 }
             );
@@ -855,7 +859,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        REVISÃO
+        MARCAR PARA REVISÃO
         --------------------------------------------------
         */
 
@@ -874,8 +878,16 @@ class ExamUI {
                     }
 
 
-                    this.engine
-                        .toggleReview();
+                    if (
+                        typeof this.engine
+                            .toggleReview ===
+                            "function"
+                    ) {
+
+                        this.engine
+                            .toggleReview();
+
+                    }
 
                 }
             );
@@ -883,7 +895,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        FINALIZAR
+        FINALIZAR EXAME
         --------------------------------------------------
         */
 
@@ -905,51 +917,6 @@ class ExamUI {
                     this.openFinishModal();
 
                 }
-
-                    /*
-    ======================================================
-    FECHAR MODAL DE FINALIZAÇÃO
-    ======================================================
-    */
-
-    closeFinishModal() {
-
-        if (
-            !this.elements ||
-            !this.elements.finishModal
-        ) {
-
-            return;
-
-        }
-
-
-        const modal =
-            this.elements.finishModal;
-
-
-        modal.classList.remove(
-            "active"
-        );
-
-
-        modal.classList.add(
-            "hidden"
-        );
-
-
-        modal.setAttribute(
-            "hidden",
-            ""
-        );
-
-
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-    }
             );
 
 
@@ -1037,7 +1004,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        ESC
+        TECLA ESC
         --------------------------------------------------
         */
 
@@ -1061,7 +1028,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        RELOAD
+        RECARREGAR
         --------------------------------------------------
         */
 
@@ -1075,8 +1042,7 @@ class ExamUI {
                     "click",
                     () => {
 
-                        window.location
-                            .reload();
+                        window.location.reload();
 
                     }
                 );
@@ -1085,6 +1051,325 @@ class ExamUI {
 
     }
 
+
+    /*
+    ======================================================
+    MODAL DE FINALIZAÇÃO
+    ======================================================
+    */
+
+    openFinishModal() {
+
+        if (
+            !this.elements.finishModal
+        ) {
+
+            /*
+            Se o HTML não possuir modal, finalizamos
+            diretamente como fallback.
+            */
+
+            this.confirmFinishExam();
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Obtém progresso atual
+        --------------------------------------------------
+        */
+
+        let progress = null;
+
+
+        if (
+            this.engine &&
+            typeof this.engine
+                .getProgress ===
+                "function"
+        ) {
+
+            progress =
+                this.engine
+                    .getProgress();
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Atualiza informações do modal
+        --------------------------------------------------
+        */
+
+        if (
+            progress &&
+            this.elements.finishAnsweredCount
+        ) {
+
+            this.elements
+                .finishAnsweredCount
+                .textContent =
+                    String(
+                        progress.answered || 0
+                    );
+
+        }
+
+
+        if (
+            progress &&
+            this.elements.finishUnansweredCount
+        ) {
+
+            const unanswered =
+                Number.isFinite(
+                    Number(
+                        progress.remaining
+                    )
+                )
+                    ? Number(
+                        progress.remaining
+                    )
+                    : Math.max(
+                        0,
+                        Number(
+                            progress.total || 0
+                        ) -
+                        Number(
+                            progress.answered || 0
+                        )
+                    );
+
+
+            this.elements
+                .finishUnansweredCount
+                .textContent =
+                    String(
+                        unanswered
+                    );
+
+        }
+
+
+        if (
+            progress &&
+            this.elements.finishReviewCount
+        ) {
+
+            this.elements
+                .finishReviewCount
+                .textContent =
+                    String(
+                        progress.review || 0
+                    );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Exibe modal
+        --------------------------------------------------
+        */
+
+        this.elements
+            .finishModal
+            .classList
+            .remove(
+                "hidden"
+            );
+
+
+        this.elements
+            .finishModal
+            .classList
+            .add(
+                "active"
+            );
+
+
+        this.elements
+            .finishModal
+            .removeAttribute(
+                "hidden"
+            );
+
+
+        this.elements
+            .finishModal
+            .setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+    }
+
+
+    /*
+    ======================================================
+    FECHAR MODAL DE FINALIZAÇÃO
+    ======================================================
+    */
+
+    closeFinishModal() {
+
+        if (
+            !this.elements.finishModal
+        ) {
+
+            return;
+
+        }
+
+
+        this.elements
+            .finishModal
+            .classList
+            .remove(
+                "active"
+            );
+
+
+        this.elements
+            .finishModal
+            .classList
+            .add(
+                "hidden"
+            );
+
+
+        this.elements
+            .finishModal
+            .setAttribute(
+                "hidden",
+                ""
+            );
+
+
+        this.elements
+            .finishModal
+            .setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+    }
+
+
+    /*
+    ======================================================
+    VERIFICAR MODAL
+    ======================================================
+    */
+
+    isFinishModalOpen() {
+
+        if (
+            !this.elements.finishModal
+        ) {
+
+            return false;
+
+        }
+
+
+        return (
+            !this.elements
+                .finishModal
+                .hasAttribute(
+                    "hidden"
+                ) &&
+            !this.elements
+                .finishModal
+                .classList
+                .contains(
+                    "hidden"
+                )
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    CONFIRMAR FINALIZAÇÃO
+    ======================================================
+    */
+
+    confirmFinishExam() {
+
+        if (
+            !this.examRunning
+        ) {
+
+            return;
+
+        }
+
+
+        this.closeFinishModal();
+
+
+        if (
+            !this.engine
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Método principal esperado
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.engine
+                .finishExam ===
+                "function"
+        ) {
+
+            this.engine
+                .finishExam();
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Compatibilidade
+        --------------------------------------------------
+        */
+
+        if (
+            typeof this.engine
+                .finish ===
+                "function"
+        ) {
+
+            this.engine
+                .finish();
+
+            return;
+
+        }
+
+
+        this.showError(
+            "ExamEngine não possui método de finalização."
+        );
+
+    }
+
+
     /*
     ======================================================
     EVENTOS DO EXAM ENGINE
@@ -1101,7 +1386,7 @@ class ExamUI {
 
         this.engine.on(
             "examStarted",
-            () => {
+            data => {
 
                 this.examRunning =
                     true;
@@ -1110,13 +1395,22 @@ class ExamUI {
                     false;
 
 
-                this.showScreen(
-                    this.elements.examScreen
-                );
+                this.closeFinishModal();
 
+
+                /*
+                ------------------------------------------
+                Troca de tela
+                ------------------------------------------
+                */
 
                 this.hideScreen(
                     this.elements.startScreen
+                );
+
+
+                this.showScreen(
+                    this.elements.examScreen
                 );
 
 
@@ -1125,24 +1419,65 @@ class ExamUI {
                 );
 
 
-                this.renderCurrentQuestion();
-
-
-                this.updateInterface();
-
-
                 /*
-                Inicia o timer somente quando existe
-                duração configurada.
+                ------------------------------------------
+                Domínio
+                ------------------------------------------
                 */
 
                 if (
-                    this.engine
-                        .getRemainingTime() > 0
+                    this.elements.examDomainName
                 ) {
 
-                    this.engine
-                        .startTimer();
+                    this.elements
+                        .examDomainName
+                        .textContent =
+                            "Network Fundamentals";
+
+                }
+
+
+                /*
+                ------------------------------------------
+                Renderização inicial
+                ------------------------------------------
+                */
+
+                this.renderCurrentQuestion();
+
+                this.updateInterface();
+
+                this.updateNavigationRenderer();
+
+
+                /*
+                ------------------------------------------
+                Timer inicial
+                ------------------------------------------
+                */
+
+                if (
+                    data &&
+                    data.remainingTime !==
+                        undefined
+                ) {
+
+                    this.updateTimer(
+                        data.remainingTime
+                    );
+
+                }
+
+
+                if (
+                    data &&
+                    data.elapsedTime !==
+                        undefined
+                ) {
+
+                    this.updateElapsedTime(
+                        data.elapsedTime
+                    );
 
                 }
 
@@ -1171,8 +1506,11 @@ class ExamUI {
 
                 this.renderCurrentQuestion();
 
-
                 this.updateInterface();
+
+                this.updateNavigationRenderer();
+
+                this.autoSave();
 
             }
         );
@@ -1197,16 +1535,9 @@ class ExamUI {
                 }
 
 
-                /*
-                O QuestionRenderer pode precisar redesenhar
-                a questão para refletir seleção/desmarcação.
-                */
-
-                this.renderCurrentQuestion();
-
-
                 this.updateInterface();
 
+                this.updateNavigationRenderer();
 
                 this.autoSave();
 
@@ -1235,6 +1566,7 @@ class ExamUI {
 
                 this.updateInterface();
 
+                this.updateNavigationRenderer();
 
                 this.autoSave();
 
@@ -1244,75 +1576,43 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        TEMPO ALTERADO
+        TIMER
         --------------------------------------------------
         */
 
         this.engine.on(
-            "timeChanged",
-            payload => {
+            "timerTick",
+            data => {
 
-                if (
-                    !this.examRunning
-                ) {
+                if (!data) {
 
                     return;
 
                 }
 
 
-                const remainingTime =
-                    payload &&
-                    Number.isFinite(
-                        Number(
-                            payload.remainingTime
-                        )
-                    )
-                        ? Number(
-                            payload.remainingTime
-                        )
-                        : this.engine
-                            .getRemainingTime();
+                if (
+                    data.remainingTime !==
+                        undefined
+                ) {
+
+                    this.updateTimer(
+                        data.remainingTime
+                    );
+
+                }
 
 
-                const elapsedTime =
-                    payload &&
-                    Number.isFinite(
-                        Number(
-                            payload.elapsedTime
-                        )
-                    )
-                        ? Number(
-                            payload.elapsedTime
-                        )
-                        : this.engine
-                            .getElapsedTime();
+                if (
+                    data.elapsedTime !==
+                        undefined
+                ) {
 
+                    this.updateElapsedTime(
+                        data.elapsedTime
+                    );
 
-                this.updateTimer(
-                    remainingTime
-                );
-
-
-                this.updateElapsedTime(
-                    elapsedTime
-                );
-
-            }
-        );
-
-
-        /*
-        --------------------------------------------------
-        TEMPO ESGOTADO
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "timeExpired",
-            () => {
-
-                this.closeFinishModal();
+                }
 
             }
         );
@@ -1326,15 +1626,7 @@ class ExamUI {
 
         this.engine.on(
             "examFinished",
-            payload => {
-
-                const result =
-                    payload &&
-                    payload.result
-                        ? payload.result
-                        : this.engine
-                            .getResult();
-
+            result => {
 
                 this.handleExamFinished(
                     result
@@ -1346,59 +1638,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        EXAME RESTAURADO
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "examRestored",
-            () => {
-
-                this.examRunning =
-                    true;
-
-                this.examFinished =
-                    false;
-
-
-                this.hideScreen(
-                    this.elements.startScreen
-                );
-
-
-                this.hideScreen(
-                    this.elements.resultScreen
-                );
-
-
-                this.showScreen(
-                    this.elements.examScreen
-                );
-
-
-                this.renderCurrentQuestion();
-
-
-                this.updateInterface();
-
-
-                if (
-                    this.engine
-                        .getRemainingTime() > 0
-                ) {
-
-                    this.engine
-                        .startTimer();
-
-                }
-
-            }
-        );
-
-
-        /*
-        --------------------------------------------------
-        RESET
+        EXAME RESETADO
         --------------------------------------------------
         */
 
@@ -1406,17 +1646,35 @@ class ExamUI {
             "examReset",
             () => {
 
-                this.examRunning =
-                    false;
-
-                this.examFinished =
-                    false;
-
-
-                this.closeFinishModal();
-
-
                 this.prepareInitialScreen();
+
+            }
+        );
+
+
+        /*
+        --------------------------------------------------
+        ERRO
+        --------------------------------------------------
+        */
+
+        this.engine.on(
+            "error",
+            error => {
+
+                const message =
+                    error &&
+                    error.message
+                        ? error.message
+                        : String(
+                            error ||
+                            "Erro desconhecido."
+                        );
+
+
+                this.showError(
+                    message
+                );
 
             }
         );
@@ -1434,14 +1692,119 @@ class ExamUI {
 
         /*
         --------------------------------------------------
+        QUESTION RENDERER
+        --------------------------------------------------
+        */
+
+        if (
+            this.questionRenderer
+        ) {
+
+            /*
+            ----------------------------------------------
+            Callback genérico
+            ----------------------------------------------
+            */
+
+            if (
+                typeof this.questionRenderer
+                    .setOnAnswer ===
+                    "function"
+            ) {
+
+                this.questionRenderer
+                    .setOnAnswer(
+                        answer => {
+
+                            this.handleAnswer(
+                                answer
+                            );
+
+                        }
+                    );
+
+            }
+
+
+            /*
+            ----------------------------------------------
+            Compatibilidade com callback direto
+            ----------------------------------------------
+            */
+
+            if (
+                "onAnswer" in
+                this.questionRenderer
+            ) {
+
+                this.questionRenderer
+                    .onAnswer =
+                        answer => {
+
+                            this.handleAnswer(
+                                answer
+                            );
+
+                        };
+
+            }
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        NAVIGATION RENDERER
+        --------------------------------------------------
+        */
+
+        if (
+            this.navigationRenderer
+        ) {
+
+            if (
+                typeof this.navigationRenderer
+                    .setOnNavigate ===
+                    "function"
+            ) {
+
+                this.navigationRenderer
+                    .setOnNavigate(
+                        index => {
+
+                            this.goToQuestion(
+                                index
+                            );
+
+                        }
+                    );
+
+            }
+
+
+            if (
+                "onNavigate" in
+                this.navigationRenderer
+            ) {
+
+                this.navigationRenderer
+                    .onNavigate =
+                        index => {
+
+                            this.goToQuestion(
+                                index
+                            );
+
+                        };
+
+            }
+
+        }
+
+
+        /*
+        --------------------------------------------------
         RESULT RENDERER
-
-        O ResultRenderer possui callbacks para:
-        - novo exame
-        - fechar resultado
-
-        Ambos retornam para a tela inicial de forma
-        controlada.
         --------------------------------------------------
         */
 
@@ -1468,29 +1831,6 @@ class ExamUI {
 
 
             if (
-                typeof this.resultRenderer
-                    .setOnClose ===
-                    "function"
-            ) {
-
-                this.resultRenderer
-                    .setOnClose(
-                        () => {
-
-                            this.closeResultScreen();
-
-                        }
-                    );
-
-            }
-
-
-            /*
-            Compatibilidade com implementações que usam
-            propriedades públicas em vez de setters.
-            */
-
-            if (
                 "onRestart" in
                 this.resultRenderer
             ) {
@@ -1505,58 +1845,6 @@ class ExamUI {
 
             }
 
-
-            if (
-                "onClose" in
-                this.resultRenderer
-            ) {
-
-                this.resultRenderer
-                    .onClose =
-                        () => {
-
-                            this.closeResultScreen();
-
-                        };
-
-            }
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        NAVIGATION RENDERER
-
-        Caso o renderer permita callback explícito,
-        utilizamos o ExamEngine como controlador.
-        --------------------------------------------------
-        */
-
-        if (
-            this.navigationRenderer
-        ) {
-
-            if (
-                typeof this.navigationRenderer
-                    .setOnNavigate ===
-                    "function"
-            ) {
-
-                this.navigationRenderer
-                    .setOnNavigate(
-                        index => {
-
-                            this.engine
-                                .goToQuestion(
-                                    index
-                                );
-
-                        }
-                    );
-
-            }
-
         }
 
     }
@@ -1564,7 +1852,7 @@ class ExamUI {
 
     /*
     ======================================================
-    INICIAR EXAME A PARTIR DA INTERFACE
+    INICIAR EXAME PELA INTERFACE
     ======================================================
     */
 
@@ -1579,9 +1867,12 @@ class ExamUI {
         }
 
 
+        this.closeFinishModal();
+
+
         /*
         --------------------------------------------------
-        Descobre o modo selecionado
+        Determina modo selecionado
         --------------------------------------------------
         */
 
@@ -1594,70 +1885,24 @@ class ExamUI {
                 );
 
 
-        let modeName =
-            checked
-                ? checked.value
-                : this.selectedMode;
-
-
-        /*
-        --------------------------------------------------
-        Compatibilidade com HTML antigo que eventualmente
-        use valores numéricos.
-        --------------------------------------------------
-        */
-
         if (
-            !this.examModes[
-                modeName
+            checked &&
+            this.examModes[
+                checked.value
             ]
         ) {
 
-            const numericMode =
-                Number(
-                    modeName
-                );
-
-
-            if (
-                numericMode === 20
-            ) {
-
-                modeName =
-                    "quick";
-
-            } else if (
-                numericMode === 60
-            ) {
-
-                modeName =
-                    "standard";
-
-            } else if (
-                numericMode === 180
-            ) {
-
-                modeName =
-                    "full";
-
-            } else {
-
-                modeName =
-                    "standard";
-
-            }
+            this.selectedMode =
+                checked.value;
 
         }
 
 
-        this.selectedMode =
-            modeName;
-
-
         const mode =
             this.examModes[
-                modeName
-            ];
+                this.selectedMode
+            ] ||
+            this.examModes.standard;
 
 
         /*
@@ -1675,9 +1920,8 @@ class ExamUI {
         ) {
 
             this.showError(
-                "Nenhuma questão está disponível para iniciar o exame."
+                "O banco de questões está vazio."
             );
-
 
             return;
 
@@ -1686,104 +1930,179 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        O modo full usa até 180 questões, limitado pelo
-        tamanho real do banco.
+        Quantidade solicitada
         --------------------------------------------------
         */
 
-        const questionCount =
+        let questionCount =
+            mode.questionCount;
+
+
+        if (
+            this.selectedMode ===
+            "full"
+        ) {
+
+            questionCount =
+                available;
+
+        }
+
+
+        questionCount =
             Math.min(
-                mode.questionCount,
+                questionCount,
                 available
             );
 
 
         /*
         --------------------------------------------------
-        Reseta estado visual
+        Configuração do exame
         --------------------------------------------------
         */
 
-        this.examFinished =
-            false;
+        const config = {
 
+            mode:
+                this.selectedMode,
 
-        this.closeFinishModal();
+            questionCount:
+                questionCount,
+
+            duration:
+                mode.duration,
+
+            shuffleQuestions:
+                true,
+
+            shuffleAnswers:
+                true
+
+        };
 
 
         /*
         --------------------------------------------------
-        Limpa renderizadores antes da nova tentativa
+        Desabilita botão temporariamente
         --------------------------------------------------
         */
 
         if (
-            this.resultRenderer &&
-            typeof this.resultRenderer
-                .clear ===
-                "function"
+            this.elements.startExamButton
         ) {
 
-            this.resultRenderer
-                .clear();
+            this.elements
+                .startExamButton
+                .disabled =
+                    true;
 
         }
 
-
-        if (
-            this.navigationRenderer &&
-            typeof this.navigationRenderer
-                .clear ===
-                "function"
-        ) {
-
-            this.navigationRenderer
-                .clear();
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Inicia pelo ExamEngine
-        --------------------------------------------------
-        */
 
         try {
 
-            this.engine
-                .startExam({
+            /*
+            ----------------------------------------------
+            API principal
+            ----------------------------------------------
+            */
 
-                    title:
-                        "Cisco CCNA 200-301",
+            if (
+                typeof this.engine
+                    .startExam ===
+                    "function"
+            ) {
 
-                    domain:
-                        "Network Fundamentals",
+                const result =
+                    this.engine
+                        .startExam(
+                            config
+                        );
 
-                    questionCount:
-                        questionCount,
 
-                    duration:
-                        mode.duration,
+                /*
+                ------------------------------------------
+                Compatibilidade caso startExam seja async
+                ------------------------------------------
+                */
 
-                    passingScore:
-                        70
+                if (
+                    result &&
+                    typeof result.then ===
+                        "function"
+                ) {
 
-                });
+                    result.catch(
+                        error => {
 
-        } catch (error) {
+                            this.handleStartError(
+                                error
+                            );
 
-            console.error(
-                "ExamUI: erro ao iniciar exame.",
-                error
+                        }
+                    );
+
+                }
+
+
+                return;
+
+            }
+
+
+            /*
+            ----------------------------------------------
+            Compatibilidade com start()
+            ----------------------------------------------
+            */
+
+            if (
+                typeof this.engine
+                    .start ===
+                    "function"
+            ) {
+
+                const result =
+                    this.engine
+                        .start(
+                            config
+                        );
+
+
+                if (
+                    result &&
+                    typeof result.then ===
+                        "function"
+                ) {
+
+                    result.catch(
+                        error => {
+
+                            this.handleStartError(
+                                error
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                return;
+
+            }
+
+
+            throw new Error(
+                "ExamEngine não possui método startExam() ou start()."
             );
 
+        }
+        catch (error) {
 
-            this.showError(
-                error &&
-                error.message
-                    ? error.message
-                    : "Não foi possível iniciar o exame."
+            this.handleStartError(
+                error
             );
 
         }
@@ -1793,14 +2112,66 @@ class ExamUI {
 
     /*
     ======================================================
-    RENDERIZAR QUESTÃO ATUAL
+    ERRO AO INICIAR EXAME
     ======================================================
     */
 
-    renderCurrentQuestion() {
+    handleStartError(
+        error
+    ) {
+
+        this.examRunning =
+            false;
+
 
         if (
-            !this.questionRenderer
+            this.elements.startExamButton
+        ) {
+
+            this.elements
+                .startExamButton
+                .disabled =
+                    false;
+
+        }
+
+
+        const message =
+            error &&
+            error.message
+                ? error.message
+                : String(
+                    error ||
+                    "Não foi possível iniciar o exame."
+                );
+
+
+        console.error(
+            "ExamUI: erro ao iniciar exame.",
+            error
+        );
+
+
+        this.showError(
+            message
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    PROCESSAR RESPOSTA
+    ======================================================
+    */
+
+    handleAnswer(
+        answer
+    ) {
+
+        if (
+            !this.examRunning ||
+            !this.engine
         ) {
 
             return;
@@ -1810,19 +2181,20 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Interface principal esperada
+        API principal
         --------------------------------------------------
         */
 
         if (
-            typeof this.questionRenderer
-                .render ===
+            typeof this.engine
+                .answerCurrentQuestion ===
                 "function"
         ) {
 
-            this.questionRenderer
-                .render();
-
+            this.engine
+                .answerCurrentQuestion(
+                    answer
+                );
 
             return;
 
@@ -1836,15 +2208,374 @@ class ExamUI {
         */
 
         if (
-            typeof this.questionRenderer
-                .renderCurrentQuestion ===
+            typeof this.engine
+                .setAnswer ===
                 "function"
         ) {
 
-            this.questionRenderer
-                .renderCurrentQuestion();
+            this.engine
+                .setAnswer(
+                    answer
+                );
+
+            return;
 
         }
+
+
+        if (
+            typeof this.engine
+                .answerQuestion ===
+                "function"
+        ) {
+
+            const question =
+                this.getCurrentQuestion();
+
+
+            if (!question) {
+
+                return;
+
+            }
+
+
+            this.engine
+                .answerQuestion(
+                    question.id,
+                    answer
+                );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    IR PARA QUESTÃO
+    ======================================================
+    */
+
+    goToQuestion(
+        index
+    ) {
+
+        if (
+            !this.examRunning ||
+            !this.engine
+        ) {
+
+            return;
+
+        }
+
+
+        const target =
+            Number(
+                index
+            );
+
+
+        if (
+            !Number.isInteger(
+                target
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .goToQuestion ===
+                "function"
+        ) {
+
+            this.engine
+                .goToQuestion(
+                    target
+                );
+
+            return;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .setCurrentQuestion ===
+                "function"
+        ) {
+
+            this.engine
+                .setCurrentQuestion(
+                    target
+                );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER QUESTÃO ATUAL
+    ======================================================
+    */
+
+    getCurrentQuestion() {
+
+        if (
+            !this.engine
+        ) {
+
+            return null;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .getCurrentQuestion ===
+                "function"
+        ) {
+
+            return this.engine
+                .getCurrentQuestion();
+
+        }
+
+
+        if (
+            this.engine.currentQuestion
+        ) {
+
+            return this.engine
+                .currentQuestion;
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER ÍNDICE ATUAL
+    ======================================================
+    */
+
+    getCurrentQuestionIndex() {
+
+        if (
+            !this.engine
+        ) {
+
+            return 0;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .getCurrentQuestionIndex ===
+                "function"
+        ) {
+
+            const index =
+                Number(
+                    this.engine
+                        .getCurrentQuestionIndex()
+                );
+
+
+            return Number.isFinite(
+                index
+            )
+                ? index
+                : 0;
+
+        }
+
+
+        if (
+            Number.isFinite(
+                Number(
+                    this.engine
+                        .currentQuestionIndex
+                )
+            )
+        ) {
+
+            return Number(
+                this.engine
+                    .currentQuestionIndex
+            );
+
+        }
+
+
+        return 0;
+
+    }
+
+
+    /*
+    ======================================================
+    RENDERIZAR QUESTÃO ATUAL
+    ======================================================
+    */
+
+    renderCurrentQuestion() {
+
+        const question =
+            this.getCurrentQuestion();
+
+
+        if (!question) {
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Usa QuestionRenderer quando disponível
+        --------------------------------------------------
+        */
+
+        if (
+            this.questionRenderer &&
+            typeof this.questionRenderer
+                .render ===
+                "function"
+        ) {
+
+            const currentAnswer =
+                this.getCurrentAnswer();
+
+
+            this.questionRenderer
+                .render(
+                    question,
+                    currentAnswer
+                );
+
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Fallback simples
+        --------------------------------------------------
+        */
+
+        if (
+            this.elements.questionDomain
+        ) {
+
+            this.elements
+                .questionDomain
+                .textContent =
+                    question.domain ||
+                    "Network Fundamentals";
+
+        }
+
+
+        if (
+            this.elements.questionType
+        ) {
+
+            this.elements
+                .questionType
+                .textContent =
+                    question.type ||
+                    "";
+
+        }
+
+
+        if (
+            this.elements.questionText
+        ) {
+
+            this.elements
+                .questionText
+                .textContent =
+                    question.text ||
+                    question.question ||
+                    "";
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER RESPOSTA ATUAL
+    ======================================================
+    */
+
+    getCurrentAnswer() {
+
+        if (
+            !this.engine
+        ) {
+
+            return null;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .getCurrentAnswer ===
+                "function"
+        ) {
+
+            return this.engine
+                .getCurrentAnswer();
+
+        }
+
+
+        const question =
+            this.getCurrentQuestion();
+
+
+        if (!question) {
+
+            return null;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .getAnswer ===
+                "function"
+        ) {
+
+            return this.engine
+                .getAnswer(
+                    question.id
+                );
+
+        }
+
+
+        return null;
 
     }
 
@@ -1858,8 +2589,7 @@ class ExamUI {
     updateInterface() {
 
         if (
-            !this.engine ||
-            !this.engine.hasExam()
+            !this.engine
         ) {
 
             return;
@@ -1867,20 +2597,124 @@ class ExamUI {
         }
 
 
-        const state =
-            this.engine
-                .getState();
+        this.updateProgress();
+
+        this.updateNavigationButtons();
+
+        this.updateReviewButton();
+
+    }
 
 
-        const progress =
-            state.progress ||
-            this.engine
-                .getProgress();
+    /*
+    ======================================================
+    ATUALIZAR PROGRESSO
+    ======================================================
+    */
+
+    updateProgress() {
+
+        let progress = null;
+
+
+        if (
+            typeof this.engine
+                .getProgress ===
+                "function"
+        ) {
+
+            progress =
+                this.engine
+                    .getProgress();
+
+        }
 
 
         /*
         --------------------------------------------------
-        Questão atual / total
+        Fallback
+        --------------------------------------------------
+        */
+
+        if (!progress) {
+
+            const total =
+                this.getExamQuestionCount();
+
+
+            const currentIndex =
+                this.getCurrentQuestionIndex();
+
+
+            progress = {
+
+                total:
+                    total,
+
+                current:
+                    currentIndex + 1,
+
+                answered:
+                    0,
+
+                remaining:
+                    total,
+
+                review:
+                    0
+
+            };
+
+        }
+
+
+        const total =
+            Number(
+                progress.total || 0
+            );
+
+
+        const current =
+            Number(
+                progress.current ||
+                (
+                    this.getCurrentQuestionIndex() +
+                    1
+                )
+            );
+
+
+        const answered =
+            Number(
+                progress.answered || 0
+            );
+
+
+        const remaining =
+            Number.isFinite(
+                Number(
+                    progress.remaining
+                )
+            )
+                ? Number(
+                    progress.remaining
+                )
+                : Math.max(
+                    0,
+                    total -
+                    answered
+                );
+
+
+        const review =
+            Number(
+                progress.review || 0
+            );
+
+
+        /*
+        --------------------------------------------------
+        Contador da questão
         --------------------------------------------------
         */
 
@@ -1891,7 +2725,7 @@ class ExamUI {
             this.elements
                 .questionCounter
                 .textContent =
-                    `${progress.current} / ${progress.total}`;
+                    `${current} / ${total}`;
 
         }
 
@@ -1910,7 +2744,7 @@ class ExamUI {
                 .answeredCount
                 .textContent =
                     String(
-                        progress.answered
+                        answered
                     );
 
         }
@@ -1930,7 +2764,7 @@ class ExamUI {
                 .remainingCount
                 .textContent =
                     String(
-                        progress.remaining
+                        remaining
                     );
 
         }
@@ -1950,7 +2784,7 @@ class ExamUI {
                 .reviewCount
                 .textContent =
                     String(
-                        progress.review
+                        review
                     );
 
         }
@@ -1962,84 +2796,17 @@ class ExamUI {
         --------------------------------------------------
         */
 
-        this.updateProgress(
-            progress
-        );
-
-
-        /*
-        --------------------------------------------------
-        Botões
-        --------------------------------------------------
-        */
-
-        this.updateNavigationButtons();
-
-
-        this.updateReviewButton();
-
-
-        /*
-        --------------------------------------------------
-        Timer
-        --------------------------------------------------
-        */
-
-        this.updateTimer(
-            state.remainingTime
-        );
-
-
-        this.updateElapsedTime(
-            state.elapsedTime
-        );
-
-
-        /*
-        --------------------------------------------------
-        Navigation Renderer
-        --------------------------------------------------
-        */
-
-        this.updateNavigationRenderer();
-
-    }
-
-
-    /*
-    ======================================================
-    ATUALIZAR PROGRESSO
-    ======================================================
-    */
-
-    updateProgress(
-        progress
-    ) {
-
-        if (!progress) {
-
-            return;
-
-        }
-
-
-        const percent =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    Number(
-                        progress.percent
-                    ) || 0
+        const percentage =
+            total > 0
+                ? Math.round(
+                    (
+                        current /
+                        total
+                    ) *
+                    100
                 )
-            );
+                : 0;
 
-
-        /*
-        --------------------------------------------------
-        <progress>
-        --------------------------------------------------
-        */
 
         if (
             this.elements.examProgress
@@ -2052,26 +2819,16 @@ class ExamUI {
 
                 this.elements
                     .examProgress
-                    .max =
-                        100;
-
-
-                this.elements
-                    .examProgress
                     .value =
-                        percent;
+                        percentage;
 
             }
 
 
-            /*
-            Compatibilidade com barra baseada em CSS.
-            */
-
             this.elements
                 .examProgress
                 .style.width =
-                    `${percent}%`;
+                    `${percentage}%`;
 
 
             this.elements
@@ -2079,18 +2836,12 @@ class ExamUI {
                 .setAttribute(
                     "aria-valuenow",
                     String(
-                        percent
+                        percentage
                     )
                 );
 
         }
 
-
-        /*
-        --------------------------------------------------
-        Texto
-        --------------------------------------------------
-        */
 
         if (
             this.elements.progressText
@@ -2099,7 +2850,7 @@ class ExamUI {
             this.elements
                 .progressText
                 .textContent =
-                    `${percent}%`;
+                    `${percentage}%`;
 
         }
 
@@ -2108,11 +2859,94 @@ class ExamUI {
 
     /*
     ======================================================
-    BOTÕES DE NAVEGAÇÃO
+    QUANTIDADE DE QUESTÕES DO EXAME
+    ======================================================
+    */
+
+    getExamQuestionCount() {
+
+        if (
+            !this.engine
+        ) {
+
+            return 0;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .getQuestionCount ===
+                "function"
+        ) {
+
+            return Number(
+                this.engine
+                    .getQuestionCount()
+            ) || 0;
+
+        }
+
+
+        if (
+            typeof this.engine
+                .getQuestions ===
+                "function"
+        ) {
+
+            const questions =
+                this.engine
+                    .getQuestions();
+
+
+            return Array.isArray(
+                questions
+            )
+                ? questions.length
+                : 0;
+
+        }
+
+
+        if (
+            Array.isArray(
+                this.engine.questions
+            )
+        ) {
+
+            return this.engine
+                .questions
+                .length;
+
+        }
+
+
+        return 0;
+
+    }
+
+
+    /*
+    ======================================================
+    ATUALIZAR BOTÕES DE NAVEGAÇÃO
     ======================================================
     */
 
     updateNavigationButtons() {
+
+        const index =
+            this.getCurrentQuestionIndex();
+
+
+        const total =
+            this.getExamQuestionCount();
+
+
+        /*
+        --------------------------------------------------
+        Anterior
+        --------------------------------------------------
+        */
 
         if (
             this.elements.previousButton
@@ -2121,11 +2955,19 @@ class ExamUI {
             this.elements
                 .previousButton
                 .disabled =
-                    !this.engine
-                        .hasPrevious();
+                    (
+                        !this.examRunning ||
+                        index <= 0
+                    );
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Próxima
+        --------------------------------------------------
+        */
 
         if (
             this.elements.nextButton
@@ -2134,8 +2976,30 @@ class ExamUI {
             this.elements
                 .nextButton
                 .disabled =
-                    !this.engine
-                        .hasNext();
+                    (
+                        !this.examRunning ||
+                        total <= 0 ||
+                        index >=
+                            total - 1
+                    );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Finalizar
+        --------------------------------------------------
+        */
+
+        if (
+            this.elements.finishExamButton
+        ) {
+
+            this.elements
+                .finishExamButton
+                .disabled =
+                    !this.examRunning;
 
         }
 
@@ -2144,7 +3008,7 @@ class ExamUI {
 
     /*
     ======================================================
-    BOTÃO DE REVISÃO
+    ATUALIZAR BOTÃO DE REVISÃO
     ======================================================
     */
 
@@ -2159,9 +3023,48 @@ class ExamUI {
         }
 
 
-        const marked =
-            this.engine
-                .isCurrentQuestionMarkedForReview();
+        let marked =
+            false;
+
+
+        if (
+            this.engine &&
+            typeof this.engine
+                .isCurrentQuestionMarkedForReview ===
+                "function"
+        ) {
+
+            marked =
+                Boolean(
+                    this.engine
+                        .isCurrentQuestionMarkedForReview()
+                );
+
+        }
+        else if (
+            this.engine &&
+            typeof this.engine
+                .isMarkedForReview ===
+                "function"
+        ) {
+
+            const question =
+                this.getCurrentQuestion();
+
+
+            if (question) {
+
+                marked =
+                    Boolean(
+                        this.engine
+                            .isMarkedForReview(
+                                question.id
+                            )
+                    );
+
+            }
+
+        }
 
 
         this.elements
@@ -2175,15 +3078,6 @@ class ExamUI {
 
         this.elements
             .reviewButton
-            .classList
-            .toggle(
-                "selected",
-                marked
-            );
-
-
-        this.elements
-            .reviewButton
             .setAttribute(
                 "aria-pressed",
                 marked
@@ -2191,480 +3085,543 @@ class ExamUI {
                     : "false"
             );
 
+
+        /*
+        --------------------------------------------------
+        Mantém texto coerente
+        --------------------------------------------------
+        */
+
+        const label =
+            this.elements
+                .reviewButton
+                .querySelector(
+                    "[data-review-label]"
+                );
+
+
+        if (label) {
+
+            label.textContent =
+                marked
+                    ? "Marcada para revisão"
+                    : "Marcar para revisão";
+
+        }
+
     }
+
 
     /*
     ======================================================
-    EVENTOS DO EXAM ENGINE
+    ATUALIZAR TIMER
     ======================================================
     */
 
-    bindEngineEvents() {
+    updateTimer(
+        seconds
+    ) {
 
-        /*
-        --------------------------------------------------
-        EXAME INICIADO
-        --------------------------------------------------
-        */
+        if (
+            !this.elements.timer
+        ) {
 
-        this.engine.on(
-            "examStarted",
-            () => {
+            return;
 
-                this.examRunning =
-                    true;
-
-                this.examFinished =
-                    false;
+        }
 
 
-                this.showScreen(
-                    this.elements.examScreen
+        const value =
+            Math.max(
+                0,
+                Number(
+                    seconds
+                ) || 0
+            );
+
+
+        this.elements
+            .timer
+            .textContent =
+                this.formatTime(
+                    value
                 );
 
 
-                this.hideScreen(
-                    this.elements.startScreen
+        /*
+        --------------------------------------------------
+        Classes de alerta
+        --------------------------------------------------
+        */
+
+        this.elements
+            .timer
+            .classList
+            .remove(
+                "warning",
+                "danger"
+            );
+
+
+        if (
+            value > 0 &&
+            value <= 300
+        ) {
+
+            this.elements
+                .timer
+                .classList
+                .add(
+                    "danger"
                 );
 
+        }
+        else if (
+            value > 300 &&
+            value <= 900
+        ) {
 
-                this.hideScreen(
-                    this.elements.resultScreen
+            this.elements
+                .timer
+                .classList
+                .add(
+                    "warning"
                 );
 
+        }
 
-                this.renderCurrentQuestion();
-
-
-                this.updateInterface();
+    }
 
 
-                /*
-                Inicia o timer somente quando existe
-                duração configurada.
-                */
+    /*
+    ======================================================
+    ATUALIZAR TEMPO DECORRIDO
+    ======================================================
+    */
 
-                if (
-                    this.engine
-                        .getRemainingTime() > 0
-                ) {
+    updateElapsedTime(
+        seconds
+    ) {
 
-                    this.engine
-                        .startTimer();
+        if (
+            !this.elements.elapsedTime
+        ) {
 
-                }
+            return;
 
-            }
-        );
-
-
-        /*
-        --------------------------------------------------
-        QUESTÃO ALTERADA
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "questionChanged",
-            () => {
-
-                if (
-                    !this.examRunning
-                ) {
-
-                    return;
-
-                }
+        }
 
 
-                this.renderCurrentQuestion();
+        this.elements
+            .elapsedTime
+            .textContent =
+                this.formatTime(
+                    seconds
+                );
+
+    }
 
 
-                this.updateInterface();
+    /*
+    ======================================================
+    FORMATAR TEMPO
+    ======================================================
+    */
 
-            }
-        );
+    formatTime(
+        seconds
+    ) {
 
-
-        /*
-        --------------------------------------------------
-        RESPOSTA ALTERADA
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "answerChanged",
-            () => {
-
-                if (
-                    !this.examRunning
-                ) {
-
-                    return;
-
-                }
+        const value =
+            Math.max(
+                0,
+                Math.floor(
+                    Number(
+                        seconds
+                    ) || 0
+                )
+            );
 
 
-                /*
-                O QuestionRenderer pode precisar redesenhar
-                a questão para refletir seleção/desmarcação.
-                */
-
-                this.renderCurrentQuestion();
+        const hours =
+            Math.floor(
+                value / 3600
+            );
 
 
-                this.updateInterface();
+        const minutes =
+            Math.floor(
+                (
+                    value % 3600
+                ) /
+                60
+            );
 
 
-                this.autoSave();
-
-            }
-        );
+        const remainingSeconds =
+            value % 60;
 
 
-        /*
-        --------------------------------------------------
-        REVISÃO ALTERADA
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "reviewChanged",
-            () => {
-
-                if (
-                    !this.examRunning
-                ) {
-
-                    return;
-
-                }
-
-
-                this.updateInterface();
-
-
-                this.autoSave();
-
-            }
-        );
-
-
-        /*
-        --------------------------------------------------
-        TEMPO ALTERADO
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "timeChanged",
-            payload => {
-
-                if (
-                    !this.examRunning
-                ) {
-
-                    return;
-
-                }
-
-
-                const remainingTime =
-                    payload &&
-                    Number.isFinite(
-                        Number(
-                            payload.remainingTime
-                        )
+        return [
+            hours,
+            minutes,
+            remainingSeconds
+        ]
+            .map(
+                item =>
+                    String(
+                        item
                     )
-                        ? Number(
-                            payload.remainingTime
+                        .padStart(
+                            2,
+                            "0"
                         )
-                        : this.engine
-                            .getRemainingTime();
+            )
+            .join(
+                ":"
+            );
+
+    }
 
 
-                const elapsedTime =
-                    payload &&
-                    Number.isFinite(
-                        Number(
-                            payload.elapsedTime
-                        )
-                    )
-                        ? Number(
-                            payload.elapsedTime
-                        )
-                        : this.engine
-                            .getElapsedTime();
+    /*
+    ======================================================
+    ATUALIZAR NAVEGAÇÃO LATERAL
+    ======================================================
+    */
 
+    updateNavigationRenderer() {
 
-                this.updateTimer(
-                    remainingTime
-                );
+        if (
+            !this.navigationRenderer
+        ) {
 
+            return;
 
-                this.updateElapsedTime(
-                    elapsedTime
-                );
-
-            }
-        );
+        }
 
 
         /*
         --------------------------------------------------
-        TEMPO ESGOTADO
+        Renderização inicial / completa
         --------------------------------------------------
         */
 
-        this.engine.on(
-            "timeExpired",
-            () => {
+        if (
+            typeof this.navigationRenderer
+                .render ===
+                "function"
+        ) {
 
-                this.closeFinishModal();
+            const state =
+                this.getNavigationState();
 
-            }
-        );
+
+            this.navigationRenderer
+                .render(
+                    state
+                );
+
+
+            return;
+
+        }
 
 
         /*
         --------------------------------------------------
-        EXAME FINALIZADO
+        Atualização de estados
         --------------------------------------------------
         */
 
-        this.engine.on(
-            "examFinished",
-            payload => {
+        if (
+            typeof this.navigationRenderer
+                .updateStates ===
+                "function"
+        ) {
 
-                const result =
-                    payload &&
-                    payload.result
-                        ? payload.result
-                        : this.engine
-                            .getResult();
+            this.navigationRenderer
+                .updateStates(
+                    this.getNavigationState()
+                );
+
+        }
+
+    }
 
 
-                this.handleExamFinished(
+    /*
+    ======================================================
+    ESTADO PARA NAVEGAÇÃO
+    ======================================================
+    */
+
+    getNavigationState() {
+
+        const total =
+            this.getExamQuestionCount();
+
+
+        const currentIndex =
+            this.getCurrentQuestionIndex();
+
+
+        let progress = null;
+
+
+        if (
+            this.engine &&
+            typeof this.engine
+                .getProgress ===
+                "function"
+        ) {
+
+            progress =
+                this.engine
+                    .getProgress();
+
+        }
+
+
+        return {
+
+            total:
+                total,
+
+            currentIndex:
+                currentIndex,
+
+            progress:
+                progress,
+
+            engine:
+                this.engine
+
+        };
+
+    }
+
+
+    /*
+    ======================================================
+    AUTO SAVE
+    ======================================================
+    */
+
+    autoSave() {
+
+        if (
+            !this.storageManager ||
+            !this.engine ||
+            !this.examRunning
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            /*
+            ----------------------------------------------
+            Obtém estado
+            ----------------------------------------------
+            */
+
+            let state = null;
+
+
+            if (
+                typeof this.engine
+                    .getState ===
+                    "function"
+            ) {
+
+                state =
+                    this.engine
+                        .getState();
+
+            }
+            else if (
+                typeof this.engine
+                    .exportState ===
+                    "function"
+            ) {
+
+                state =
+                    this.engine
+                        .exportState();
+
+            }
+
+
+            if (!state) {
+
+                return;
+
+            }
+
+
+            /*
+            ----------------------------------------------
+            Persiste
+            ----------------------------------------------
+            */
+
+            if (
+                typeof this.storageManager
+                    .saveExamState ===
+                    "function"
+            ) {
+
+                this.storageManager
+                    .saveExamState(
+                        state
+                    );
+
+                return;
+
+            }
+
+
+            if (
+                typeof this.storageManager
+                    .save ===
+                    "function"
+            ) {
+
+                this.storageManager
+                    .save(
+                        state
+                    );
+
+            }
+
+        }
+        catch (error) {
+
+            /*
+            Falha de autosave não deve interromper
+            o exame.
+            */
+
+            console.warn(
+                "ExamUI: não foi possível salvar o estado do exame.",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    EXAME FINALIZADO
+    ======================================================
+    */
+
+    handleExamFinished(
+        result
+    ) {
+
+        this.examRunning =
+            false;
+
+        this.examFinished =
+            true;
+
+
+        this.closeFinishModal();
+
+
+        /*
+        --------------------------------------------------
+        Limpa sessão persistida
+        --------------------------------------------------
+        */
+
+        if (
+            this.storageManager
+        ) {
+
+            try {
+
+                if (
+                    typeof this.storageManager
+                        .clearExamState ===
+                        "function"
+                ) {
+
+                    this.storageManager
+                        .clearExamState();
+
+                }
+                else if (
+                    typeof this.storageManager
+                        .clear ===
+                        "function"
+                ) {
+
+                    this.storageManager
+                        .clear();
+
+                }
+
+            }
+            catch (error) {
+
+                console.warn(
+                    "ExamUI: não foi possível limpar o estado salvo.",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Troca para tela de resultado
+        --------------------------------------------------
+        */
+
+        this.hideScreen(
+            this.elements.examScreen
+        );
+
+
+        if (
+            this.elements.resultScreen
+        ) {
+
+            this.showScreen(
+                this.elements.resultScreen
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Renderiza resultado
+        --------------------------------------------------
+        */
+
+        if (
+            this.resultRenderer &&
+            typeof this.resultRenderer
+                .render ===
+                "function"
+        ) {
+
+            this.resultRenderer
+                .render(
                     result
                 );
 
-            }
-        );
-
-
-        /*
-        --------------------------------------------------
-        EXAME RESTAURADO
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "examRestored",
-            () => {
-
-                this.examRunning =
-                    true;
-
-                this.examFinished =
-                    false;
-
-
-                this.hideScreen(
-                    this.elements.startScreen
-                );
-
-
-                this.hideScreen(
-                    this.elements.resultScreen
-                );
-
-
-                this.showScreen(
-                    this.elements.examScreen
-                );
-
-
-                this.renderCurrentQuestion();
-
-
-                this.updateInterface();
-
-
-                if (
-                    this.engine
-                        .getRemainingTime() > 0
-                ) {
-
-                    this.engine
-                        .startTimer();
-
-                }
-
-            }
-        );
-
-
-        /*
-        --------------------------------------------------
-        RESET
-        --------------------------------------------------
-        */
-
-        this.engine.on(
-            "examReset",
-            () => {
-
-                this.examRunning =
-                    false;
-
-                this.examFinished =
-                    false;
-
-
-                this.closeFinishModal();
-
-
-                this.prepareInitialScreen();
-
-            }
-        );
-
-    }
-
-
-    /*
-    ======================================================
-    CONFIGURAR RENDERIZADORES
-    ======================================================
-    */
-
-    configureRenderers() {
-
-        /*
-        --------------------------------------------------
-        RESULT RENDERER
-
-        O ResultRenderer possui callbacks para:
-        - novo exame
-        - fechar resultado
-
-        Ambos retornam para a tela inicial de forma
-        controlada.
-        --------------------------------------------------
-        */
-
-        if (
-            this.resultRenderer
-        ) {
-
-            if (
-                typeof this.resultRenderer
-                    .setOnRestart ===
-                    "function"
-            ) {
-
-                this.resultRenderer
-                    .setOnRestart(
-                        () => {
-
-                            this.restartApplication();
-
-                        }
-                    );
-
-            }
-
-
-            if (
-                typeof this.resultRenderer
-                    .setOnClose ===
-                    "function"
-            ) {
-
-                this.resultRenderer
-                    .setOnClose(
-                        () => {
-
-                            this.closeResultScreen();
-
-                        }
-                    );
-
-            }
-
-
-            /*
-            Compatibilidade com implementações que usam
-            propriedades públicas em vez de setters.
-            */
-
-            if (
-                "onRestart" in
-                this.resultRenderer
-            ) {
-
-                this.resultRenderer
-                    .onRestart =
-                        () => {
-
-                            this.restartApplication();
-
-                        };
-
-            }
-
-
-            if (
-                "onClose" in
-                this.resultRenderer
-            ) {
-
-                this.resultRenderer
-                    .onClose =
-                        () => {
-
-                            this.closeResultScreen();
-
-                        };
-
-            }
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        NAVIGATION RENDERER
-
-        Caso o renderer permita callback explícito,
-        utilizamos o ExamEngine como controlador.
-        --------------------------------------------------
-        */
-
-        if (
-            this.navigationRenderer
-        ) {
-
-            if (
-                typeof this.navigationRenderer
-                    .setOnNavigate ===
-                    "function"
-            ) {
-
-                this.navigationRenderer
-                    .setOnNavigate(
-                        index => {
-
-                            this.engine
-                                .goToQuestion(
-                                    index
-                                );
-
-                        }
-                    );
-
-            }
-
         }
 
     }
@@ -2672,642 +3629,14 @@ class ExamUI {
 
     /*
     ======================================================
-    INICIAR EXAME A PARTIR DA INTERFACE
+    REINICIAR APLICAÇÃO
     ======================================================
     */
 
-    startExamFromUI() {
-
-        if (
-            this.examRunning
-        ) {
-
-            return;
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Descobre o modo selecionado
-        --------------------------------------------------
-        */
-
-        const checked =
-            this.elements
-                .examModeInputs
-                .find(
-                    input =>
-                        input.checked
-                );
-
-
-        let modeName =
-            checked
-                ? checked.value
-                : this.selectedMode;
-
-
-        /*
-        --------------------------------------------------
-        Compatibilidade com HTML antigo que eventualmente
-        use valores numéricos.
-        --------------------------------------------------
-        */
-
-        if (
-            !this.examModes[
-                modeName
-            ]
-        ) {
-
-            const numericMode =
-                Number(
-                    modeName
-                );
-
-
-            if (
-                numericMode === 20
-            ) {
-
-                modeName =
-                    "quick";
-
-            } else if (
-                numericMode === 60
-            ) {
-
-                modeName =
-                    "standard";
-
-            } else if (
-                numericMode === 180
-            ) {
-
-                modeName =
-                    "full";
-
-            } else {
-
-                modeName =
-                    "standard";
-
-            }
-
-        }
-
-
-        this.selectedMode =
-            modeName;
-
-
-        const mode =
-            this.examModes[
-                modeName
-            ];
-
-
-        /*
-        --------------------------------------------------
-        Quantidade disponível
-        --------------------------------------------------
-        */
-
-        const available =
-            this.getAvailableQuestionCount();
-
-
-        if (
-            available <= 0
-        ) {
-
-            this.showError(
-                "Nenhuma questão está disponível para iniciar o exame."
-            );
-
-
-            return;
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        O modo full usa até 180 questões, limitado pelo
-        tamanho real do banco.
-        --------------------------------------------------
-        */
-
-        const questionCount =
-            Math.min(
-                mode.questionCount,
-                available
-            );
-
-
-        /*
-        --------------------------------------------------
-        Reseta estado visual
-        --------------------------------------------------
-        */
-
-        this.examFinished =
-            false;
-
+    restartApplication() {
 
         this.closeFinishModal();
 
-
-        /*
-        --------------------------------------------------
-        Limpa renderizadores antes da nova tentativa
-        --------------------------------------------------
-        */
-
-        if (
-            this.resultRenderer &&
-            typeof this.resultRenderer
-                .clear ===
-                "function"
-        ) {
-
-            this.resultRenderer
-                .clear();
-
-        }
-
-
-        if (
-            this.navigationRenderer &&
-            typeof this.navigationRenderer
-                .clear ===
-                "function"
-        ) {
-
-            this.navigationRenderer
-                .clear();
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Inicia pelo ExamEngine
-        --------------------------------------------------
-        */
-
-        try {
-
-            this.engine
-                .startExam({
-
-                    title:
-                        "Cisco CCNA 200-301",
-
-                    domain:
-                        "Network Fundamentals",
-
-                    questionCount:
-                        questionCount,
-
-                    duration:
-                        mode.duration,
-
-                    passingScore:
-                        70
-
-                });
-
-        } catch (error) {
-
-            console.error(
-                "ExamUI: erro ao iniciar exame.",
-                error
-            );
-
-
-            this.showError(
-                error &&
-                error.message
-                    ? error.message
-                    : "Não foi possível iniciar o exame."
-            );
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    RENDERIZAR QUESTÃO ATUAL
-    ======================================================
-    */
-
-    renderCurrentQuestion() {
-
-        if (
-            !this.questionRenderer
-        ) {
-
-            return;
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Interface principal esperada
-        --------------------------------------------------
-        */
-
-        if (
-            typeof this.questionRenderer
-                .render ===
-                "function"
-        ) {
-
-            this.questionRenderer
-                .render();
-
-
-            return;
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Compatibilidade
-        --------------------------------------------------
-        */
-
-        if (
-            typeof this.questionRenderer
-                .renderCurrentQuestion ===
-                "function"
-        ) {
-
-            this.questionRenderer
-                .renderCurrentQuestion();
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    ATUALIZAR INTERFACE
-    ======================================================
-    */
-
-    updateInterface() {
-
-        if (
-            !this.engine ||
-            !this.engine.hasExam()
-        ) {
-
-            return;
-
-        }
-
-
-        const state =
-            this.engine
-                .getState();
-
-
-        const progress =
-            state.progress ||
-            this.engine
-                .getProgress();
-
-
-        /*
-        --------------------------------------------------
-        Questão atual / total
-        --------------------------------------------------
-        */
-
-        if (
-            this.elements.questionCounter
-        ) {
-
-            this.elements
-                .questionCounter
-                .textContent =
-                    `${progress.current} / ${progress.total}`;
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Respondidas
-        --------------------------------------------------
-        */
-
-        if (
-            this.elements.answeredCount
-        ) {
-
-            this.elements
-                .answeredCount
-                .textContent =
-                    String(
-                        progress.answered
-                    );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Restantes
-        --------------------------------------------------
-        */
-
-        if (
-            this.elements.remainingCount
-        ) {
-
-            this.elements
-                .remainingCount
-                .textContent =
-                    String(
-                        progress.remaining
-                    );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Revisão
-        --------------------------------------------------
-        */
-
-        if (
-            this.elements.reviewCount
-        ) {
-
-            this.elements
-                .reviewCount
-                .textContent =
-                    String(
-                        progress.review
-                    );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Barra de progresso
-        --------------------------------------------------
-        */
-
-        this.updateProgress(
-            progress
-        );
-
-
-        /*
-        --------------------------------------------------
-        Botões
-        --------------------------------------------------
-        */
-
-        this.updateNavigationButtons();
-
-
-        this.updateReviewButton();
-
-
-        /*
-        --------------------------------------------------
-        Timer
-        --------------------------------------------------
-        */
-
-        this.updateTimer(
-            state.remainingTime
-        );
-
-
-        this.updateElapsedTime(
-            state.elapsedTime
-        );
-
-
-        /*
-        --------------------------------------------------
-        Navigation Renderer
-        --------------------------------------------------
-        */
-
-        this.updateNavigationRenderer();
-
-    }
-
-
-    /*
-    ======================================================
-    ATUALIZAR PROGRESSO
-    ======================================================
-    */
-
-    updateProgress(
-        progress
-    ) {
-
-        if (!progress) {
-
-            return;
-
-        }
-
-
-        const percent =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    Number(
-                        progress.percent
-                    ) || 0
-                )
-            );
-
-
-        /*
-        --------------------------------------------------
-        <progress>
-        --------------------------------------------------
-        */
-
-        if (
-            this.elements.examProgress
-        ) {
-
-            if (
-                "value" in
-                this.elements.examProgress
-            ) {
-
-                this.elements
-                    .examProgress
-                    .max =
-                        100;
-
-
-                this.elements
-                    .examProgress
-                    .value =
-                        percent;
-
-            }
-
-
-            /*
-            Compatibilidade com barra baseada em CSS.
-            */
-
-            this.elements
-                .examProgress
-                .style.width =
-                    `${percent}%`;
-
-
-            this.elements
-                .examProgress
-                .setAttribute(
-                    "aria-valuenow",
-                    String(
-                        percent
-                    )
-                );
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Texto
-        --------------------------------------------------
-        */
-
-        if (
-            this.elements.progressText
-        ) {
-
-            this.elements
-                .progressText
-                .textContent =
-                    `${percent}%`;
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    BOTÕES DE NAVEGAÇÃO
-    ======================================================
-    */
-
-    updateNavigationButtons() {
-
-        if (
-            this.elements.previousButton
-        ) {
-
-            this.elements
-                .previousButton
-                .disabled =
-                    !this.engine
-                        .hasPrevious();
-
-        }
-
-
-        if (
-            this.elements.nextButton
-        ) {
-
-            this.elements
-                .nextButton
-                .disabled =
-                    !this.engine
-                        .hasNext();
-
-        }
-
-    }
-
-
-    /*
-    ======================================================
-    BOTÃO DE REVISÃO
-    ======================================================
-    */
-
-    updateReviewButton() {
-
-        if (
-            !this.elements.reviewButton
-        ) {
-
-            return;
-
-        }
-
-
-        const marked =
-            this.engine
-                .isCurrentQuestionMarkedForReview();
-
-
-        this.elements
-            .reviewButton
-            .classList
-            .toggle(
-                "active",
-                marked
-            );
-
-
-        this.elements
-            .reviewButton
-            .classList
-            .toggle(
-                "selected",
-                marked
-            );
-
-
-        this.elements
-            .reviewButton
-            .setAttribute(
-                "aria-pressed",
-                marked
-                    ? "true"
-                    : "false"
-            );
-
-    }
-
-    /*
-    ======================================================
-    FECHAR TELA DE RESULTADO
-    ======================================================
-    */
-
-    closeResultScreen() {
 
         /*
         --------------------------------------------------
@@ -3330,79 +3659,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Reseta engine
-        --------------------------------------------------
-        */
-
-        if (
-            this.engine &&
-            typeof this.engine
-                .reset ===
-                "function"
-        ) {
-
-            this.engine
-                .reset();
-
-
-            /*
-            O evento examReset chamará
-            prepareInitialScreen().
-            */
-
-            return;
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Fallback
-        --------------------------------------------------
-        */
-
-        this.examRunning =
-            false;
-
-        this.examFinished =
-            false;
-
-
-        this.prepareInitialScreen();
-
-    }
-
-
-    /*
-    ======================================================
-    NOVO EXAME
-    ======================================================
-    */
-
-    restartApplication() {
-
-        /*
-        --------------------------------------------------
-        Limpa resultado
-        --------------------------------------------------
-        */
-
-        if (
-            this.resultRenderer &&
-            typeof this.resultRenderer
-                .clear ===
-                "function"
-        ) {
-
-            this.resultRenderer
-                .clear();
-
-        }
-
-
-        /*
-        --------------------------------------------------
-        Limpa navegação
+        Limpa navegação visual
         --------------------------------------------------
         */
 
@@ -3421,7 +3678,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Reseta engine
+        Reseta o engine
         --------------------------------------------------
         */
 
@@ -3436,6 +3693,12 @@ class ExamUI {
                 .reset();
 
 
+            /*
+            Se o ExamEngine emitir "examReset",
+            prepareInitialScreen() será chamado
+            pelo listener configurado anteriormente.
+            */
+
             return;
 
         }
@@ -3443,7 +3706,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Fallback
+        Fallback caso não exista reset()
         --------------------------------------------------
         */
 
@@ -3467,6 +3730,12 @@ class ExamUI {
 
     resetStatusDisplay() {
 
+        /*
+        --------------------------------------------------
+        Questão atual
+        --------------------------------------------------
+        */
+
         if (
             this.elements.questionCounter
         ) {
@@ -3478,6 +3747,12 @@ class ExamUI {
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Respondidas
+        --------------------------------------------------
+        */
 
         if (
             this.elements.answeredCount
@@ -3491,6 +3766,12 @@ class ExamUI {
         }
 
 
+        /*
+        --------------------------------------------------
+        Restantes
+        --------------------------------------------------
+        */
+
         if (
             this.elements.remainingCount
         ) {
@@ -3503,6 +3784,12 @@ class ExamUI {
         }
 
 
+        /*
+        --------------------------------------------------
+        Revisão
+        --------------------------------------------------
+        */
+
         if (
             this.elements.reviewCount
         ) {
@@ -3514,6 +3801,12 @@ class ExamUI {
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Timer
+        --------------------------------------------------
+        */
 
         if (
             this.elements.timer
@@ -3536,6 +3829,12 @@ class ExamUI {
         }
 
 
+        /*
+        --------------------------------------------------
+        Tempo decorrido
+        --------------------------------------------------
+        */
+
         if (
             this.elements.elapsedTime
         ) {
@@ -3547,6 +3846,12 @@ class ExamUI {
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Barra de progresso
+        --------------------------------------------------
+        */
 
         if (
             this.elements.examProgress
@@ -3597,7 +3902,7 @@ class ExamUI {
 
     /*
     ======================================================
-    QUANTIDADE DISPONÍVEL
+    QUANTIDADE DISPONÍVEL NO BANCO
     ======================================================
     */
 
@@ -3614,7 +3919,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        ExamEngine consolidado
+        API direta do ExamEngine
         --------------------------------------------------
         */
 
@@ -3634,17 +3939,33 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Fallback pelo QuestionManager
+        Obtém QuestionManager
         --------------------------------------------------
         */
 
-        const manager =
+        let manager = null;
+
+
+        if (
             typeof this.engine
                 .getQuestionManager ===
                 "function"
-                ? this.engine
-                    .getQuestionManager()
-                : null;
+        ) {
+
+            manager =
+                this.engine
+                    .getQuestionManager();
+
+        }
+        else if (
+            this.engine.questionManager
+        ) {
+
+            manager =
+                this.engine
+                    .questionManager;
+
+        }
 
 
         if (!manager) {
@@ -3653,6 +3974,12 @@ class ExamUI {
 
         }
 
+
+        /*
+        --------------------------------------------------
+        QuestionManager.getCount()
+        --------------------------------------------------
+        */
 
         if (
             typeof manager
@@ -3667,6 +3994,12 @@ class ExamUI {
 
         }
 
+
+        /*
+        --------------------------------------------------
+        QuestionManager.getAll()
+        --------------------------------------------------
+        */
 
         if (
             typeof manager
@@ -3687,6 +4020,12 @@ class ExamUI {
 
         }
 
+
+        /*
+        --------------------------------------------------
+        Array interno
+        --------------------------------------------------
+        */
 
         if (
             Array.isArray(
@@ -3725,15 +4064,18 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Esconde as demais telas principais
+        Esconde as outras telas principais
         --------------------------------------------------
         */
 
         const screens = [
 
             this.elements.startScreen,
+
             this.elements.examScreen,
+
             this.elements.resultScreen,
+
             this.elements.errorScreen
 
         ];
@@ -3769,13 +4111,19 @@ class ExamUI {
                     ""
                 );
 
+
+                screen.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
             }
         );
 
 
         /*
         --------------------------------------------------
-        Mostra a tela solicitada
+        Mostra tela solicitada
         --------------------------------------------------
         */
 
@@ -3875,6 +4223,48 @@ class ExamUI {
             ""
         );
 
+
+        element.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    MOSTRAR ELEMENTO
+    ======================================================
+    */
+
+    showElement(
+        element
+    ) {
+
+        if (!element) {
+
+            return;
+
+        }
+
+
+        element.classList
+            .remove(
+                "hidden"
+            );
+
+
+        element.removeAttribute(
+            "hidden"
+        );
+
+
+        element.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
     }
 
 
@@ -3888,15 +4278,22 @@ class ExamUI {
         message
     ) {
 
+        const errorMessage =
+            String(
+                message ||
+                "Ocorreu um erro inesperado."
+            );
+
+
         console.error(
             "ExamUI:",
-            message
+            errorMessage
         );
 
 
         /*
         --------------------------------------------------
-        Se existir tela específica de erro
+        Tela dedicada de erro
         --------------------------------------------------
         */
 
@@ -3917,13 +4314,13 @@ class ExamUI {
                     );
 
 
-            if (messageElement) {
+            if (
+                messageElement
+            ) {
 
                 messageElement
                     .textContent =
-                        String(
-                            message
-                        );
+                        errorMessage;
 
             }
 
@@ -3940,14 +4337,12 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Fallback sem tela de erro dedicada
+        Fallback
         --------------------------------------------------
         */
 
         window.alert(
-            String(
-                message
-            )
+            errorMessage
         );
 
     }
@@ -3955,7 +4350,7 @@ class ExamUI {
 
     /*
     ======================================================
-    ESTADO PÚBLICO
+    ESTADO PÚBLICO DA INTERFACE
     ======================================================
     */
 
@@ -3982,7 +4377,251 @@ class ExamUI {
 
     /*
     ======================================================
-    DESTROY
+    OBTER CONFIGURAÇÃO DO MODO
+    ======================================================
+    */
+
+    getSelectedModeConfig() {
+
+        return (
+            this.examModes[
+                this.selectedMode
+            ] ||
+            this.examModes.standard
+        );
+
+    }
+
+
+    /*
+    ======================================================
+    ATUALIZAR DOMÍNIO VISUAL
+    ======================================================
+    */
+
+    setDomainName(
+        domainName
+    ) {
+
+        const value =
+            domainName ||
+            "Network Fundamentals";
+
+
+        if (
+            this.elements.startDomainName
+        ) {
+
+            this.elements
+                .startDomainName
+                .textContent =
+                    value;
+
+        }
+
+
+        if (
+            this.elements.examDomainName
+        ) {
+
+            this.elements
+                .examDomainName
+                .textContent =
+                    value;
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    ATUALIZAR QUANTIDADE VISUAL DO BANCO
+    ======================================================
+    */
+
+    updateQuestionBankSize() {
+
+        if (
+            !this.elements.questionBankSize
+        ) {
+
+            return;
+
+        }
+
+
+        this.elements
+            .questionBankSize
+            .textContent =
+                String(
+                    this.getAvailableQuestionCount()
+                );
+
+    }
+
+
+    /*
+    ======================================================
+    HABILITAR BOTÃO DE INÍCIO
+    ======================================================
+    */
+
+    enableStartButton() {
+
+        if (
+            !this.elements.startExamButton
+        ) {
+
+            return;
+
+        }
+
+
+        this.elements
+            .startExamButton
+            .disabled =
+                false;
+
+    }
+
+
+    /*
+    ======================================================
+    DESABILITAR BOTÃO DE INÍCIO
+    ======================================================
+    */
+
+    disableStartButton() {
+
+        if (
+            !this.elements.startExamButton
+        ) {
+
+            return;
+
+        }
+
+
+        this.elements
+            .startExamButton
+            .disabled =
+                true;
+
+    }
+
+
+    /*
+    ======================================================
+    SINCRONIZAR ESTADO DA QUESTÃO
+    ======================================================
+    */
+
+    syncCurrentQuestion() {
+
+        if (
+            !this.examRunning
+        ) {
+
+            return;
+
+        }
+
+
+        this.renderCurrentQuestion();
+
+        this.updateInterface();
+
+        this.updateNavigationRenderer();
+
+    }
+
+
+    /*
+    ======================================================
+    ATUALIZAR RESULTADO MANUALMENTE
+    ======================================================
+    */
+
+    renderResult(
+        result
+    ) {
+
+        if (
+            !this.resultRenderer ||
+            typeof this.resultRenderer
+                .render !==
+                "function"
+        ) {
+
+            return;
+
+        }
+
+
+        this.resultRenderer
+            .render(
+                result
+            );
+
+    }
+
+
+    /*
+    ======================================================
+    LIMPAR RESULTADO
+    ======================================================
+    */
+
+    clearResult() {
+
+        if (
+            !this.resultRenderer ||
+            typeof this.resultRenderer
+                .clear !==
+                "function"
+        ) {
+
+            return;
+
+        }
+
+
+        this.resultRenderer
+            .clear();
+
+    }
+
+
+    /*
+    ======================================================
+    LIMPAR NAVEGAÇÃO
+    ======================================================
+    */
+
+    clearNavigation() {
+
+        if (
+            !this.navigationRenderer ||
+            typeof this.navigationRenderer
+                .clear !==
+                "function"
+        ) {
+
+            return;
+
+        }
+
+
+        this.navigationRenderer
+            .clear();
+
+    }
+
+
+    /*
+    ======================================================
+    DESTRUIR INTERFACE
     ======================================================
     */
 
@@ -3990,7 +4629,7 @@ class ExamUI {
 
         /*
         --------------------------------------------------
-        Interrompe timer
+        Interrompe timer se houver API disponível
         --------------------------------------------------
         */
 
@@ -4007,6 +4646,23 @@ class ExamUI {
         }
 
 
+        /*
+        --------------------------------------------------
+        Limpa renderizadores
+        --------------------------------------------------
+        */
+
+        this.clearNavigation();
+
+        this.clearResult();
+
+
+        /*
+        --------------------------------------------------
+        Estado local
+        --------------------------------------------------
+        */
+
         this.examRunning =
             false;
 
@@ -4018,14 +4674,490 @@ class ExamUI {
 
     }
 
+
+    /*
+    ======================================================
+    DIAGNÓSTICO DA INTERFACE
+    ======================================================
+    */
+
+    getDebugState() {
+
+        return {
+
+            initialized:
+                this.initialized,
+
+            examRunning:
+                this.examRunning,
+
+            examFinished:
+                this.examFinished,
+
+            selectedMode:
+                this.selectedMode,
+
+            availableQuestions:
+                this.getAvailableQuestionCount(),
+
+            examQuestions:
+                this.getExamQuestionCount(),
+
+            currentQuestionIndex:
+                this.getCurrentQuestionIndex(),
+
+            finishModalOpen:
+                this.isFinishModalOpen()
+
+        };
+
+    }
+
+
+    /*
+    ======================================================
+    VERIFICAR MODAL DE FINALIZAÇÃO
+    ======================================================
+    */
+
+    isFinishModalOpen() {
+
+        const modal =
+            this.elements.finishModal;
+
+        if (!modal) {
+
+            return false;
+
+        }
+
+
+        if (
+            modal.hasAttribute(
+                "hidden"
+            )
+        ) {
+
+            return false;
+
+        }
+
+
+        if (
+            modal.classList.contains(
+                "hidden"
+            )
+        ) {
+
+            return false;
+
+        }
+
+
+        return true;
+
+    }
+
+
+    /*
+    ======================================================
+    ABRIR MODAL DE FINALIZAÇÃO
+    ======================================================
+    */
+
+    openFinishModal() {
+
+        const modal =
+            this.elements.finishModal;
+
+
+        /*
+        --------------------------------------------------
+        Se não existir modal no HTML, finaliza
+        diretamente pelo engine.
+        --------------------------------------------------
+        */
+
+        if (!modal) {
+
+            this.finishExam();
+
+            return;
+
+        }
+
+
+        modal.classList
+            .remove(
+                "hidden"
+            );
+
+
+        modal.classList
+            .add(
+                "active"
+            );
+
+
+        modal.removeAttribute(
+            "hidden"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        /*
+        --------------------------------------------------
+        Foco no botão de confirmação
+        --------------------------------------------------
+        */
+
+        const confirmButton =
+            this.elements.confirmFinishButton;
+
+
+        if (
+            confirmButton &&
+            typeof confirmButton.focus ===
+                "function"
+        ) {
+
+            window.setTimeout(
+                () => {
+
+                    confirmButton.focus();
+
+                },
+                0
+            );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    FECHAR MODAL DE FINALIZAÇÃO
+    ======================================================
+    */
+
+    closeFinishModal() {
+
+        const modal =
+            this.elements.finishModal;
+
+        if (!modal) {
+
+            return;
+
+        }
+
+
+        modal.classList
+            .remove(
+                "active"
+            );
+
+
+        modal.classList
+            .add(
+                "hidden"
+            );
+
+
+        modal.setAttribute(
+            "hidden",
+            ""
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        /*
+        --------------------------------------------------
+        Devolve foco ao botão de finalizar
+        --------------------------------------------------
+        */
+
+        const finishButton =
+            this.elements.finishExamButton;
+
+
+        if (
+            finishButton &&
+            typeof finishButton.focus ===
+                "function"
+        ) {
+
+            window.setTimeout(
+                () => {
+
+                    finishButton.focus();
+
+                },
+                0
+            );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    ALIAS DE COMPATIBILIDADE
+    ======================================================
+
+    Algumas versões anteriores do app.js/renderizadores
+    podem chamar nomes diferentes para as mesmas ações.
+
+    Estes aliases evitam quebrar a aplicação durante
+    a integração dos módulos.
+    ======================================================
+    */
+
+    showFinishModal() {
+
+        this.openFinishModal();
+
+    }
+
+
+    hideFinishModal() {
+
+        this.closeFinishModal();
+
+    }
+
+
+    confirmFinishExam() {
+
+        this.closeFinishModal();
+
+        this.finishExam();
+
+    }
+
+
+    /*
+    ======================================================
+    EXIBIR TELA INICIAL
+    ======================================================
+    */
+
+    showStartScreen() {
+
+        this.examRunning =
+            false;
+
+        this.examFinished =
+            false;
+
+
+        this.closeFinishModal();
+
+
+        if (
+            this.elements.startScreen
+        ) {
+
+            this.showScreen(
+                this.elements.startScreen
+            );
+
+        }
+
+
+        this.updateQuestionBankSize();
+
+    }
+
+
+    /*
+    ======================================================
+    EXIBIR TELA DO EXAME
+    ======================================================
+    */
+
+    showExamScreen() {
+
+        if (
+            this.elements.examScreen
+        ) {
+
+            this.showScreen(
+                this.elements.examScreen
+            );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    EXIBIR TELA DE RESULTADO
+    ======================================================
+    */
+
+    showResultScreen() {
+
+        if (
+            this.elements.resultScreen
+        ) {
+
+            this.showScreen(
+                this.elements.resultScreen
+            );
+
+        }
+
+    }
+
+
+    /*
+    ======================================================
+    VERIFICAR INICIALIZAÇÃO
+    ======================================================
+    */
+
+    isInitialized() {
+
+        return this.initialized;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER ENGINE
+    ======================================================
+    */
+
+    getEngine() {
+
+        return this.engine;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER ELEMENTOS
+    ======================================================
+    */
+
+    getElements() {
+
+        return this.elements;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER RENDERIZADOR DE QUESTÃO
+    ======================================================
+    */
+
+    getQuestionRenderer() {
+
+        return this.questionRenderer;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER RENDERIZADOR DE NAVEGAÇÃO
+    ======================================================
+    */
+
+    getNavigationRenderer() {
+
+        return this.navigationRenderer;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER RENDERIZADOR DE RESULTADO
+    ======================================================
+    */
+
+    getResultRenderer() {
+
+        return this.resultRenderer;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER RENDERIZADOR DE LAB
+    ======================================================
+    */
+
+    getLabRenderer() {
+
+        return this.labRenderer;
+
+    }
+
+
+    /*
+    ======================================================
+    OBTER RENDERIZADOR DE REVISÃO
+    ======================================================
+    */
+
+    getReviewRenderer() {
+
+        return this.reviewRenderer;
+
+    }
+
 }
 
 
 /*
 ==========================================================
-Disponibilização global
+DISPONIBILIZAÇÃO GLOBAL
+==========================================================
+
+O projeto atual utiliza scripts JavaScript tradicionais.
+
+Por isso, ExamUI precisa estar disponível em window para
+que js/app.js possa localizar a classe durante a
+inicialização da aplicação.
 ==========================================================
 */
 
 window.ExamUI =
     ExamUI;
+
+
+/*
+==========================================================
+DIAGNÓSTICO DE CARREGAMENTO
+==========================================================
+*/
+
+console.log(
+    "ExamUI loaded successfully."
+);
+
+
+
+
+    
