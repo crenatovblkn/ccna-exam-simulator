@@ -502,7 +502,10 @@ class ExamEngine {
                 )
             ) {
 
-                return selected;
+                return selected.slice(
+                0,
+                questionCount
+            );
 
             }
 
@@ -532,8 +535,10 @@ class ExamEngine {
                 )
             ) {
 
-                return selected;
-
+                return selected.slice(
+                0,
+                questionCount
+           );
             }
 
         }
@@ -562,7 +567,10 @@ class ExamEngine {
                 )
             ) {
 
-                return selected;
+                return selected.slice(
+                0,
+                questionCount
+           );
 
             }
 
