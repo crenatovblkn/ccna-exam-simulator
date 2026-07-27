@@ -1000,143 +1000,6 @@ class QuestionRenderer {
 
     /*
     --------------------------------------------------
-    CLI
-    --------------------------------------------------
-    */
-
-    if (
-        cli &&
-        this.elements.exhibitContainer &&
-        this.elements.exhibitContent
-    ) {
-
-        const title =
-            cli.title ||
-            "CLI Output";
-
-
-        const output =
-            cli.output ||
-            cli.code ||
-            cli.content ||
-            "";
-
-
-        /*
-        --------------------------------------------------
-        Torna o painel CLI visível
-        --------------------------------------------------
-        */
-
-        this.elements
-            .exhibitContainer
-            .classList.remove(
-                "hidden"
-            );
-
-
-        /*
-        --------------------------------------------------
-        Limpa conteúdo anterior
-        --------------------------------------------------
-        */
-
-        this.elements
-            .exhibitContent
-            .innerHTML = "";
-
-
-        /*
-        --------------------------------------------------
-        Cria bloco CLI diretamente
-        --------------------------------------------------
-        */
-
-        const wrapper =
-            document.createElement(
-                "div"
-            );
-
-
-        wrapper.className =
-            "code-block";
-
-
-        const header =
-            document.createElement(
-                "div"
-            );
-
-
-        header.className =
-            "code-block-header";
-
-
-        header.textContent =
-            title;
-
-
-        const pre =
-            document.createElement(
-                "pre"
-            );
-
-
-        pre.className =
-            "code-block-content";
-
-
-        const code =
-            document.createElement(
-                "code"
-            );
-
-
-        code.textContent =
-            output;
-
-
-        pre.appendChild(
-            code
-        );
-
-
-        wrapper.appendChild(
-            header
-        );
-
-
-        wrapper.appendChild(
-            pre
-        );
-
-
-        this.elements
-            .exhibitContent
-            .appendChild(
-                wrapper
-            );
-
-    }
-
-
-    /*
-    --------------------------------------------------
-    Alternativas da questão CLI
-    --------------------------------------------------
-    */
-
-    this.renderChoiceQuestion(
-        question,
-        "radio"
-    );
-
-}
-);
-        
-
-    /*
-    --------------------------------------------------
     Renderiza a saída CLI
     --------------------------------------------------
     */
@@ -1150,14 +1013,22 @@ class QuestionRenderer {
             "";
 
 
+        /*
+        --------------------------------------------------
+        Aceita CLI como string ou objeto
+        --------------------------------------------------
+        */
+
         if (
             typeof cli ===
             "string"
         ) {
 
-            output = cli;
+            output =
+                cli;
 
-        } else if (
+        }
+        else if (
             typeof cli ===
             "object"
         ) {
@@ -1177,8 +1048,7 @@ class QuestionRenderer {
 
         /*
         --------------------------------------------------
-        Prioridade 1:
-        painel de exhibit
+        Exibe o painel CLI
         --------------------------------------------------
         */
 
@@ -1194,6 +1064,20 @@ class QuestionRenderer {
                 );
 
 
+            /*
+            Limpa conteúdo anterior
+            */
+
+            this.elements
+                .exhibitContent
+                .innerHTML = "";
+
+
+            /*
+            Cria o bloco de código
+            usando o método já existente da classe.
+            */
+
             this.createCodeBlock(
                 output,
                 this.elements
@@ -1203,10 +1087,13 @@ class QuestionRenderer {
 
         }
 
+
         /*
         --------------------------------------------------
-        Fallback:
-        exibe junto às respostas
+        Fallback
+
+        Caso o HTML não possua exhibitContainer,
+        coloca o CLI junto às alternativas.
         --------------------------------------------------
         */
 
@@ -1228,7 +1115,7 @@ class QuestionRenderer {
 
     /*
     --------------------------------------------------
-    Alternativas
+    Renderiza as alternativas
     --------------------------------------------------
     */
 
