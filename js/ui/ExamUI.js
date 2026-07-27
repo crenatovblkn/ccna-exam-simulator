@@ -1637,16 +1637,21 @@ class ExamUI {
         */
 
         this.engine.on(
-            "examFinished",
-            result => {
+    "examFinished",
+    payload => {
 
-                this.handleExamFinished(
-                    result
-                );
+        const result =
+            payload &&
+            payload.result
+                ? payload.result
+                : payload;
 
-            }
+        this.handleExamFinished(
+            result
         );
 
+    }
+);
 
         /*
         --------------------------------------------------
