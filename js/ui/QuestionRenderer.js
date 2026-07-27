@@ -998,23 +998,140 @@ class QuestionRenderer {
         question.getCli();
 
 
-    console.log(
-    "=== DEBUG CLI ===",
-    {
-        id:
-            typeof question.getId === "function"
-                ? question.getId()
-                : "sem getId",
+    /*
+    --------------------------------------------------
+    CLI
+    --------------------------------------------------
+    */
 
-        type:
-            typeof question.getType === "function"
-                ? question.getType()
-                : "sem getType",
+    if (
+        cli &&
+        this.elements.exhibitContainer &&
+        this.elements.exhibitContent
+    ) {
 
-        cli: cli,
+        const title =
+            cli.title ||
+            "CLI Output";
 
-        question: question
+
+        const output =
+            cli.output ||
+            cli.code ||
+            cli.content ||
+            "";
+
+
+        /*
+        --------------------------------------------------
+        Torna o painel CLI visível
+        --------------------------------------------------
+        */
+
+        this.elements
+            .exhibitContainer
+            .classList.remove(
+                "hidden"
+            );
+
+
+        /*
+        --------------------------------------------------
+        Limpa conteúdo anterior
+        --------------------------------------------------
+        */
+
+        this.elements
+            .exhibitContent
+            .innerHTML = "";
+
+
+        /*
+        --------------------------------------------------
+        Cria bloco CLI diretamente
+        --------------------------------------------------
+        */
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.className =
+            "code-block";
+
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.className =
+            "code-block-header";
+
+
+        header.textContent =
+            title;
+
+
+        const pre =
+            document.createElement(
+                "pre"
+            );
+
+
+        pre.className =
+            "code-block-content";
+
+
+        const code =
+            document.createElement(
+                "code"
+            );
+
+
+        code.textContent =
+            output;
+
+
+        pre.appendChild(
+            code
+        );
+
+
+        wrapper.appendChild(
+            header
+        );
+
+
+        wrapper.appendChild(
+            pre
+        );
+
+
+        this.elements
+            .exhibitContent
+            .appendChild(
+                wrapper
+            );
+
     }
+
+
+    /*
+    --------------------------------------------------
+    Alternativas da questão CLI
+    --------------------------------------------------
+    */
+
+    this.renderChoiceQuestion(
+        question,
+        "radio"
+    );
+
+}
 );
         
 
