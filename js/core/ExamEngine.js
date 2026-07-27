@@ -1594,6 +1594,56 @@ class ExamEngine {
 
     }
 
+    /*
+======================================================
+MOVER ITEM DO ORDERING
+======================================================
+*/
+
+moveOrderItem(
+    fromIndex,
+    toIndex
+) {
+
+    const question =
+        this.getCurrentQuestion();
+
+
+    if (
+        !question ||
+        typeof question.moveOrderItem !==
+            "function"
+    ) {
+
+        return false;
+
+    }
+
+
+    const moved =
+        question.moveOrderItem(
+            fromIndex,
+            toIndex
+        );
+
+
+    if (!moved) {
+
+        return false;
+
+    }
+
+
+    this.emitAnswerChanged(
+        question
+    );
+
+
+    return true;
+
+  }
+
+
 
     /*
     ======================================================
