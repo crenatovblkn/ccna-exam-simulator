@@ -998,6 +998,26 @@ class QuestionRenderer {
         question.getCli();
 
 
+    console.log(
+    "=== DEBUG CLI ===",
+    {
+        id:
+            typeof question.getId === "function"
+                ? question.getId()
+                : "sem getId",
+
+        type:
+            typeof question.getType === "function"
+                ? question.getType()
+                : "sem getType",
+
+        cli: cli,
+
+        question: question
+    }
+);
+        
+
     /*
     --------------------------------------------------
     Renderiza a saída CLI
