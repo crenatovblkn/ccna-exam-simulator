@@ -994,60 +994,113 @@ class QuestionRenderer {
 
     renderCli(question) {
 
-        const cli =
-            question.getCli();
+    const cli =
+        question.getCli();
+
+
+    /*
+    --------------------------------------------------
+    Renderiza a saída CLI
+    --------------------------------------------------
+    */
+
+    if (cli) {
+
+        let title =
+            "CLI Output";
+
+        let output =
+            "";
 
 
         if (
-            cli &&
-            this.elements
-                .exhibitContent
+            typeof cli ===
+            "string"
         ) {
 
-            this.elements
-                .exhibitContainer
-                ?.classList.remove(
-                    "hidden"
-                );
+            output = cli;
 
+        } else if (
+            typeof cli ===
+            "object"
+        ) {
 
-            if (
-                typeof cli ===
-                "string"
-            ) {
+            title =
+                cli.title ||
+                "CLI Output";
 
-                this.createCodeBlock(
-                    cli,
-                    this.elements
-                        .exhibitContent,
-                    "CLI Output"
-                );
-
-            } else if (
-                typeof cli ===
-                "object"
-            ) {
-
-                this.createCodeBlock(
-                    cli.output ||
-                    cli.code ||
-                    "",
-                    this.elements
-                        .exhibitContent,
-                    cli.title ||
-                    "CLI Output"
-                );
-
-            }
+            output =
+                cli.output ||
+                cli.code ||
+                cli.content ||
+                "";
 
         }
 
 
-        this.renderChoiceQuestion(
-            question
-        );
+        /*
+        --------------------------------------------------
+        Prioridade 1:
+        painel de exhibit
+        --------------------------------------------------
+        */
+
+        if (
+            this.elements.exhibitContainer &&
+            this.elements.exhibitContent
+        ) {
+
+            this.elements
+                .exhibitContainer
+                .classList.remove(
+                    "hidden"
+                );
+
+
+            this.createCodeBlock(
+                output,
+                this.elements
+                    .exhibitContent,
+                title
+            );
+
+        }
+
+        /*
+        --------------------------------------------------
+        Fallback:
+        exibe junto às respostas
+        --------------------------------------------------
+        */
+
+        else if (
+            this.elements.answerContainer
+        ) {
+
+            this.createCodeBlock(
+                output,
+                this.elements
+                    .answerContainer,
+                title
+            );
+
+        }
 
     }
+
+
+    /*
+    --------------------------------------------------
+    Alternativas
+    --------------------------------------------------
+    */
+
+    this.renderChoiceQuestion(
+        question,
+        "radio"
+    );
+
+}
 
 
     /*
