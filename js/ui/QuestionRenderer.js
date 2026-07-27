@@ -279,10 +279,8 @@ class QuestionRenderer {
         ) {
 
             this.elements
-                .exhibitContainer
-                .classList.add(
-                    "hidden"
-                );
+              .exhibitContainer
+              .hidden = true;
 
         }
 
