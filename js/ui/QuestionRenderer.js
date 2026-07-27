@@ -331,52 +331,51 @@ class QuestionRenderer {
 
     renderInstruction(question) {
 
-        const element =
-            this.elements
-                .questionInstruction;
+    const element =
+        this.elements
+            .questionInstruction;
 
 
-        if (!element) {
+    if (!element) {
 
-            return;
-
-        }
-
-
-        let instruction =
-            question.getInstruction();
-
-
-        if (!instruction) {
-
-            instruction =
-                this.getDefaultInstruction(
-                    question
-                );
-
-        }
-
-
-        if (instruction) {
-
-            element.textContent =
-                instruction;
-
-            element.classList.remove(
-                "hidden"
-            );
-
-        } else {
-
-            element.textContent = "";
-
-            element.classList.add(
-                "hidden"
-            );
-
-        }
+        return;
 
     }
+
+
+    let instruction =
+        question.getInstruction();
+
+
+    if (!instruction) {
+
+        instruction =
+            this.getDefaultInstruction(
+                question
+            );
+
+    }
+
+
+    if (instruction) {
+
+        element.textContent =
+            instruction;
+
+        element.hidden =
+            false;
+
+    } else {
+
+        element.textContent =
+            "";
+
+        element.hidden =
+            true;
+
+    }
+
+}
 
 
     /*
@@ -500,10 +499,8 @@ class QuestionRenderer {
 
 
         this.elements
-            .exhibitContainer
-            .classList.remove(
-                "hidden"
-            );
+          .exhibitContainer
+          .hidden = false;
 
 
         this.renderExhibitContent(
@@ -1051,40 +1048,37 @@ class QuestionRenderer {
         */
 
         if (
-            this.elements.exhibitContainer &&
-            this.elements.exhibitContent
-        ) {
+    this.elements.exhibitContainer &&
+    this.elements.exhibitContent
+) {
 
-            this.elements
-                .exhibitContainer
-                .classList.remove(
-                    "hidden"
-                );
+    this.elements
+        .exhibitContainer
+        .hidden = false;
 
 
-            /*
-            Limpa conteúdo anterior
-            */
+    /*
+    Limpa conteúdo anterior
+    */
 
-            this.elements
-                .exhibitContent
-                .innerHTML = "";
+    this.elements
+        .exhibitContent
+        .innerHTML = "";
 
 
-            /*
-            Cria o bloco de código
-            usando o método já existente da classe.
-            */
+    /*
+    Cria o bloco de código
+    usando o método já existente da classe.
+    */
 
-            this.createCodeBlock(
-                output,
-                this.elements
-                    .exhibitContent,
-                title
-            );
+    this.createCodeBlock(
+        output,
+        this.elements
+            .exhibitContent,
+        title
+    );
 
-        }
-
+}
 
         /*
         --------------------------------------------------
