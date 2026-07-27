@@ -544,7 +544,11 @@ class Question {
         --------------------------------------------------
         */
 
-        if (this.isSingleChoice()) {
+        if (
+           this.isSingleChoice() ||
+           this.isCli() ||
+          this.isExhibit()
+        ) {
 
             this.userAnswers = [answerId];
 
