@@ -132,7 +132,7 @@ class ResultRenderer {
 
             this.container =
                 document.getElementById(
-                    "resultScreen"
+                    "resultsScreen"
                 );
 
         }
