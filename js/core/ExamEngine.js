@@ -2447,6 +2447,14 @@ moveOrderItem(
                             );
 
 
+                    console.log({
+                    numero: index + 1,
+                    answered,
+                    isCorrect,
+                    userAnswers: this.getUserAnswers(question),
+                    correctAnswers: this.getCorrectAnswers(question)
+                    });
+
                     if (!answered) {
 
                         unanswered++;
@@ -2648,7 +2656,8 @@ moveOrderItem(
                 questionResults
             );
 
-
+        console.log("BUILD RESULT:", normalized);
+        
         return normalized;
 
     }
