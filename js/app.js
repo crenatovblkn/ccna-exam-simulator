@@ -213,7 +213,7 @@ Responsabilidade:
 
                     container:
                         document.getElementById(
-                            "resultScreen"
+                             "resultsScreen"
                         )
 
                 });
