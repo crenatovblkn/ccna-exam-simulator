@@ -3596,6 +3596,11 @@ throw new Error(
         result
     ) {
 
+         console.log(
+        "RESULTADO FINAL RECEBIDO:",
+        result
+        );
+
         this.examRunning =
             false;
 
