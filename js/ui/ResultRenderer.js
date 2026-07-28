@@ -106,18 +106,17 @@ class ResultRenderer {
 
         if (!result && this.engine) {
 
-            const exam =
-                this.engine.getExam();
+    if (
+        typeof this.engine.getResult ===
+        "function"
+    ) {
 
-            if (exam) {
+        result =
+            this.engine.getResult();
 
-                result =
-                    exam.getResult();
+    }
 
-            }
-
-        }
-
+}
 
         if (!result) {
 
