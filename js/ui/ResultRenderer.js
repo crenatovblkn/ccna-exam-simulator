@@ -149,7 +149,7 @@ class ResultRenderer {
         }
 
 
-        this.container.innerHTML = "";
+       // this.container.innerHTML = "";
 
 
         const wrapper =
