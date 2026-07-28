@@ -3,12 +3,18 @@
 Cisco CCNA 200-301 Exam Simulator
 ResultRenderer
 
-Responsabilidade
-----------------------------------------------------------
-- Receber o resultado calculado pelo ExamEngine
-- Atualizar a tela de resultados existente no HTML
-- Exibir desempenho por domínio
-- Exibir revisão das questões
+Responsabilidade:
+- Renderizar o resultado final
+- Mostrar score
+- Mostrar acertos e erros
+- Mostrar questões não respondidas
+- Mostrar desempenho por domínio
+- Mostrar tempo utilizado
+- Mostrar status de aprovação
+- Exibir revisão detalhada das questões
+- Controlar abertura e fechamento do resultado
+
+Este componente NÃO calcula o resultado.
 ==========================================================
 */
 
@@ -20,12 +26,10 @@ class ResultRenderer {
             options.engine || null;
 
         this.container =
-            options.container ||
-            document.getElementById(
-                "resultsScreen"
-            );
+            options.container || null;
 
-        this.result = null;
+        this.result =
+            null;
 
         this.onClose =
             typeof options.onClose === "function"
@@ -37,130 +41,60 @@ class ResultRenderer {
                 ? options.onRestart
                 : null;
 
-        this.cacheElements();
-
-        this.bindButtons();
-
     }
+
 
     /*
     ======================================================
-    ELEMENTOS
+    ENGINE
     ======================================================
     */
 
-    cacheElements() {
+    setEngine(engine) {
 
-        this.elements = {
-
-            percentage:
-                document.getElementById(
-                    "resultPercentage"
-                ),
-
-            status:
-                document.getElementById(
-                    "resultStatus"
-                ),
-
-            correct:
-                document.getElementById(
-                    "resultCorrect"
-                ),
-
-            incorrect:
-                document.getElementById(
-                    "resultIncorrect"
-                ),
-
-            unanswered:
-                document.getElementById(
-                    "resultUnanswered"
-                ),
-
-            total:
-                document.getElementById(
-                    "resultTotal"
-                ),
-
-            time:
-                document.getElementById(
-                    "resultTime"
-                ),
-
-            domains:
-                document.getElementById(
-                    "domainResults"
-                ),
-
-            questions:
-                document.getElementById(
-                    "resultsQuestionList"
-                ),
-
-            reviewButton:
-                document.getElementById(
-                    "reviewExamButton"
-                ),
-
-            restartButton:
-                document.getElementById(
-                    "restartExamButton"
-                )
-
-        };
+        this.engine = engine;
 
     }
+
 
     /*
     ======================================================
-    BOTÕES
+    CONTAINER
     ======================================================
     */
 
-    bindButtons() {
+    setContainer(container) {
 
-        if (this.elements.reviewButton) {
-
-            this.elements.reviewButton
-                .addEventListener(
-                    "click",
-                    () => {
-
-                        if (this.onClose) {
-
-                            this.onClose(
-                                this.result
-                            );
-
-                        }
-
-                    }
-                );
-
-        }
-
-        if (this.elements.restartButton) {
-
-            this.elements.restartButton
-                .addEventListener(
-                    "click",
-                    () => {
-
-                        if (this.onRestart) {
-
-                            this.onRestart(
-                                this.result
-                            );
-
-                        }
-
-                    }
-                );
-
-        }
+        this.container = container;
 
     }
+
+
+    /*
+    ======================================================
+    CALLBACKS
+    ======================================================
+    */
+
+    setOnClose(callback) {
+
+        this.onClose =
+            typeof callback === "function"
+                ? callback
+                : null;
+
+    }
+
+
+    setOnRestart(callback) {
+
+        this.onRestart =
+            typeof callback === "function"
+                ? callback
+                : null;
+
+    }
+
 
     /*
     ======================================================
@@ -172,17 +106,17 @@ class ResultRenderer {
 
         if (!result && this.engine) {
 
-            if (
-                typeof this.engine.getResult ===
-                "function"
-            ) {
+    if (
+        typeof this.engine.getResult ===
+        "function"
+    ) {
 
-                result =
-                    this.engine.getResult();
+        result =
+            this.engine.getResult();
 
-            }
+    }
 
-        }
+}
 
         if (!result) {
 
@@ -190,142 +124,649 @@ class ResultRenderer {
 
         }
 
+
         this.result = result;
 
-        this.updateSummary(result);
 
-        this.updateDomains(result);
+        if (!this.container) {
 
-        this.updateQuestionReview(result);
+            this.container =
+                document.getElementById(
+                    "resultsScreen"
+                );
+
+        }
+
+
+        if (!this.container) {
+
+            console.error(
+                "Result screen container was not found."
+            );
+
+            return false;
+
+        }
+
+
+       // this.container.innerHTML = "";
+
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.className =
+            "result-wrapper";
+
+
+        /*
+        --------------------------------------------------
+        Cabeçalho
+        --------------------------------------------------
+        */
+
+        wrapper.appendChild(
+            this.createHeader(result)
+        );
+
+
+        /*
+        --------------------------------------------------
+        Score
+        --------------------------------------------------
+        */
+
+        wrapper.appendChild(
+            this.createScoreSection(
+                result
+            )
+        );
+
+
+        /*
+        --------------------------------------------------
+        Estatísticas
+        --------------------------------------------------
+        */
+
+        wrapper.appendChild(
+            this.createStatisticsSection(
+                result
+            )
+        );
+
+
+        /*
+        --------------------------------------------------
+        Domínios
+        --------------------------------------------------
+        */
+
+        const domainSection =
+            this.createDomainSection(
+                result
+            );
+
+
+        if (domainSection) {
+
+            wrapper.appendChild(
+                domainSection
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Revisão
+        --------------------------------------------------
+        */
+
+        const reviewSection =
+            this.createReviewSection(
+                result
+            );
+
+
+        if (reviewSection) {
+
+            wrapper.appendChild(
+                reviewSection
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Ações
+        --------------------------------------------------
+        */
+
+        wrapper.appendChild(
+            this.createActions()
+        );
+
+
+        this.container.appendChild(
+            wrapper
+        );
+
 
         this.show();
+
 
         return true;
 
     }
 
+
     /*
     ======================================================
-    RESUMO
+    CABEÇALHO
     ======================================================
     */
 
-    updateSummary(result) {
+    createHeader(result) {
 
-        if (this.elements.percentage) {
-
-            this.elements.percentage.textContent =
-                `${Number(result.score) || 0}%`;
-
-        }
-
-        if (this.elements.status) {
-
-            const passed =
-                typeof result.passed === "boolean"
-                    ? result.passed
-                    : (Number(result.score) || 0) >=
-                      (Number(result.passingScore) || 70);
-
-            this.elements.status.textContent =
-                passed
-                    ? "APROVADO"
-                    : "NÃO APROVADO";
-
-            this.elements.status.classList.remove(
-                "passed",
-                "failed"
+        const header =
+            document.createElement(
+                "div"
             );
 
-            this.elements.status.classList.add(
-                passed
-                    ? "passed"
-                    : "failed"
+
+        header.className =
+            "result-header";
+
+
+        const eyebrow =
+            document.createElement(
+                "div"
             );
 
-        }
 
-        if (this.elements.correct) {
+        eyebrow.className =
+            "result-eyebrow";
 
-            this.elements.correct.textContent =
-                result.correct ?? 0;
+        eyebrow.textContent =
+            "EXAM COMPLETE";
 
-        }
 
-        if (this.elements.incorrect) {
+        const title =
+            document.createElement(
+                "h1"
+            );
 
-            this.elements.incorrect.textContent =
-                result.incorrect ?? 0;
 
-        }
+        title.textContent =
+            result.title ||
+            "Cisco CCNA 200-301";
 
-        if (this.elements.unanswered) {
 
-            this.elements.unanswered.textContent =
-                result.unanswered ?? 0;
+        const subtitle =
+            document.createElement(
+                "p"
+            );
 
-        }
 
-        if (this.elements.total) {
+        subtitle.textContent =
+            result.domain ||
+            "Exam Results";
 
-            this.elements.total.textContent =
-                result.totalQuestions ?? 0;
 
-        }
+        header.appendChild(
+            eyebrow
+        );
 
-        if (this.elements.time) {
+        header.appendChild(
+            title
+        );
 
-            this.elements.time.textContent =
-                result.formattedElapsedTime ||
-                this.formatTime(
-                    result.elapsedTime
-                );
+        header.appendChild(
+            subtitle
+        );
 
-        }
+
+        return header;
 
     }
 
+
     /*
     ======================================================
-    DOMÍNIOS
+    SCORE
     ======================================================
     */
 
-    updateDomains(result) {
+    createScoreSection(result) {
 
-        if (!this.elements.domains) {
+        const section =
+            document.createElement(
+                "section"
+            );
 
-            return;
 
-        }
+        section.className =
+            "result-score-section";
 
-        this.elements.domains.innerHTML = "";
+
+        const score =
+            Number(result.score) || 0;
+
+
+        const passingScore =
+            Number.isFinite(
+                Number(result.passingScore)
+            )
+                ? Number(
+                    result.passingScore
+                )
+                : 70;
+
+
+        const passed =
+            typeof result.passed ===
+            "boolean"
+                ? result.passed
+                : score >= passingScore;
+
+
+        /*
+        --------------------------------------------------
+        Círculo / bloco de score
+        --------------------------------------------------
+        */
+
+        const scoreBlock =
+            document.createElement(
+                "div"
+            );
+
+
+        scoreBlock.className =
+            "result-score-block";
+
+
+        scoreBlock.classList.add(
+            passed
+                ? "passed"
+                : "failed"
+        );
+
+
+        const scoreValue =
+            document.createElement(
+                "div"
+            );
+
+
+        scoreValue.className =
+            "result-score-value";
+
+        scoreValue.textContent =
+            `${score}%`;
+
+
+        const scoreLabel =
+            document.createElement(
+                "div"
+            );
+
+
+        scoreLabel.className =
+            "result-score-label";
+
+        scoreLabel.textContent =
+            "Score";
+
+
+        scoreBlock.appendChild(
+            scoreValue
+        );
+
+        scoreBlock.appendChild(
+            scoreLabel
+        );
+
+
+        /*
+        --------------------------------------------------
+        Status
+        --------------------------------------------------
+        */
+
+        const status =
+            document.createElement(
+                "div"
+            );
+
+
+        status.className =
+            "result-status";
+
+
+        const statusTitle =
+            document.createElement(
+                "h2"
+            );
+
+
+        statusTitle.textContent =
+            passed
+                ? "PASSED"
+                : "NOT PASSED";
+
+
+        const statusText =
+            document.createElement(
+                "p"
+            );
+
+
+        statusText.textContent =
+            passed
+                ? "You reached the simulator passing score."
+                : "You did not reach the simulator passing score.";
+
+
+        const threshold =
+            document.createElement(
+                "span"
+            );
+
+
+        threshold.className =
+            "result-threshold";
+
+        threshold.textContent =
+            `Simulator passing score: ${passingScore}%`;
+
+
+        status.appendChild(
+            statusTitle
+        );
+
+        status.appendChild(
+            statusText
+        );
+
+        status.appendChild(
+            threshold
+        );
+
+
+        section.appendChild(
+            scoreBlock
+        );
+
+        section.appendChild(
+            status
+        );
+
+
+        return section;
+
+    }
+
+
+    /*
+    ======================================================
+    ESTATÍSTICAS
+    ======================================================
+    */
+
+    createStatisticsSection(
+        result
+    ) {
+
+        const section =
+            document.createElement(
+                "section"
+            );
+
+
+        section.className =
+            "result-statistics";
+
+
+        const cards =
+            [
+
+                {
+                    label:
+                        "Questions",
+
+                    value:
+                        result.totalQuestions ??
+                        0,
+
+                    className:
+                        "total"
+                },
+
+                {
+                    label:
+                        "Correct",
+
+                    value:
+                        result.correct ??
+                        0,
+
+                    className:
+                        "correct"
+                },
+
+                {
+                    label:
+                        "Incorrect",
+
+                    value:
+                        result.incorrect ??
+                        0,
+
+                    className:
+                        "incorrect"
+                },
+
+                {
+                    label:
+                        "Unanswered",
+
+                    value:
+                        result.unanswered ??
+                        0,
+
+                    className:
+                        "unanswered"
+                },
+
+                {
+                    label:
+                        "Review",
+
+                    value:
+                        result.review ??
+                        0,
+
+                    className:
+                        "review"
+                },
+
+                {
+                    label:
+                        "Time",
+
+                    value:
+                        result.formattedElapsedTime ||
+                        this.formatTime(
+                            result.elapsedTime
+                        ),
+
+                    className:
+                        "time"
+                }
+
+            ];
+
+
+        cards.forEach(
+            item => {
+
+                section.appendChild(
+                    this.createStatisticCard(
+                        item
+                    )
+                );
+
+            }
+        );
+
+
+        return section;
+
+    }
+
+
+    /*
+    ======================================================
+    CARD ESTATÍSTICO
+    ======================================================
+    */
+
+    createStatisticCard(item) {
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            `result-stat-card ${item.className || ""}`;
+
+
+        const value =
+            document.createElement(
+                "strong"
+            );
+
+
+        value.textContent =
+            item.value;
+
+
+        const label =
+            document.createElement(
+                "span"
+            );
+
+
+        label.textContent =
+            item.label;
+
+
+        card.appendChild(
+            value
+        );
+
+        card.appendChild(
+            label
+        );
+
+
+        return card;
+
+    }
+
+
+    /*
+    ======================================================
+    DESEMPENHO POR DOMÍNIO
+    ======================================================
+    */
+
+    createDomainSection(result) {
 
         if (
             !result.domains ||
-            typeof result.domains !== "object"
+            typeof result.domains !==
+            "object"
         ) {
 
-            return;
+            return null;
 
         }
 
-        Object.values(result.domains)
-            .forEach(domain => {
 
-                const card =
+        const domains =
+            Object.values(
+                result.domains
+            );
+
+
+        if (
+            domains.length === 0
+        ) {
+
+            return null;
+
+        }
+
+
+        const section =
+            document.createElement(
+                "section"
+            );
+
+
+        section.className =
+            "result-domain-section";
+
+
+        const title =
+            document.createElement(
+                "h2"
+            );
+
+
+        title.textContent =
+            "Performance by Domain";
+
+
+        section.appendChild(
+            title
+        );
+
+
+        const list =
+            document.createElement(
+                "div"
+            );
+
+
+        list.className =
+            "result-domain-list";
+
+
+        domains.forEach(
+            domain => {
+
+                const item =
                     document.createElement(
                         "div"
                     );
 
-                card.className =
-                    "domain-result-card";
+
+                item.className =
+                    "result-domain-item";
 
 
                 /*
-                --------------------------------------------
                 Cabeçalho
-                --------------------------------------------
                 */
 
                 const header =
@@ -333,14 +774,16 @@ class ResultRenderer {
                         "div"
                     );
 
+
                 header.className =
-                    "domain-result-header";
+                    "result-domain-header";
 
 
                 const name =
                     document.createElement(
                         "strong"
                     );
+
 
                 name.textContent =
                     domain.domain ||
@@ -351,6 +794,7 @@ class ResultRenderer {
                     document.createElement(
                         "span"
                     );
+
 
                 percentage.textContent =
                     `${domain.percentage || 0}%`;
@@ -366,9 +810,7 @@ class ResultRenderer {
 
 
                 /*
-                --------------------------------------------
                 Barra
-                --------------------------------------------
                 */
 
                 const progress =
@@ -376,8 +818,9 @@ class ResultRenderer {
                         "div"
                     );
 
+
                 progress.className =
-                    "domain-progress";
+                    "result-domain-progress";
 
 
                 const bar =
@@ -385,11 +828,13 @@ class ResultRenderer {
                         "div"
                     );
 
-                bar.className =
-                    "domain-progress-bar";
 
-                bar.style.width =
-                    `${Math.max(
+                bar.className =
+                    "result-domain-progress-bar";
+
+
+                const percent =
+                    Math.max(
                         0,
                         Math.min(
                             100,
@@ -397,7 +842,12 @@ class ResultRenderer {
                                 domain.percentage
                             ) || 0
                         )
-                    )}%`;
+                    );
+
+
+                bar.style.width =
+                    `${percent}%`;
+
 
                 progress.appendChild(
                     bar
@@ -405,9 +855,7 @@ class ResultRenderer {
 
 
                 /*
-                --------------------------------------------
-                Estatísticas
-                --------------------------------------------
+                Detalhes
                 */
 
                 const details =
@@ -415,36 +863,47 @@ class ResultRenderer {
                         "div"
                     );
 
+
                 details.className =
-                    "domain-result-details";
-
-                details.innerHTML =
-
-                    `<span>✔ ${domain.correct || 0}</span>
-                     <span>✖ ${domain.incorrect || 0}</span>
-                     <span>— ${domain.unanswered || 0}</span>`;
+                    "result-domain-details";
 
 
-                card.appendChild(
+                details.textContent =
+                    `${domain.correct || 0} correct · ` +
+                    `${domain.incorrect || 0} incorrect · ` +
+                    `${domain.unanswered || 0} unanswered`;
+
+
+                item.appendChild(
                     header
                 );
 
-                card.appendChild(
+                item.appendChild(
                     progress
                 );
 
-                card.appendChild(
+                item.appendChild(
                     details
                 );
 
-                this.elements.domains
-                    .appendChild(
-                        card
-                    );
 
-            });
+                list.appendChild(
+                    item
+                );
+
+            }
+        );
+
+
+        section.appendChild(
+            list
+        );
+
+
+        return section;
 
     }
+
 
     /*
     ======================================================
@@ -452,287 +911,622 @@ class ResultRenderer {
     ======================================================
     */
 
-    updateQuestionReview(result) {
-
-        if (!this.elements.questions) {
-            return;
-        }
-
-        this.elements.questions.innerHTML = "";
+    createReviewSection(result) {
 
         if (
-            !Array.isArray(result.questions) ||
+            !Array.isArray(
+                result.questions
+            ) ||
             result.questions.length === 0
         ) {
-            return;
+
+            return null;
+
         }
 
-        result.questions.forEach((question, index) => {
 
-            const card = document.createElement("div");
-            card.className = "result-question-card";
-
-
-            /*
-            ------------------------------------------------
-            Cabeçalho
-            ------------------------------------------------
-            */
-
-            const header = document.createElement("div");
-            header.className = "result-question-header";
-
-            const title = document.createElement("h3");
-            title.textContent =
-                `Questão ${index + 1}`;
-
-            const status = document.createElement("span");
-
-            if (question.isCorrect) {
-
-                status.className =
-                    "question-status correct";
-
-                status.textContent =
-                    "✔ Correta";
-
-            } else if (
-                question.selectedAnswer === null ||
-                question.selectedAnswer === undefined
-            ) {
-
-                status.className =
-                    "question-status unanswered";
-
-                status.textContent =
-                    "— Não respondida";
-
-            } else {
-
-                status.className =
-                    "question-status incorrect";
-
-                status.textContent =
-                    "✖ Incorreta";
-
-            }
-
-            header.appendChild(title);
-            header.appendChild(status);
+        const section =
+            document.createElement(
+                "section"
+            );
 
 
-            /*
-            ------------------------------------------------
-            Pergunta
-            ------------------------------------------------
-            */
+        section.className =
+            "result-review-section";
 
-            const statement =
-                document.createElement("div");
 
-            statement.className =
-                "result-question-text";
+        /*
+        --------------------------------------------------
+        Header
+        --------------------------------------------------
+        */
 
-            statement.innerHTML =
-                this.escapeHTML(
-                    question.question ||
-                    question.text ||
-                    ""
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.className =
+            "result-review-header";
+
+
+        const title =
+            document.createElement(
+                "h2"
+            );
+
+
+        title.textContent =
+            "Question Review";
+
+
+        const toggle =
+            document.createElement(
+                "button"
+            );
+
+
+        toggle.type =
+            "button";
+
+        toggle.className =
+            "btn btn-secondary result-review-toggle";
+
+        toggle.textContent =
+            "Show Review";
+
+
+        header.appendChild(
+            title
+        );
+
+        header.appendChild(
+            toggle
+        );
+
+
+        section.appendChild(
+            header
+        );
+
+
+        /*
+        --------------------------------------------------
+        Lista
+        --------------------------------------------------
+        */
+
+        const list =
+            document.createElement(
+                "div"
+            );
+
+
+        list.className =
+            "result-review-list hidden";
+
+
+        result.questions.forEach(
+            question => {
+
+                list.appendChild(
+                    this.createQuestionReview(
+                        question
+                    )
                 );
 
-
-            /*
-            ------------------------------------------------
-            Lista de respostas
-            ------------------------------------------------
-            */
-
-            const answers =
-                document.createElement("ul");
-
-            answers.className =
-                "result-answer-list";
+            }
+        );
 
 
-            const options =
-                question.options ||
-                question.answers ||
-                [];
+        section.appendChild(
+            list
+        );
 
 
-            options.forEach((option, optionIndex) => {
+        /*
+        --------------------------------------------------
+        Toggle
+        --------------------------------------------------
+        */
 
-                const item =
-                    document.createElement("li");
+        toggle.addEventListener(
+            "click",
+            () => {
 
-                item.className =
-                    "result-answer-item";
-
-                const isCorrect =
-                    optionIndex ===
-                    question.correctAnswer;
-
-                const isSelected =
-                    optionIndex ===
-                    question.selectedAnswer;
+                const hidden =
+                    list.classList
+                        .contains(
+                            "hidden"
+                        );
 
 
-                if (isCorrect) {
-                    item.classList.add(
-                        "correct"
+                if (hidden) {
+
+                    list.classList.remove(
+                        "hidden"
                     );
-                }
 
-                if (isSelected) {
-                    item.classList.add(
-                        "selected"
-                    );
-                }
-
-                if (
-                    isSelected &&
-                    !isCorrect
-                ) {
-                    item.classList.add(
-                        "incorrect"
-                    );
-                }
-
-
-                const marker =
-                    document.createElement("span");
-
-                marker.className =
-                    "answer-marker";
-
-
-                if (isCorrect) {
-
-                    marker.textContent =
-                        "✔";
-
-                } else if (
-                    isSelected
-                ) {
-
-                    marker.textContent =
-                        "➜";
+                    toggle.textContent =
+                        "Hide Review";
 
                 } else {
 
-                    marker.textContent =
-                        "";
+                    list.classList.add(
+                        "hidden"
+                    );
+
+                    toggle.textContent =
+                        "Show Review";
 
                 }
 
-
-                const text =
-                    document.createElement("span");
-
-                text.className =
-                    "answer-text";
-
-                text.innerHTML =
-                    this.escapeHTML(option);
-
-
-                item.appendChild(marker);
-                item.appendChild(text);
-
-                answers.appendChild(item);
-
-            });
-
-
-            /*
-            ------------------------------------------------
-            Explicação
-            ------------------------------------------------
-            */
-
-            if (
-                question.explanation &&
-                question.explanation.trim() !== ""
-            ) {
-
-                const explanation =
-                    document.createElement("div");
-
-                explanation.className =
-                    "result-explanation";
-
-                explanation.innerHTML =
-
-                    "<strong>Explicação</strong><br>" +
-                    this.escapeHTML(
-                        question.explanation
-                    );
-
-                card.appendChild(
-                    explanation
-                );
-
             }
+        );
 
 
-            /*
-            ------------------------------------------------
-            Montagem
-            ------------------------------------------------
-            */
-
-            card.appendChild(header);
-
-            card.appendChild(statement);
-
-            card.appendChild(answers);
-
-            this.elements.questions.appendChild(
-                card
-            );
-
-        });
+        return section;
 
     }
 
+
     /*
     ======================================================
-    EXIBIÇÃO
+    REVISÃO INDIVIDUAL
+    ======================================================
+    */
+
+    createQuestionReview(question) {
+
+        const item =
+            document.createElement(
+                "article"
+            );
+
+
+        item.className =
+            "result-question-review";
+
+
+        if (
+            !question.answered
+        ) {
+
+            item.classList.add(
+                "unanswered"
+            );
+
+        } else if (
+            question.correct
+        ) {
+
+            item.classList.add(
+                "correct"
+            );
+
+        } else {
+
+            item.classList.add(
+                "incorrect"
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------------
+        Cabeçalho
+        --------------------------------------------------
+        */
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.className =
+            "result-question-header";
+
+
+        const number =
+            document.createElement(
+                "strong"
+            );
+
+
+        number.textContent =
+            `Question ${question.number}`;
+
+
+        const status =
+            document.createElement(
+                "span"
+            );
+
+
+        status.className =
+            "result-question-status";
+
+
+        if (
+            !question.answered
+        ) {
+
+            status.textContent =
+                "Unanswered";
+
+        } else if (
+            question.correct
+        ) {
+
+            status.textContent =
+                "Correct";
+
+        } else {
+
+            status.textContent =
+                "Incorrect";
+
+        }
+
+
+        header.appendChild(
+            number
+        );
+
+        header.appendChild(
+            status
+        );
+
+
+        /*
+        --------------------------------------------------
+        Enunciado
+        --------------------------------------------------
+        */
+
+        const text =
+            document.createElement(
+                "div"
+            );
+
+
+        text.className =
+            "result-question-text";
+
+
+        text.innerHTML =
+            this.formatText(
+                question.question
+            );
+
+
+        /*
+        --------------------------------------------------
+        Respostas
+        --------------------------------------------------
+        */
+
+        const answers =
+            document.createElement(
+                "div"
+            );
+
+
+        answers.className =
+            "result-question-answers";
+
+
+        const userAnswer =
+            document.createElement(
+                "div"
+            );
+
+
+        userAnswer.innerHTML =
+            `<strong>Your answer:</strong> ${
+                this.formatAnswerIds(
+                    question.userAnswers
+                )
+            }`;
+
+
+        const correctAnswer =
+            document.createElement(
+                "div"
+            );
+
+
+        correctAnswer.innerHTML =
+            `<strong>Correct answer:</strong> ${
+                this.formatAnswerIds(
+                    question.correctAnswers
+                )
+            }`;
+
+
+        answers.appendChild(
+            userAnswer
+        );
+
+        answers.appendChild(
+            correctAnswer
+        );
+
+
+        /*
+        --------------------------------------------------
+        Explicação
+        --------------------------------------------------
+        */
+
+        let explanation =
+            null;
+
+
+        if (
+            question.explanation
+        ) {
+
+            explanation =
+                document.createElement(
+                    "div"
+                );
+
+
+            explanation.className =
+                "result-question-explanation";
+
+
+            const explanationTitle =
+                document.createElement(
+                    "strong"
+                );
+
+
+            explanationTitle.textContent =
+                "Explanation";
+
+
+            const explanationText =
+                document.createElement(
+                    "p"
+                );
+
+
+            explanationText.innerHTML =
+                this.formatText(
+                    question.explanation
+                );
+
+
+            explanation.appendChild(
+                explanationTitle
+            );
+
+            explanation.appendChild(
+                explanationText
+            );
+
+        }
+
+
+        item.appendChild(
+            header
+        );
+
+        item.appendChild(
+            text
+        );
+
+        item.appendChild(
+            answers
+        );
+
+
+        if (explanation) {
+
+            item.appendChild(
+                explanation
+            );
+
+        }
+
+
+        return item;
+
+    }
+
+
+    /*
+    ======================================================
+    AÇÕES
+    ======================================================
+    */
+
+    createActions() {
+
+        const actions =
+            document.createElement(
+                "div"
+            );
+
+
+        actions.className =
+            "result-actions";
+
+
+        /*
+        --------------------------------------------------
+        Novo exame
+        --------------------------------------------------
+        */
+
+        const restartButton =
+            document.createElement(
+                "button"
+            );
+
+
+        restartButton.type =
+            "button";
+
+        restartButton.className =
+            "btn btn-primary";
+
+        restartButton.textContent =
+            "NEW EXAM";
+
+
+        restartButton.addEventListener(
+            "click",
+            () => {
+
+                this.hide();
+
+
+                if (
+                    this.onRestart
+                ) {
+
+                    this.onRestart(
+                        this.result
+                    );
+
+                }
+
+            }
+        );
+
+
+        /*
+        --------------------------------------------------
+        Fechar
+        --------------------------------------------------
+        */
+
+        const closeButton =
+            document.createElement(
+                "button"
+            );
+
+
+        closeButton.type =
+            "button";
+
+        closeButton.className =
+            "btn btn-secondary";
+
+        closeButton.textContent =
+            "CLOSE";
+
+
+        closeButton.addEventListener(
+            "click",
+            () => {
+
+                this.hide();
+
+
+                if (
+                    this.onClose
+                ) {
+
+                    this.onClose(
+                        this.result
+                    );
+
+                }
+
+            }
+        );
+
+
+        actions.appendChild(
+            restartButton
+        );
+
+        actions.appendChild(
+            closeButton
+        );
+
+
+        return actions;
+
+    }
+
+
+    /*
+    ======================================================
+    MOSTRAR
     ======================================================
     */
 
     show() {
 
         if (!this.container) {
+
             return;
+
         }
 
-        this.container.classList.remove("hidden");
 
-        this.container.style.display = "";
+        this.container.classList.remove(
+            "hidden"
+        );
 
-        this.container.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
+
+        this.container.classList.add(
+            "active"
+        );
+
+
+        document.body.classList.add(
+            "result-open"
+        );
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
 
     }
 
+
     /*
     ======================================================
-    OCULTAR
+    ESCONDER
     ======================================================
     */
 
     hide() {
 
         if (!this.container) {
+
             return;
+
         }
 
-        this.container.classList.add("hidden");
+
+        this.container.classList.remove(
+            "active"
+        );
+
+
+        this.container.classList.add(
+            "hidden"
+        );
+
+
+        document.body.classList.remove(
+            "result-open"
+        );
 
     }
+
 
     /*
     ======================================================
@@ -744,155 +1538,188 @@ class ResultRenderer {
 
         this.result = null;
 
-        if (this.elements.percentage) {
-            this.elements.percentage.textContent = "0%";
-        }
 
-        if (this.elements.status) {
+        if (this.container) {
 
-            this.elements.status.textContent = "";
-
-            this.elements.status.classList.remove(
-                "passed",
-                "failed"
-            );
+            this.container.innerHTML =
+                "";
 
         }
 
-        if (this.elements.correct) {
-            this.elements.correct.textContent = "0";
-        }
 
-        if (this.elements.incorrect) {
-            this.elements.incorrect.textContent = "0";
-        }
-
-        if (this.elements.unanswered) {
-            this.elements.unanswered.textContent = "0";
-        }
-
-        if (this.elements.total) {
-            this.elements.total.textContent = "0";
-        }
-
-        if (this.elements.time) {
-            this.elements.time.textContent = "00:00";
-        }
-
-        if (this.elements.domains) {
-            this.elements.domains.innerHTML = "";
-        }
-
-        if (this.elements.questions) {
-            this.elements.questions.innerHTML = "";
-        }
+        this.hide();
 
     }
 
+
     /*
     ======================================================
-    CALLBACKS
+    FORMATAR IDS DE RESPOSTA
     ======================================================
     */
 
-    setOnClose(callback) {
+    formatAnswerIds(
+        answers
+    ) {
 
-        if (typeof callback === "function") {
-            this.onClose = callback;
+        if (
+            !Array.isArray(answers) ||
+            answers.length === 0
+        ) {
+
+            return "No answer";
+
         }
+
+
+        return answers
+            .map(
+                answer =>
+                    this.escapeHTML(
+                        String(answer)
+                    )
+            )
+            .join(", ");
 
     }
 
-    setOnRestart(callback) {
-
-        if (typeof callback === "function") {
-            this.onRestart = callback;
-        }
-
-    }
 
     /*
     ======================================================
-    UTILITÁRIOS
+    TEMPO
     ======================================================
     */
 
     formatTime(seconds) {
 
-        seconds = Number(seconds);
+        seconds =
+            Math.max(
+                0,
+                Math.floor(
+                    Number(seconds) || 0
+                )
+            );
 
-        if (!Number.isFinite(seconds) || seconds < 0) {
-            seconds = 0;
-        }
 
-        const hours = Math.floor(seconds / 3600);
+        const hours =
+            Math.floor(
+                seconds / 3600
+            );
 
-        const minutes = Math.floor(
-            (seconds % 3600) / 60
-        );
 
-        const secs = Math.floor(
-            seconds % 60
-        );
+        const minutes =
+            Math.floor(
+                (seconds % 3600) /
+                60
+            );
+
+
+        const remainingSeconds =
+            seconds % 60;
+
 
         if (hours > 0) {
 
             return (
-                String(hours).padStart(2, "0") +
+                String(hours)
+                    .padStart(2, "0") +
                 ":" +
-                String(minutes).padStart(2, "0") +
+                String(minutes)
+                    .padStart(2, "0") +
                 ":" +
-                String(secs).padStart(2, "0")
+                String(
+                    remainingSeconds
+                ).padStart(2, "0")
             );
 
         }
 
+
         return (
-            String(minutes).padStart(2, "0") +
+            String(minutes)
+                .padStart(2, "0") +
             ":" +
-            String(secs).padStart(2, "0")
+            String(
+                remainingSeconds
+            ).padStart(2, "0")
         );
 
     }
 
-    formatText(text) {
+
+    /*
+    ======================================================
+    FORMATAÇÃO
+    ======================================================
+    */
+
+    formatText(value) {
 
         if (
-            text === null ||
-            text === undefined
+            value === undefined ||
+            value === null
         ) {
 
             return "";
 
         }
 
-        return String(text).trim();
+
+        return this.escapeHTML(
+            String(value)
+        )
+            .replace(
+                /\n/g,
+                "<br>"
+            )
+            .replace(
+                /`([^`]+)`/g,
+                "<code>$1</code>"
+            );
 
     }
 
-    escapeHTML(text) {
 
-        if (
-            text === null ||
-            text === undefined
-        ) {
+    /*
+    ======================================================
+    ESCAPE HTML
+    ======================================================
+    */
 
-            return "";
+    escapeHTML(value) {
 
-        }
-
-        return String(text)
-
-            .replace(/&/g, "&amp;")
-
-            .replace(/</g, "&lt;")
-
-            .replace(/>/g, "&gt;")
-
-            .replace(/"/g, "&quot;")
-
-            .replace(/'/g, "&#39;");
+        return String(value)
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
 
     }
 
 }
+
+
+/*
+==========================================================
+Disponibilização global
+==========================================================
+*/
+
+window.ResultRenderer =
+    ResultRenderer;
